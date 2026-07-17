@@ -13,9 +13,13 @@ import {
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
-import { ShoppingCart, Search, TrendingUp, DollarSign, Package } from 'lucide-react'
+import { ShoppingCart, Search } from 'lucide-react'
 import { ExcelImportDialog } from '@/components/excel-import-dialog'
 import { PurchaseRowActions } from '@/components/purchase-row-actions'
+import { CreatePurchaseDialog } from '@/components/create-purchase-dialog'
+import { SalesKpiCards } from '@/components/sales-kpi-cards'
+import { SalesByUf } from '@/components/sales-by-uf'
+import { AiInsightsPanel } from '@/components/ai-insights-panel'
 
 const fmtCurrency = (v: number | undefined) => `R$ ${(v || 0).toFixed(2)}`
 
@@ -30,77 +34,46 @@ export default function Purchases() {
   useRealtime('purchases', loadData)
   useRealtime('leads', loadData)
 
-  const filtered = purchases.filter((p) => {
+  const filtered = useMemo(() => {
     const q = search.toLowerCase()
-    return (
-      p.expand?.lead_id?.name?.toLowerCase().includes(q) ||
-      p.product_name?.toLowerCase().includes(q) ||
-      p.invoice_number?.toLowerCase().includes(q)
+    return purchases.filter(
+      (p) =>
+        p.expand?.lead_id?.name?.toLowerCase().includes(q) ||
+        p.product_name?.toLowerCase().includes(q) ||
+        p.invoice_number?.toLowerCase().includes(q),
     )
-  })
-
-  const stats = useMemo(() => {
-    const revenue = purchases.reduce((s, p) => s + (p.grand_total || p.total_price || 0), 0)
-    const avg = purchases.length > 0 ? revenue / purchases.length : 0
-    return { count: purchases.length, revenue, avg }
-  }, [purchases])
+  }, [purchases, search])
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="bg-primary/20 p-2 rounded-xl text-primary">
-          <ShoppingCart className="w-6 h-6" />
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="flex items-center gap-3">
+          <div className="bg-primary/20 p-2 rounded-xl text-primary">
+            <ShoppingCart className="w-6 h-6" />
+          </div>
+          <h2 className="text-2xl font-bold">Todas as Vendas</h2>
         </div>
-        <h2 className="text-2xl font-bold">Todas as Vendas</h2>
+        <div className="flex gap-2">
+          <ExcelImportDialog onImported={loadData} />
+          <CreatePurchaseDialog onCreated={loadData} />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="border-none shadow-subtle">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="bg-primary/10 p-2 rounded-lg text-primary">
-              <Package className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Total de Vendas</p>
-              <p className="text-xl font-bold">{stats.count}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-subtle">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="bg-green-500/10 p-2 rounded-lg text-green-600">
-              <DollarSign className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Receita Total</p>
-              <p className="text-xl font-bold">{fmtCurrency(stats.revenue)}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-subtle">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="bg-orange-500/10 p-2 rounded-lg text-orange-600">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Ticket Médio</p>
-              <p className="text-xl font-bold">{fmtCurrency(stats.avg)}</p>
-            </div>
-          </CardContent>
-        </Card>
+      <SalesKpiCards purchases={purchases} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <SalesByUf purchases={purchases} />
+        <AiInsightsPanel />
       </div>
 
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por cliente, produto ou NF..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-card border-none shadow-subtle rounded-xl"
-          />
-        </div>
-        <ExcelImportDialog onImported={loadData} />
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder="Buscar por cliente, produto ou NF..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9 bg-card border-none shadow-subtle rounded-xl"
+        />
       </div>
 
       <Card className="border-none shadow-subtle overflow-hidden">
@@ -187,7 +160,7 @@ export default function Purchases() {
                     <TableCell colSpan={17} className="text-center py-12 text-muted-foreground">
                       <ShoppingCart className="w-12 h-12 mx-auto mb-3 opacity-30" />
                       <p className="font-medium">Nenhuma venda encontrada.</p>
-                      <p className="text-sm">Importe um arquivo Excel para começar.</p>
+                      <p className="text-sm">Importe um Excel ou registre uma venda manualmente.</p>
                     </TableCell>
                   </TableRow>
                 )}

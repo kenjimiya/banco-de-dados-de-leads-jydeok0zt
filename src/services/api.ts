@@ -60,6 +60,12 @@ export const createPurchase = async (data: Partial<Purchase>) => {
   return purchase
 }
 
+export const getSalesInsights = async () => {
+  return pb.send('/backend/v1/sales-insights', { method: 'POST' }) as Promise<{
+    insights: string
+  }>
+}
+
 export const askAnalyst = async (message: string, conversationId: string | null = null) => {
   return pb.send('/backend/v1/ask-analyst', {
     method: 'POST',
