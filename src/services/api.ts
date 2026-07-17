@@ -33,6 +33,13 @@ export interface Purchase extends RecordModel {
   }
 }
 
+export interface ProposalItem {
+  quantity: number
+  description: string
+  unit_price: number
+  total_price: number
+}
+
 export interface Proposal extends RecordModel {
   lead_id: string
   title: string
@@ -40,6 +47,11 @@ export interface Proposal extends RecordModel {
   status: 'rascunho' | 'enviado' | 'aceito' | 'recusado'
   total_value: number
   expiry_date: string
+  items: ProposalItem[]
+  payment_condition: string
+  delivery_time: string
+  composition: string
+  freight_info: string
   expand?: {
     lead_id: Lead
   }

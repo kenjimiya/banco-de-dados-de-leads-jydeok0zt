@@ -29,8 +29,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { format } from 'date-fns'
-import { FileText, MoreVertical, Pencil, Trash2 } from 'lucide-react'
+import { FileText, MoreVertical, Pencil, Trash2, FileDown } from 'lucide-react'
 import { ProposalFormDialog } from '@/components/proposal-form-dialog'
+import { exportProposalPDF } from '@/lib/proposal-pdf'
 import { useToast } from '@/hooks/use-toast'
 
 const STATUS_COLORS: Record<string, string> = {
@@ -130,6 +131,9 @@ export default function Propostas() {
                             }}
                           >
                             <Pencil className="w-4 h-4 mr-2" /> Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => exportProposalPDF(p, p.expand?.lead_id)}>
+                            <FileDown className="w-4 h-4 mr-2" /> Exportar PDF
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => setDelTarget(p)}

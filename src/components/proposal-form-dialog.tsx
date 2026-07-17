@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -17,11 +17,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { createProposal, updateProposal, getLead, type Lead, type Proposal } from '@/services/api'
+import {
+  createProposal,
+  updateProposal,
+  getLead,
+  type Lead,
+  type Proposal,
+  type ProposalItem,
+} from '@/services/api'
 import { useToast } from '@/hooks/use-toast'
 import { Plus, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { LeadSelect } from './lead-select'
+import { ProposalItemsTable } from './proposal-items-table'
+
+const DEFAULT_FREIGHT = 'FOB – Favor indicar a transportadora de sua preferência'
 
 interface ProposalFormDialogProps {
   proposal?: Proposal | null
@@ -43,30 +53,37 @@ export function ProposalFormDialog({
   const setOpen = onOpenChange ?? setInternalOpen
   const [saving, setSaving] = useState(false)
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
+  const [items, setItems] = useState<ProposalItem[]>([])
   const [form, setForm] = useState<Record<string, string>>({})
 
   useEffect(() => {
     if (!open) return
-    if (proposal?.expand?.lead_id) {
-      setSelectedLead(proposal.expand.lead_id)
-    } else if (proposal?.lead_id) {
+    if (proposal?.expand?.lead_id) setSelectedLead(proposal.expand.lead_id)
+    else if (proposal?.lead_id)
       getLead(proposal.lead_id)
         .then(setSelectedLead)
         .catch(() => {})
-    } else {
-      setSelectedLead(null)
-    }
+    else setSelectedLead(null)
+    setItems(
+      proposal?.items?.length
+        ? proposal.items
+        : [{ quantity: 1, description: '', unit_price: 0, total_price: 0 }],
+    )
     setForm({
       title: proposal?.title || '',
       description: proposal?.description || '',
       status: proposal?.status || 'rascunho',
-      total_value: String(proposal?.total_value ?? ''),
       expiry_date: proposal?.expiry_date
         ? format(new Date(proposal.expiry_date), 'yyyy-MM-dd')
         : '',
+      payment_condition: proposal?.payment_condition || '28DDL',
+      delivery_time: proposal?.delivery_time || 'A Combinar',
+      composition: proposal?.composition || '',
+      freight_info: proposal?.freight_info || DEFAULT_FREIGHT,
     })
   }, [open, proposal])
 
+  const grandTotal = useMemo(() => items.reduce((s, i) => s + (i.total_price || 0), 0), [items])
   const set = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }))
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,8 +103,13 @@ export function ProposalFormDialog({
         title: form.title,
         description: form.description || '',
         status: form.status || 'rascunho',
-        total_value: Number(form.total_value) || 0,
+        total_value: grandTotal,
         expiry_date: form.expiry_date ? new Date(form.expiry_date).toISOString() : '',
+        items: items.filter((i) => i.description.trim()),
+        payment_condition: form.payment_condition || '',
+        delivery_time: form.delivery_time || '',
+        composition: form.composition || '',
+        freight_info: form.freight_info || DEFAULT_FREIGHT,
       }
       if (isEdit && proposal) {
         await updateProposal(proposal.id, data)
@@ -113,7 +135,7 @@ export function ProposalFormDialog({
           </Button>
         </DialogTrigger>
       )}
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Editar Proposta' : 'Nova Proposta'}</DialogTitle>
         </DialogHeader>
@@ -131,12 +153,8 @@ export function ProposalFormDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Descrição</Label>
-            <Textarea
-              value={form.description || ''}
-              onChange={(e) => set('description', e.target.value)}
-              rows={3}
-            />
+            <Label>Itens da Proposta</Label>
+            <ProposalItemsTable items={items} onChange={setItems} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
@@ -154,22 +172,46 @@ export function ProposalFormDialog({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Valor Total (R$)</Label>
+              <Label>Validade</Label>
               <Input
-                type="number"
-                min="0"
-                step="0.01"
-                value={form.total_value || ''}
-                onChange={(e) => set('total_value', e.target.value)}
+                type="date"
+                value={form.expiry_date || ''}
+                onChange={(e) => set('expiry_date', e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label>Condição de Pagamento</Label>
+              <Input
+                value={form.payment_condition || ''}
+                onChange={(e) => set('payment_condition', e.target.value)}
+                placeholder="Ex: 28DDL"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Prazo de Entrega</Label>
+              <Input
+                value={form.delivery_time || ''}
+                onChange={(e) => set('delivery_time', e.target.value)}
+                placeholder="Ex: A Combinar"
               />
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label>Validade</Label>
+            <Label>Composição da Proposta</Label>
+            <Textarea
+              value={form.composition || ''}
+              onChange={(e) => set('composition', e.target.value)}
+              rows={3}
+              placeholder="Descreva a composição técnica da proposta..."
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Frete</Label>
             <Input
-              type="date"
-              value={form.expiry_date || ''}
-              onChange={(e) => set('expiry_date', e.target.value)}
+              value={form.freight_info || ''}
+              onChange={(e) => set('freight_info', e.target.value)}
             />
           </div>
           <Button type="submit" className="w-full" disabled={saving}>
