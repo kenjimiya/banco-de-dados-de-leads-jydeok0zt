@@ -33,9 +33,21 @@ export interface Purchase extends RecordModel {
   }
 }
 
+export interface Proposal extends RecordModel {
+  lead_id: string
+  title: string
+  description: string
+  status: 'rascunho' | 'enviado' | 'aceito' | 'recusado'
+  total_value: number
+  expiry_date: string
+  expand?: {
+    lead_id: Lead
+  }
+}
+
 export const getLeads = () => pb.collection<Lead>('leads').getFullList({ sort: '-created' })
 export const getLead = (id: string) => pb.collection<Lead>('leads').getOne(id)
-export const createLead = (data: Partial<Lead>) => pb.collection('leads').create(data)
+export const createLead = (data: Partial<Lead>) => pb.collection<Lead>('leads').create(data)
 export const updateLead = (id: string, data: Partial<Lead>) =>
   pb.collection('leads').update(id, data)
 
@@ -106,3 +118,14 @@ async function recalculateLeadTotals(leadId: string) {
     // Lead may have been cascade-deleted — safe to ignore
   }
 }
+
+export const getProposals = () =>
+  pb.collection<Proposal>('proposals').getFullList({ sort: '-created', expand: 'lead_id' })
+
+export const createProposal = (data: Partial<Proposal>) =>
+  pb.collection<Proposal>('proposals').create(data)
+
+export const updateProposal = (id: string, data: Partial<Proposal>) =>
+  pb.collection<Proposal>('proposals').update(id, data)
+
+export const deleteProposal = (id: string) => pb.collection('proposals').delete(id)

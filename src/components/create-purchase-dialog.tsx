@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { createPurchase, getLeads, type Lead } from '@/services/api'
+import { QuickCreateLeadDialog } from './quick-create-lead-dialog'
 import { useToast } from '@/hooks/use-toast'
 import { Plus, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -178,6 +179,17 @@ export function CreatePurchaseDialog({ onCreated }: { onCreated: () => void }) {
                 </Command>
               </PopoverContent>
             </Popover>
+            <QuickCreateLeadDialog
+              onCreated={(lead) => {
+                setLeads((prev) => [...prev, lead])
+                setSelectedLead(lead)
+              }}
+              trigger={
+                <Button type="button" variant="link" size="sm" className="p-0 h-auto">
+                  + Cadastrar novo cliente
+                </Button>
+              }
+            />
           </div>
           <div className="space-y-2">
             <Label>Produto *</Label>

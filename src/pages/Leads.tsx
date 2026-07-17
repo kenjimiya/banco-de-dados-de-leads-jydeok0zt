@@ -80,7 +80,7 @@ export default function Leads() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-2xl font-bold">Gestão de Leads</h2>
+        <h2 className="text-2xl font-bold">Gestão de Clientes</h2>
         <div className="flex gap-2 w-full sm:w-auto">
           <div className="relative flex-1 sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -95,12 +95,12 @@ export default function Leads() {
           <Sheet open={isAddOpen} onOpenChange={setIsAddOpen}>
             <SheetTrigger asChild>
               <Button className="rounded-xl shadow-elevation">
-                <Plus className="w-4 h-4 mr-2" /> Novo Lead
+                <Plus className="w-4 h-4 mr-2" /> Novo Cliente
               </Button>
             </SheetTrigger>
             <SheetContent className="sm:max-w-md">
               <SheetHeader>
-                <SheetTitle>Adicionar Novo Lead</SheetTitle>
+                <SheetTitle>Adicionar Novo Cliente</SheetTitle>
               </SheetHeader>
               <form onSubmit={handleAddLead} className="space-y-4 mt-6">
                 <div className="space-y-2">

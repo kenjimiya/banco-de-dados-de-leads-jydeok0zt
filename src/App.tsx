@@ -9,6 +9,7 @@ import Index from '@/pages/Index'
 import Leads from '@/pages/Leads'
 import LeadDetail from '@/pages/LeadDetail'
 import Purchases from '@/pages/Purchases'
+import Propostas from '@/pages/Propostas'
 import Login from '@/pages/Login'
 import NotFound from '@/pages/NotFound'
 
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="/leads" element={<Leads />} />
             <Route path="/leads/:id" element={<LeadDetail />} />
             <Route path="/vendas" element={<Purchases />} />
+            <Route path="/propostas" element={<Propostas />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
