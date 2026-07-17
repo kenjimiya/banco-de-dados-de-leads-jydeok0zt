@@ -66,3 +66,37 @@ export const askAnalyst = async (message: string, conversationId: string | null 
     body: JSON.stringify({ message, conversation_id: conversationId }),
   })
 }
+
+export const updatePurchase = async (id: string, data: Partial<Purchase>) => {
+  const purchase = await pb.collection<Purchase>('purchases').update(id, data)
+  if (purchase.lead_id) {
+    await recalculateLeadTotals(purchase.lead_id)
+  }
+  return purchase
+}
+
+export const deletePurchase = async (id: string, leadId: string) => {
+  await pb.collection('purchases').delete(id)
+  await recalculateLeadTotals(leadId)
+}
+
+export const deleteLead = async (id: string) => {
+  await pb.collection('leads').delete(id)
+}
+
+async function recalculateLeadTotals(leadId: string) {
+  try {
+    const purchases = await pb
+      .collection<Purchase>('purchases')
+      .getFullList({ filter: `lead_id = "${leadId}"`, sort: '-purchase_date' })
+    const totalSpent = purchases.reduce((sum, p) => sum + (p.grand_total || p.total_price || 0), 0)
+    const lastPurchaseDate = purchases.length > 0 ? purchases[0].purchase_date : ''
+    await updateLead(leadId, {
+      total_spent: totalSpent,
+      last_purchase_date: lastPurchaseDate,
+      status: purchases.length > 0 ? 'cliente' : 'novo',
+    })
+  } catch {
+    // Lead may have been cascade-deleted — safe to ignore
+  }
+}

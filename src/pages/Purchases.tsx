@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { ShoppingCart, Search, TrendingUp, DollarSign, Package } from 'lucide-react'
 import { ExcelImportDialog } from '@/components/excel-import-dialog'
+import { PurchaseRowActions } from '@/components/purchase-row-actions'
 
 const fmtCurrency = (v: number | undefined) => `R$ ${(v || 0).toFixed(2)}`
 
@@ -27,6 +28,7 @@ export default function Purchases() {
     loadData()
   }, [])
   useRealtime('purchases', loadData)
+  useRealtime('leads', loadData)
 
   const filtered = purchases.filter((p) => {
     const q = search.toLowerCase()
@@ -123,6 +125,7 @@ export default function Purchases() {
                   <TableHead className="whitespace-nowrap text-right">Frete</TableHead>
                   <TableHead className="whitespace-nowrap text-right">Total c/ Frete</TableHead>
                   <TableHead className="whitespace-nowrap text-right">Prazo</TableHead>
+                  <TableHead className="whitespace-nowrap text-center">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -174,11 +177,14 @@ export default function Purchases() {
                     <TableCell className="whitespace-nowrap text-right text-muted-foreground">
                       {p.payment_term || 0} dias
                     </TableCell>
+                    <TableCell className="whitespace-nowrap text-center">
+                      <PurchaseRowActions purchase={p} />
+                    </TableCell>
                   </TableRow>
                 ))}
                 {filtered.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={16} className="text-center py-12 text-muted-foreground">
+                    <TableCell colSpan={17} className="text-center py-12 text-muted-foreground">
                       <ShoppingCart className="w-12 h-12 mx-auto mb-3 opacity-30" />
                       <p className="font-medium">Nenhuma venda encontrada.</p>
                       <p className="text-sm">Importe um arquivo Excel para começar.</p>
