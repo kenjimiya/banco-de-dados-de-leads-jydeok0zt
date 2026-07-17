@@ -26,6 +26,7 @@ import {
 import { format } from 'date-fns'
 import { Search, Plus } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { ExcelImportDialog } from '@/components/excel-import-dialog'
 
 const STATUS_COLORS = {
   novo: 'bg-gray-100 text-gray-700',
@@ -86,7 +87,9 @@ export default function Leads() {
               className="pl-9 bg-card border-none shadow-subtle rounded-xl"
             />
           </div>
+          <ExcelImportDialog onImported={loadData} />
           <Sheet open={isAddOpen} onOpenChange={setIsAddOpen}>
+            {' '}
             <SheetTrigger asChild>
               <Button className="rounded-xl shadow-elevation">
                 <Plus className="w-4 h-4 mr-2" /> Novo Lead
