@@ -50,8 +50,8 @@ export function ExcelImportDialog({ onImported }: { onImported: () => void }) {
 
   const handleFile = useCallback(
     async (file: File) => {
-      if (!file.name.match(/\.(xlsx|xls)$/i)) {
-        setErrorMsg('Formato inválido. Use arquivos .xlsx ou .xls.')
+      if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
+        setErrorMsg('Formato inválido. Use arquivos .xlsx, .xls ou .csv.')
         setStep('error')
         return
       }
@@ -123,11 +123,13 @@ export function ExcelImportDialog({ onImported }: { onImported: () => void }) {
               <FileSpreadsheet className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
               <p className="font-medium">Arraste seu arquivo Excel aqui</p>
               <p className="text-sm text-muted-foreground mt-1">ou clique para selecionar</p>
-              <p className="text-xs text-muted-foreground mt-3">Formatos suportados: .xlsx, .xls</p>
+              <p className="text-xs text-muted-foreground mt-3">
+                Formatos suportados: .xlsx, .xls, .csv
+              </p>
               <input
                 ref={inputRef}
                 type="file"
-                accept=".xlsx,.xls"
+                accept=".xlsx,.xls,.csv"
                 className="hidden"
                 onChange={(e) => {
                   const f = e.target.files?.[0]

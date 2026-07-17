@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-17T14:09:19.329Z",
+  "generatedAt": "2026-07-17T18:17:46.863Z",
   "collections": [
     {
       "name": "users",
@@ -119,11 +119,25 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "uf",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "activity",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
         "CREATE INDEX idx_leads_status ON leads (status)",
-        "CREATE INDEX idx_leads_last_purchase ON leads (last_purchase_date)"
+        "CREATE INDEX idx_leads_last_purchase ON leads (last_purchase_date)",
+        "CREATE INDEX `idx_leads_uf` ON `leads` (uf)",
+        "CREATE INDEX `idx_leads_activity` ON `leads` (activity)"
       ]
     },
     {
@@ -187,6 +201,54 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "sale_type",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "invoice_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pi_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "raw_material_cost",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_cost",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "shipping_cost",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "grand_total",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "payment_term",
+          "type": "number",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_purchases_lead_id ON purchases (lead_id)"]

@@ -9,12 +9,12 @@ import {
   Purchase,
 } from '@/services/api'
 import { useRealtime } from '@/hooks/use-realtime'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Sparkles, Plus, Send } from 'lucide-react'
+import { ArrowLeft, Sparkles, Plus, Send, MapPin, Briefcase } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -28,6 +28,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
+
+const fmtCurrency = (v: number | undefined) => `R$ ${(v || 0).toFixed(2)}`
 
 export default function LeadDetail() {
   const { id } = useParams()
@@ -82,7 +84,7 @@ export default function LeadDetail() {
       const res = await askAnalyst(`Sobre o lead ${lead?.name} (ID: ${lead?.id}): ${msg}`, convId)
       setConvId(res.conversation_id)
       setChatLog((prev) => [...prev, { role: 'agent', content: res.content }])
-    } catch (e) {
+    } catch {
       setChatLog((prev) => [
         ...prev,
         { role: 'agent', content: 'Desculpe, ocorreu um erro na análise.' },
@@ -104,7 +106,6 @@ export default function LeadDetail() {
       </Button>
 
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Profile Sidebar */}
         <Card className="w-full md:w-1/3 border-none shadow-subtle h-fit">
           <CardContent className="p-6 text-center space-y-4">
             <Avatar className="w-24 h-24 mx-auto border-4 border-secondary">
@@ -114,13 +115,23 @@ export default function LeadDetail() {
             </Avatar>
             <div>
               <h2 className="text-2xl font-bold">{lead.name}</h2>
-              <p className="text-muted-foreground">{lead.email}</p>
+              <p className="text-muted-foreground">{lead.email || 'Sem email'}</p>
               <p className="text-muted-foreground text-sm">{lead.phone || 'Sem telefone'}</p>
             </div>
-            <div className="flex justify-center gap-2">
+            <div className="flex justify-center flex-wrap gap-2">
               <Badge className="bg-accent/20 text-accent-foreground hover:bg-accent/30 border-none px-4 py-1">
                 {lead.status.toUpperCase()}
               </Badge>
+              {lead.uf && (
+                <Badge variant="outline" className="px-3 py-1 gap-1">
+                  <MapPin className="w-3 h-3" /> {lead.uf}
+                </Badge>
+              )}
+              {lead.activity && (
+                <Badge variant="outline" className="px-3 py-1 gap-1">
+                  <Briefcase className="w-3 h-3" /> {lead.activity}
+                </Badge>
+              )}
             </div>
             <div className="pt-4 border-t border-border/50 text-left">
               <p className="text-sm text-muted-foreground">Total Gasto</p>
@@ -129,7 +140,6 @@ export default function LeadDetail() {
           </CardContent>
         </Card>
 
-        {/* Main Content Area */}
         <Card className="flex-1 border-none shadow-subtle">
           <CardContent className="p-6">
             <Tabs defaultValue="history" className="w-full">
@@ -188,37 +198,66 @@ export default function LeadDetail() {
                 </div>
 
                 <div className="rounded-xl border border-border/50 overflow-hidden">
-                  <Table>
-                    <TableHeader className="bg-secondary/30">
-                      <TableRow className="border-border/50">
-                        <TableHead>Data</TableHead>
-                        <TableHead>Produto</TableHead>
-                        <TableHead className="text-right">Qtd</TableHead>
-                        <TableHead className="text-right">Total</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {purchases.map((p) => (
-                        <TableRow key={p.id} className="border-border/50">
-                          <TableCell className="text-muted-foreground">
-                            {format(new Date(p.purchase_date), 'dd/MM/yyyy')}
-                          </TableCell>
-                          <TableCell className="font-medium">{p.product_name}</TableCell>
-                          <TableCell className="text-right">{p.quantity}</TableCell>
-                          <TableCell className="text-right font-semibold">
-                            R$ {p.total_price.toFixed(2)}
-                          </TableCell>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader className="bg-secondary/30">
+                        <TableRow className="border-border/50">
+                          <TableHead className="whitespace-nowrap">Data</TableHead>
+                          <TableHead className="whitespace-nowrap">Tipo</TableHead>
+                          <TableHead className="whitespace-nowrap">NF</TableHead>
+                          <TableHead className="whitespace-nowrap">Produto</TableHead>
+                          <TableHead className="whitespace-nowrap text-right">Qtd</TableHead>
+                          <TableHead className="whitespace-nowrap text-right">Vlr Unid</TableHead>
+                          <TableHead className="whitespace-nowrap text-right">Total</TableHead>
+                          <TableHead className="whitespace-nowrap text-right">
+                            Total c/ Frete
+                          </TableHead>
                         </TableRow>
-                      ))}
-                      {purchases.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={4} className="text-center py-4 text-muted-foreground">
-                            Nenhuma compra registrada.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {purchases.map((p) => (
+                          <TableRow key={p.id} className="border-border/50">
+                            <TableCell className="whitespace-nowrap text-muted-foreground">
+                              {format(new Date(p.purchase_date), 'dd/MM/yyyy')}
+                            </TableCell>
+                            <TableCell className="whitespace-nowrap">
+                              <Badge variant={p.sale_type === 'VENDA' ? 'default' : 'secondary'}>
+                                {p.sale_type || '-'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="whitespace-nowrap text-muted-foreground">
+                              {p.invoice_number || '-'}
+                            </TableCell>
+                            <TableCell className="whitespace-nowrap font-medium">
+                              {p.product_name}
+                            </TableCell>
+                            <TableCell className="whitespace-nowrap text-right">
+                              {p.quantity}
+                            </TableCell>
+                            <TableCell className="whitespace-nowrap text-right">
+                              {fmtCurrency(p.unit_price)}
+                            </TableCell>
+                            <TableCell className="whitespace-nowrap text-right font-semibold">
+                              {fmtCurrency(p.total_price)}
+                            </TableCell>
+                            <TableCell className="whitespace-nowrap text-right font-bold text-primary">
+                              {fmtCurrency(p.grand_total)}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {purchases.length === 0 && (
+                          <TableRow>
+                            <TableCell
+                              colSpan={8}
+                              className="text-center py-4 text-muted-foreground"
+                            >
+                              Nenhuma compra registrada.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               </TabsContent>
 

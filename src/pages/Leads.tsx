@@ -51,7 +51,9 @@ export default function Leads() {
   const filteredLeads = leads.filter(
     (l) =>
       l.name.toLowerCase().includes(search.toLowerCase()) ||
-      l.email.toLowerCase().includes(search.toLowerCase()),
+      l.email.toLowerCase().includes(search.toLowerCase()) ||
+      (l.uf || '').toLowerCase().includes(search.toLowerCase()) ||
+      (l.activity || '').toLowerCase().includes(search.toLowerCase()),
   )
 
   const handleAddLead = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -63,12 +65,14 @@ export default function Leads() {
         email: fd.get('email') as string,
         phone: fd.get('phone') as string,
         status: fd.get('status') as Lead['status'],
+        uf: fd.get('uf') as string,
+        activity: fd.get('activity') as string,
         notes: '',
         total_spent: 0,
       })
       setIsAddOpen(false)
       toast({ title: 'Lead adicionado com sucesso!' })
-    } catch (err) {
+    } catch {
       toast({ title: 'Erro ao adicionar', variant: 'destructive' })
     }
   }
@@ -89,7 +93,6 @@ export default function Leads() {
           </div>
           <ExcelImportDialog onImported={loadData} />
           <Sheet open={isAddOpen} onOpenChange={setIsAddOpen}>
-            {' '}
             <SheetTrigger asChild>
               <Button className="rounded-xl shadow-elevation">
                 <Plus className="w-4 h-4 mr-2" /> Novo Lead
@@ -106,11 +109,21 @@ export default function Leads() {
                 </div>
                 <div className="space-y-2">
                   <Label>Email</Label>
-                  <Input name="email" type="email" required />
+                  <Input name="email" type="email" />
                 </div>
                 <div className="space-y-2">
                   <Label>Telefone</Label>
                   <Input name="phone" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>UF</Label>
+                    <Input name="uf" placeholder="Ex: SC" maxLength={3} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Atividade</Label>
+                    <Input name="activity" placeholder="Ex: MOVELEIRO" />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Status</Label>
@@ -141,6 +154,8 @@ export default function Leads() {
             <TableHeader className="bg-secondary/50">
               <TableRow className="border-none hover:bg-transparent">
                 <TableHead>Nome</TableHead>
+                <TableHead className="hidden md:table-cell">UF</TableHead>
+                <TableHead className="hidden md:table-cell">Atividade</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="hidden md:table-cell">Última Compra</TableHead>
                 <TableHead className="text-right">Valor Gasto</TableHead>
@@ -158,6 +173,12 @@ export default function Leads() {
                     <div className="text-xs text-muted-foreground font-normal md:hidden">
                       {lead.email}
                     </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell text-muted-foreground">
+                    {lead.uf || '-'}
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell text-muted-foreground">
+                    {lead.activity || '-'}
                   </TableCell>
                   <TableCell>
                     <Badge
@@ -179,7 +200,7 @@ export default function Leads() {
               ))}
               {filteredLeads.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                     Nenhum lead encontrado.
                   </TableCell>
                 </TableRow>
