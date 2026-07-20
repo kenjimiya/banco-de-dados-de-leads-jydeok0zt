@@ -34,7 +34,8 @@ const DEFAULT_TERMS = {
   payment_condition: '28DDL',
   delivery_time: 'A combinar',
   validity: 'Proposta válida por 15 dias, a contar da data de emissão',
-  guarantee: 'Garantimos os equipamentos objetos desta proposta por um período de 06 meses, contra eventuais defeitos de fabricação, exceto materiais elétricos e pneumáticos (quando aplicado), por serem produtos de qualidade c/ garantia própria;',
+  guarantee:
+    'Garantimos os equipamentos objetos desta proposta por um período de 06 meses, contra eventuais defeitos de fabricação, exceto materiais elétricos e pneumáticos (quando aplicado), por serem produtos de qualidade c/ garantia própria;',
 }
 
 interface PatFormDialogProps {
@@ -214,13 +215,17 @@ export function PatFormDialog({
           </div>
 
           <div className="pt-2">
-            <Label className="text-base font-semibold text-primary mb-2 block">1. Itens e Laudo Técnico</Label>
+            <Label className="text-base font-semibold text-primary mb-2 block">
+              1. Itens e Laudo Técnico
+            </Label>
             <PatItemsTable items={items} onChange={setItems} />
           </div>
 
           <div className="pt-4 space-y-4">
-            <Label className="text-base font-semibold text-primary block">2. Termos e Condições</Label>
-            
+            <Label className="text-base font-semibold text-primary block">
+              2. Termos e Condições
+            </Label>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label>Prazo de Entrega</Label>
@@ -237,7 +242,7 @@ export function PatFormDialog({
                 />
               </div>
             </div>
-            
+
             <div className="space-y-1.5">
               <Label>Validade da Proposta</Label>
               <Input
@@ -245,7 +250,7 @@ export function PatFormDialog({
                 onChange={(e) => set('validity', e.target.value)}
               />
             </div>
-            
+
             <div className="space-y-1.5">
               <Label>Garantia</Label>
               <Textarea
@@ -256,18 +261,6 @@ export function PatFormDialog({
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={saving}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="rascunho">Rascunho</SelectItem>
-                <SelectItem value="enviado">Enviado</SelectItem>
-                <SelectItem value="aceito">Aceito</SelectItem>
-                <SelectItem value="recusado">Recusado</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
           <Button type="submit" className="w-full" disabled={saving}>
             {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             {isEdit ? 'Salvar Alterações' : 'Criar PAT'}
