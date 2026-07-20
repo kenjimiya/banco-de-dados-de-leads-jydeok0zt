@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { format, isValid, parseISO } from 'date-fns'
-import { ShoppingCart, Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
+import { ShoppingCart, Search, ArrowUpDown, ArrowUp, ArrowDown, X } from 'lucide-react'
 import { ExcelImportDialog } from '@/components/excel-import-dialog'
 import { PurchaseRowActions } from '@/components/purchase-row-actions'
 import { CreatePurchaseDialog } from '@/components/create-purchase-dialog'
@@ -72,10 +72,7 @@ export default function Purchases() {
           </div>
           <h2 className="text-2xl font-bold">Todas as Vendas</h2>
         </div>
-        <div className="flex gap-2">
-          <ExcelImportDialog onImported={loadData} />
-          <CreatePurchaseDialog onCreated={loadData} />
-        </div>
+        <ExcelImportDialog onImported={loadData} />
       </div>
 
       <SalesKpiCards purchases={purchases} />
@@ -85,15 +82,42 @@ export default function Purchases() {
         <AiInsightsPanel />
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar por cliente, produto ou NF..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 bg-card border-none shadow-subtle rounded-xl"
-        />
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por cliente, produto ou NF..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 pr-9 bg-card border-none shadow-subtle rounded-xl"
+          />
+          {search && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSearch('')}
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
+              title="Apagar Filtro"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setSearch('')}
+          disabled={!search}
+          className="rounded-xl whitespace-nowrap"
+        >
+          <X className="w-4 h-4 mr-1" /> Apagar Filtro
+        </Button>
+        <CreatePurchaseDialog onCreated={loadData} />
       </div>
+
+      <p className="text-sm text-muted-foreground">
+        Total de vendas: <span className="font-semibold text-foreground">{filtered.length}</span>
+      </p>
 
       <Card className="border-none shadow-subtle overflow-hidden">
         <CardContent className="p-0">
