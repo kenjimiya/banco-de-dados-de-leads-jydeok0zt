@@ -17,7 +17,7 @@ const NavItems = [
   { to: '/', icon: Home, label: 'Dashboard' },
   { to: '/leads', icon: Users, label: 'Clientes' },
   { to: '/vendas', icon: ShoppingCart, label: 'Vendas' },
-  { to: '/propostas', icon: FileText, label: 'Propostas' },
+  { to: '/propostas', icon: FileText, label: 'Propostas Comerciais (PCS)' },
 ]
 
 export default function Layout() {

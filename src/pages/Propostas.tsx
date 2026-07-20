@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getProposals, deleteProposal, type Proposal } from '@/services/api'
+import { getProposals, deleteProposal, updateProposal, type Proposal } from '@/services/api'
 import { useRealtime } from '@/hooks/use-realtime'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -30,6 +30,13 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { format } from 'date-fns'
 import { FileText, MoreVertical, Pencil, Trash2, FileDown } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { ProposalFormDialog } from '@/components/proposal-form-dialog'
 import { exportProposalPDF } from '@/lib/proposal-pdf'
 import { useToast } from '@/hooks/use-toast'
@@ -76,7 +83,7 @@ export default function Propostas() {
           <div className="bg-primary/20 p-2 rounded-xl text-primary">
             <FileText className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl font-bold">Propostas</h2>
+          <h2 className="text-2xl font-bold">Propostas Comerciais (PCS)</h2>
         </div>
         <ProposalFormDialog onSaved={loadData} />
       </div>
@@ -103,12 +110,29 @@ export default function Propostas() {
                     </TableCell>
                     <TableCell>{p.title}</TableCell>
                     <TableCell>
-                      <Badge
-                        variant="secondary"
-                        className={`border-none ${STATUS_COLORS[p.status] || ''}`}
+                      <Select
+                        value={p.status}
+                        onValueChange={async (newStatus) => {
+                          if (newStatus === p.status) return
+                          try {
+                            await updateProposal(p.id, { status: newStatus as Proposal['status'] })
+                            toast({ title: 'Status atualizado com sucesso!' })
+                            loadData()
+                          } catch {
+                            toast({ title: 'Erro ao atualizar status', variant: 'destructive' })
+                          }
+                        }}
                       >
-                        {p.status.toUpperCase()}
-                      </Badge>
+                        <SelectTrigger className="w-[130px] h-8">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="rascunho">Rascunho</SelectItem>
+                          <SelectItem value="enviado">Enviado</SelectItem>
+                          <SelectItem value="aceito">Aceito</SelectItem>
+                          <SelectItem value="recusado">Recusado</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell className="text-right font-semibold text-primary">
                       {fmtCurrency(p.total_value)}

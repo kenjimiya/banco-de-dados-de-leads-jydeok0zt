@@ -21,7 +21,6 @@ import { CreatePurchaseDialog } from '@/components/create-purchase-dialog'
 import { SalesKpiCards } from '@/components/sales-kpi-cards'
 import { SalesByUf } from '@/components/sales-by-uf'
 import { MonthlyRevenueDashboard } from '@/components/monthly-revenue-dashboard'
-import { AiInsightsPanel } from '@/components/ai-insights-panel'
 
 const fmtCurrency = (v: number | undefined) =>
   `R$ ${(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -80,10 +79,7 @@ export default function Purchases() {
 
       <SalesKpiCards purchases={filtered} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <SalesByUf purchases={purchases} />
-        <AiInsightsPanel />
-      </div>
+      <SalesByUf purchases={purchases} />
 
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
