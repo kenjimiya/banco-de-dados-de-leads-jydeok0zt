@@ -28,6 +28,14 @@ import { useToast } from '@/hooks/use-toast'
 import { Plus, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { LeadSelect } from './lead-select'
+import { PatItemsTable } from './pat-items-table'
+
+const DEFAULT_TERMS = {
+  payment_condition: '28DDL',
+  delivery_time: 'A combinar',
+  validity: 'Proposta válida por 15 dias, a contar da data de emissão',
+  guarantee: 'Garantimos os equipamentos objetos desta proposta por um período de 06 meses, contra eventuais defeitos de fabricação, exceto materiais elétricos e pneumáticos (quando aplicado), por serem produtos de qualidade c/ garantia própria;',
+}
 
 interface PatFormDialogProps {
   proposal?: TechnicalProposal | null
@@ -49,6 +57,7 @@ export function PatFormDialog({
   const setOpen = onOpenChange ?? setInternalOpen
   const [saving, setSaving] = useState(false)
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
+  const [items, setItems] = useState<any[]>([])
   const [form, setForm] = useState<Record<string, string>>({})
 
   useEffect(() => {
@@ -59,18 +68,38 @@ export function PatFormDialog({
         .then(setSelectedLead)
         .catch(() => {})
     else setSelectedLead(null)
+    setItems(
+      proposal?.items?.length
+        ? proposal.items
+        : [
+            {
+              description: '',
+              serial_number: '',
+              manufacture_date: '',
+              defect: '',
+              solution: '',
+              unit_price: 0,
+              quantity: 1,
+              total_price: 0,
+            },
+          ],
+    )
     setForm({
       proposal_number: proposal?.proposal_number || '',
+      revision: proposal?.revision || '00',
       invoice_number: proposal?.invoice_number || '',
       date: proposal?.date
         ? format(new Date(proposal.date), 'yyyy-MM-dd')
         : format(new Date(), 'yyyy-MM-dd'),
-      defect: proposal?.defect || '',
-      solution: proposal?.solution || '',
-      total_price: proposal?.total_price != null ? String(proposal.total_price) : '',
       status: proposal?.status || 'rascunho',
+      payment_condition: proposal?.payment_condition || DEFAULT_TERMS.payment_condition,
+      delivery_time: proposal?.delivery_time || DEFAULT_TERMS.delivery_time,
+      validity: proposal?.validity || DEFAULT_TERMS.validity,
+      guarantee: proposal?.guarantee || DEFAULT_TERMS.guarantee,
     })
   }, [open, proposal])
+
+  const grandTotal = items.reduce((sum, item) => sum + (item.total_price || 0), 0)
 
   const set = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }))
 
@@ -85,12 +114,18 @@ export function PatFormDialog({
       const data = {
         lead_id: selectedLead.id,
         proposal_number: form.proposal_number || '',
+        revision: form.revision || '00',
         invoice_number: form.invoice_number || '',
         date: form.date ? new Date(form.date).toISOString() : '',
-        defect: form.defect || '',
-        solution: form.solution || '',
-        total_price: Number(form.total_price) || 0,
+        total_price: grandTotal,
         status: form.status || 'rascunho',
+        items: items,
+        payment_condition: form.payment_condition || '',
+        delivery_time: form.delivery_time || '',
+        validity: form.validity || '',
+        guarantee: form.guarantee || '',
+        defect: '', // Legacy
+        solution: '', // Legacy
       }
       if (isEdit && proposal) {
         await updateTechnicalProposal(proposal.id, data)
@@ -116,7 +151,7 @@ export function PatFormDialog({
           </Button>
         </DialogTrigger>
       )}
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isEdit ? 'Editar PAT' : 'Nova Proposta de Assistência Técnica'}
@@ -127,66 +162,101 @@ export function PatFormDialog({
             <Label>Cliente *</Label>
             <LeadSelect value={selectedLead} onChange={setSelectedLead} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1.5">
               <Label>Nº Proposta</Label>
               <Input
                 value={form.proposal_number || ''}
                 onChange={(e) => set('proposal_number', e.target.value)}
-                placeholder="Ex: PAT-001"
+                placeholder="Ex: 001/26"
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Nº Nota Fiscal</Label>
+              <Label>Revisão</Label>
               <Input
-                value={form.invoice_number || ''}
-                onChange={(e) => set('invoice_number', e.target.value)}
-                placeholder="Ex: NF-12345"
+                value={form.revision || ''}
+                onChange={(e) => set('revision', e.target.value)}
+                placeholder="Ex: 00"
               />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Status</Label>
+              <Select value={form.status} onValueChange={(v) => set('status', v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="rascunho">Rascunho</SelectItem>
+                  <SelectItem value="enviado">Enviado</SelectItem>
+                  <SelectItem value="aceito">Aceito</SelectItem>
+                  <SelectItem value="recusado">Recusado</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>Data</Label>
+              <Label>Nº Nota Fiscal (Remessa)</Label>
+              <Input
+                value={form.invoice_number || ''}
+                onChange={(e) => set('invoice_number', e.target.value)}
+                placeholder="Ex: 375928"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Data de Emissão (PAT)</Label>
               <Input
                 type="date"
                 value={form.date || ''}
                 onChange={(e) => set('date', e.target.value)}
               />
             </div>
+          </div>
+
+          <div className="pt-2">
+            <Label className="text-base font-semibold text-primary mb-2 block">1. Itens e Laudo Técnico</Label>
+            <PatItemsTable items={items} onChange={setItems} />
+          </div>
+
+          <div className="pt-4 space-y-4">
+            <Label className="text-base font-semibold text-primary block">2. Termos e Condições</Label>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Prazo de Entrega</Label>
+                <Input
+                  value={form.delivery_time || ''}
+                  onChange={(e) => set('delivery_time', e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Condição de Pagamento</Label>
+                <Input
+                  value={form.payment_condition || ''}
+                  onChange={(e) => set('payment_condition', e.target.value)}
+                />
+              </div>
+            </div>
+            
             <div className="space-y-1.5">
-              <Label>Preço (R$)</Label>
+              <Label>Validade da Proposta</Label>
               <Input
-                type="number"
-                step="0.01"
-                min="0"
-                value={form.total_price || ''}
-                onChange={(e) => set('total_price', e.target.value)}
-                placeholder="0,00"
+                value={form.validity || ''}
+                onChange={(e) => set('validity', e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-1.5">
+              <Label>Garantia</Label>
+              <Textarea
+                value={form.guarantee || ''}
+                onChange={(e) => set('guarantee', e.target.value)}
+                rows={2}
               />
             </div>
           </div>
-          <div className="space-y-1.5">
-            <Label>Defeito</Label>
-            <Textarea
-              value={form.defect || ''}
-              onChange={(e) => set('defect', e.target.value)}
-              rows={3}
-              placeholder="Descreva o defeito apresentado..."
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Solução</Label>
-            <Textarea
-              value={form.solution || ''}
-              onChange={(e) => set('solution', e.target.value)}
-              rows={3}
-              placeholder="Descreva a solução proposta..."
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Status</Label>
-            <Select value={form.status} onValueChange={(v) => set('status', v)}>
+
+          <Button type="submit" className="w-full" disabled={saving}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

@@ -8,65 +8,172 @@ export function exportPatPDF(proposal: TechnicalProposal, lead?: Lead) {
   const leadEmail = lead?.email || proposal.expand?.lead_id?.email || ''
   const leadPhone = lead?.phone || proposal.expand?.lead_id?.phone || ''
   const leadUF = lead?.uf || proposal.expand?.lead_id?.uf || ''
-  const leadActivity = lead?.activity || proposal.expand?.lead_id?.activity || ''
   const dateStr = proposal.date
     ? new Date(proposal.date).toLocaleDateString('pt-BR')
     : new Date().toLocaleDateString('pt-BR')
+
+  const items = proposal.items || []
+
+  const itemsHtml = items
+    .map(
+      (item, index) => `
+    <tbody>
+      <tr class="item-header">
+        <td style="width: 50px; font-weight: bold; text-align: center;">ITEM</td>
+        <td style="width: 50px; font-weight: bold; text-align: center;">${index + 1}</td>
+        <td style="font-weight: bold; text-align: center;">DESCRIÇÃO:</td>
+        <td style="width: 80px; font-weight: bold; text-align: center;">Nº Série:</td>
+        <td style="width: 120px; font-weight: bold; text-align: center;">Data de Fabricação:</td>
+      </tr>
+      <tr>
+        <td colspan="2"></td>
+        <td style="text-align: center;">${item.description || '-'}</td>
+        <td style="text-align: center;">${item.serial_number || '-'}</td>
+        <td style="text-align: center;">${item.manufacture_date ? new Date(item.manufacture_date).toLocaleDateString('pt-BR') : '-'}</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="font-weight: bold; text-align: center; vertical-align: middle;">DEFEITO</td>
+        <td colspan="2" style="white-space: pre-wrap; vertical-align: top;">${item.defect || '-'}</td>
+        <td style="font-weight: bold; text-align: center; vertical-align: middle; background-color: #f2f2f2;">VALOR UNIT.(R$)</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="font-weight: bold; text-align: center; vertical-align: middle;">SOLUÇÃO</td>
+        <td colspan="2" style="white-space: pre-wrap; vertical-align: top;">${item.solution || '-'}</td>
+        <td style="text-align: right; vertical-align: middle;">${fmtCurrency(item.unit_price || 0)}</td>
+      </tr>
+      <tr>
+        <td colspan="4" style="text-align: right; font-weight: bold;">SUBTOTAL ${index + 1}:</td>
+        <td style="text-align: right; font-weight: bold; background-color: #e8ebf5;">${fmtCurrency(item.total_price || 0)}</td>
+      </tr>
+    </tbody>
+  `,
+    )
+    .join('')
 
   const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
 <title>PAT ${proposal.proposal_number || ''}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;font-size:12px;color:#333;padding:20px}
-.header{display:flex;justify-content:space-between;border-bottom:2px solid #1a56db;padding-bottom:15px;margin-bottom:20px}
-.company-name{font-size:18px;font-weight:bold;color:#1a56db}
-.company-info{font-size:11px;color:#666;margin-top:4px}
-.section{margin-bottom:15px}
-.section-title{font-size:13px;font-weight:bold;color:#1a56db;margin-bottom:8px;border-bottom:1px solid #ddd;padding-bottom:3px}
-table{width:100%;border-collapse:collapse;margin-bottom:10px}
-td{padding:6px 8px;border-bottom:1px solid #ddd}
-.total-row{font-weight:bold;font-size:14px;background:#f0f4ff}
-.terms{font-size:11px;line-height:1.6;list-style:none}
-.terms li{margin-bottom:4px}
+body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:20px}
+.header-table{width:100%;border-collapse:collapse;margin-bottom:10px}
+.header-table td{border:1px solid #000;padding:4px}
+.logo-cell{width:250px;text-align:center;vertical-align:middle;}
+.title-cell{text-align:center;font-weight:bold;font-size:14px;color:#1e3a8a;}
+.pat-cell{text-align:center;font-weight:bold;font-size:12px;color:#1e3a8a;}
+.address{font-style:italic;font-size:9px;margin-bottom:15px}
+.info-table{width:100%;border-collapse:collapse;margin-bottom:15px}
+.info-table td{border:1px solid #000;padding:4px 6px;}
+.label{font-weight:bold;color:#1e3a8a;width:120px;}
+.section-title{font-size:12px;font-weight:bold;color:#1e3a8a;margin-top:15px;margin-bottom:5px;text-transform:uppercase;}
+.tech-table{width:100%;border-collapse:collapse;margin-bottom:15px;border:2px solid #000;}
+.tech-table td{border:1px solid #000;padding:4px;}
+.item-header{background-color:#cdd4ea;}
+.grand-total{font-weight:bold;font-size:12px;}
+.text-block{line-height:1.4;margin-bottom:15px;text-align:justify;}
 @media print{body{padding:0}}
 </style></head><body>
-<div class="header"><div>
-<div class="company-name">Sigma Transformadores Ltda</div>
-<div class="company-info">Mauro Miyawaki — Gerente Comercial</div>
-<div class="company-info">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
-</div><div style="text-align:right">
-<div style="font-size:14px;font-weight:bold">PROPOSTA DE ASSISTÊNCIA TÉCNICA</div>
-<div class="company-info">Nº ${proposal.proposal_number || '—'}</div>
-<div class="company-info">Data: ${dateStr}</div>
-</div></div>
-<div class="section"><div class="section-title">Dados do Cliente</div>
-<table>
-<tr><td style="width:120px;font-weight:bold">Cliente:</td><td>${leadName}</td><td style="width:80px;font-weight:bold">UF:</td><td>${leadUF || '—'}</td></tr>
-<tr><td style="font-weight:bold">Atividade:</td><td>${leadActivity || '—'}</td><td style="font-weight:bold">Telefone:</td><td>${leadPhone || '—'}</td></tr>
-<tr><td style="font-weight:bold">Email:</td><td colspan="3">${leadEmail || '—'}</td></tr>
-</table></div>
-<div class="section"><div class="section-title">Informações da Nota Fiscal</div>
-<table>
-<tr><td style="width:120px;font-weight:bold">Nº Proposta:</td><td>${proposal.proposal_number || '—'}</td><td style="width:120px;font-weight:bold">Nº Nota Fiscal:</td><td>${proposal.invoice_number || '—'}</td></tr>
-<tr><td style="font-weight:bold">Data:</td><td>${dateStr}</td><td style="font-weight:bold">Status:</td><td>${(proposal.status || '').toUpperCase()}</td></tr>
-</table></div>
-<div class="section"><div class="section-title">Descrição do Defeito</div>
-<p style="line-height:1.6;white-space:pre-wrap">${proposal.defect || 'Não informado.'}</p></div>
-<div class="section"><div class="section-title">Solução Proposta</div>
-<p style="line-height:1.6;white-space:pre-wrap">${proposal.solution || 'Não informado.'}</p></div>
-<div class="section">
-<table><tbody>
-<tr class="total-row"><td style="text-align:right">PREÇO TOTAL:</td><td style="text-align:right;width:150px">${fmtCurrency(proposal.total_price || 0)}</td></tr>
-</tbody></table></div>
-<div class="section"><div class="section-title">Termos e Condições</div>
-<ul class="terms">
-<li><strong>Valor Total:</strong> ${fmtCurrency(proposal.total_price || 0)}</li>
-<li><strong>Garantia:</strong> Garantimos o serviço executado por 03 meses contra eventuais defeitos.</li>
-<li><strong>Validade:</strong> 5 dias a contar da data de emissão.</li>
-</ul></div>
-<p style="margin-top:20px;font-size:10px;color:#999;text-align:center">
-Obrigado pela oportunidade. Aguardamos a confirmação do serviço.<br>
-Atenciosamente, Mauro Miyawaki — Gerente Comercial — Sigma Transformadores Ltda</p>
+
+<table class="header-table">
+  <tr>
+    <td rowspan="2" class="logo-cell">
+      <!-- Placeholder for Sigma Logo -->
+      <h1 style="color:#333;font-size:24px;margin:0;">Sigma</h1>
+      <div style="font-size:8px;font-weight:bold;">TRANSFORMADORES LTDA</div>
+    </td>
+    <td class="title-cell">PROPOSTA DE ASSISTÊNCIA TÉCNICA</td>
+    <td style="text-align:center;width:100px;"><b>Data:</b></td>
+  </tr>
+  <tr>
+    <td class="pat-cell">PAT &nbsp;&nbsp; ${proposal.proposal_number || '---'} &nbsp;&nbsp; Rev.${proposal.revision || '00'}</td>
+    <td style="text-align:center;font-weight:bold;color:#1e3a8a;">${dateStr}</td>
+  </tr>
+</table>
+<div class="address">Avenida dos Bosques, 1231 — São José dos Pinhais / Paraná / Brasil — CEP 83.075-180</div>
+
+<table class="info-table">
+  <tr>
+    <td class="label">RAZÃO SOCIAL:</td>
+    <td colspan="3">${leadName}</td>
+  </tr>
+  <tr>
+    <td class="label">ENDEREÇO:</td>
+    <td>-</td>
+    <td class="label" style="width:80px;">CEP:</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td class="label">CIDADE:</td>
+    <td>-</td>
+    <td class="label">BAIRRO:</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td class="label">EMAIL:</td>
+    <td>${leadEmail}</td>
+    <td class="label">TELEFONE:</td>
+    <td>${leadPhone}</td>
+  </tr>
+</table>
+
+<div class="section-title">1-DESCRIÇÃO DA PROPOSTA:</div>
+<div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+  <span>Conforme o envio de remessa de bens próprios para conserto</span>
+  <table style="border-collapse:collapse;">
+    <tr>
+      <td style="border:1px solid #000;padding:2px 10px;font-weight:bold;">Nfe</td>
+      <td style="border:1px solid #000;padding:2px 10px;text-align:right;">${proposal.invoice_number || '-'}</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #000;padding:2px 10px;font-weight:bold;">Data:</td>
+      <td style="border:1px solid #000;padding:2px 10px;text-align:right;">${dateStr}</td>
+    </tr>
+  </table>
+</div>
+<div style="font-weight:bold;margin-bottom:5px;">Segue o laudo técnico:</div>
+
+<table class="tech-table">
+  ${itemsHtml}
+  <tr>
+    <td colspan="4" style="text-align:right;font-weight:bold;font-size:12px;padding:6px;">TOTAL R$</td>
+    <td style="text-align:right;font-weight:bold;font-size:12px;padding:6px;background-color:#e8ebf5;">${fmtCurrency(proposal.total_price || 0)}</td>
+  </tr>
+</table>
+
+<div class="section-title">2-ESCOPO DA PROPOSTA:</div>
+<div class="text-block">
+  Conserto do(s) equipamento(s) relacionado(s) na Descrição da proposta (Item 1) para posterior instalação pela equipe de manutenção elétrica do cliente ou empresa terceirizada autorizada, contando com manual de instalação do equipamento, assim como as devidas identificações no equipamento e suporte via telefone da Sigma Transformadores LTDA.<br><br>
+  Caso haja necessidade de deslocamento técnico por parte da Sigma Transformadores, a mesma será por conta e ordem do cliente, assim como alimentação e hospedagem.
+</div>
+
+<div class="section-title">3- BENEFÍCIOS DA PROPOSTA:</div>
+<div class="text-block">
+  Ao adquirir um produto Sigma Transformadores, além da superior performance, qualidade e design, você conta com o melhor atendimento pós-venda.<br>
+  Através de sua Assistência Técnica Autorizada, responsável por um atendimento de credibilidade e empatia, onde você encontra preço justo e profissionais treinados para realizar o melhor serviço dentro e fora de garantia.
+</div>
+
+<div class="section-title">4- TERMOS E CONDIÇÕES:</div>
+<div class="text-block">
+  <b>DAS CONDIÇÕES:</b><br>
+  Prevalecem as Condições Gerais de Fornecimento da Associação Brasileira da Indústria de Máquinas e Equipamentos, departamento Nacional de Máquinas e Ferramentas;<br><br>
+  
+  <table style="width:100%;border:none;margin-bottom:10px;">
+    <tr><td style="width:200px;font-weight:bold;">VALOR TOTAL DA PROPOSTA:</td><td style="font-weight:bold;">${fmtCurrency(proposal.total_price || 0)}</td></tr>
+    <tr><td style="font-weight:bold;">PRAZO DE ENTREGA:</td><td>${proposal.delivery_time || 'A combinar'}</td></tr>
+    <tr><td style="font-weight:bold;">COND. PAGAMENTO:</td><td>${proposal.payment_condition || '28DDL'}</td></tr>
+    <tr><td style="font-weight:bold;">IMPOSTOS:</td><td>Inclusos (Empresa optante pelo regime SIMPLES);</td></tr>
+    <tr><td style="font-weight:bold;">VALIDADE DA PROPOSTA:</td><td>${proposal.validity || 'Proposta válida por 15 dias, a contar da data de emissão'}</td></tr>
+  </table>
+
+  <b>GARANTIA:</b><br>
+  ${proposal.guarantee || 'Garantimos os equipamentos objetos desta proposta por um período de 06 meses, contra eventuais defeitos de fabricação, exceto materiais elétricos e pneumáticos (quando aplicado), por serem produtos de qualidade c/ garantia própria;'}<br><br>
+
+  <b>FRETE/SEGURO:</b><br>
+  FOB (favor informar qual a transportadora de sua preferência);<br><br>
+
+  <b>CONDIÇÕES PROPOSTA/SEGURO:</b><br>
+  Esta proposta uma vez dada como aceita, sendo a mesma firmada e reconhecida e aceita pelas partes de competência, passa automaticamente a ter cunho e força de pedido, prevalecendo sobre a mesma todas às garantias cabíveis a uma transação mercantil, sendo amparada pelos itens tabulados no anverso do pedido de produtos Sigma Transformadores;
+</div>
+
 </body></html>`
 
   const win = window.open('', '_blank')

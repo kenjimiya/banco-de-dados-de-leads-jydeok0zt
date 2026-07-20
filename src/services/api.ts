@@ -70,6 +70,16 @@ export const getLeadPurchases = (leadId: string) =>
     .collection<Purchase>('purchases')
     .getFullList({ filter: `lead_id = "${leadId}"`, sort: '-purchase_date' })
 
+export const getLeadProposals = (leadId: string) =>
+  pb
+    .collection<Proposal>('proposals')
+    .getFullList({ filter: `lead_id = "${leadId}"`, sort: '-created' })
+
+export const getLeadTechnicalProposals = (leadId: string) =>
+  pb
+    .collection<TechnicalProposal>('technical_proposals')
+    .getFullList({ filter: `lead_id = "${leadId}"`, sort: '-created' })
+
 export const createPurchase = async (data: Partial<Purchase>) => {
   const purchase = await pb.collection('purchases').create(data)
   if (data.lead_id) {
@@ -142,15 +152,32 @@ export const updateProposal = (id: string, data: Partial<Proposal>) =>
 
 export const deleteProposal = (id: string) => pb.collection('proposals').delete(id)
 
+export interface TechnicalProposalItem {
+  description: string
+  serial_number: string
+  manufacture_date: string
+  defect: string
+  solution: string
+  unit_price: number
+  quantity: number
+  total_price: number
+}
+
 export interface TechnicalProposal extends RecordModel {
   lead_id: string
   proposal_number: string
+  revision: string
   invoice_number: string
   date: string
   defect: string
   solution: string
   total_price: number
   status: 'rascunho' | 'enviado' | 'aceito' | 'recusado'
+  items: TechnicalProposalItem[]
+  payment_condition: string
+  delivery_time: string
+  validity: string
+  guarantee: string
   expand?: {
     lead_id: Lead
   }

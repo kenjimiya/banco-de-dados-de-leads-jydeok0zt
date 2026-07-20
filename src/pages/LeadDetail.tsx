@@ -3,10 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom'
 import {
   getLead,
   getLeadPurchases,
+  getLeadProposals,
+  getLeadTechnicalProposals,
   createPurchase,
   askAnalyst,
   Lead,
   Purchase,
+  Proposal,
+  TechnicalProposal,
 } from '@/services/api'
 import { useRealtime } from '@/hooks/use-realtime'
 import { Card, CardContent } from '@/components/ui/card'
@@ -35,6 +39,8 @@ export default function LeadDetail() {
   const navigate = useNavigate()
   const [lead, setLead] = useState<Lead | null>(null)
   const [purchases, setPurchases] = useState<Purchase[]>([])
+  const [proposals, setProposals] = useState<Proposal[]>([])
+  const [patProposals, setPatProposals] = useState<TechnicalProposal[]>([])
   const [isPurchaseOpen, setIsPurchaseOpen] = useState(false)
   const [chatLog, setChatLog] = useState<{ role: 'user' | 'agent'; content: string }[]>([])
   const [chatInput, setChatInput] = useState('')
@@ -46,6 +52,8 @@ export default function LeadDetail() {
     try {
       setLead(await getLead(id))
       setPurchases(await getLeadPurchases(id))
+      setProposals(await getLeadProposals(id))
+      setPatProposals(await getLeadTechnicalProposals(id))
     } catch {
       navigate('/leads')
     }
@@ -56,6 +64,38 @@ export default function LeadDetail() {
   }, [id])
   useRealtime('leads', loadData)
   useRealtime('purchases', loadData)
+  useRealtime('proposals', loadData)
+  useRealtime('technical_proposals', loadData)
+
+  const unifiedHistory = [
+    ...purchases.map((p) => ({
+      id: p.id,
+      type: 'Venda' as const,
+      date: p.purchase_date,
+      title: p.product_name,
+      status: p.sale_type || 'VENDA',
+      value: p.grand_total || p.total_price || 0,
+      link: '/vendas',
+    })),
+    ...proposals.map((p) => ({
+      id: p.id,
+      type: 'Proposta Comercial' as const,
+      date: p.created,
+      title: p.title,
+      status: p.status,
+      value: p.total_value || 0,
+      link: '/propostas',
+    })),
+    ...patProposals.map((p) => ({
+      id: p.id,
+      type: 'Assistência Técnica' as const,
+      date: p.date || p.created,
+      title: p.proposal_number || 'PAT',
+      status: p.status,
+      value: p.total_price || 0,
+      link: '/pat',
+    })),
+  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   const handleAddPurchase = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -144,7 +184,7 @@ export default function LeadDetail() {
             <Tabs defaultValue="history" className="w-full">
               <TabsList className="mb-6 bg-secondary/50 rounded-xl p-1">
                 <TabsTrigger value="history" className="rounded-lg">
-                  Histórico de Compras
+                  Histórico Unificado
                 </TabsTrigger>
                 <TabsTrigger
                   value="insights"
@@ -156,7 +196,7 @@ export default function LeadDetail() {
 
               <TabsContent value="history" className="space-y-4">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-semibold text-lg">Transações</h3>
+                  <h3 className="font-semibold text-lg">Histórico do Cliente</h3>
                   <Sheet open={isPurchaseOpen} onOpenChange={setIsPurchaseOpen}>
                     <SheetTrigger asChild>
                       <Button size="sm" className="rounded-xl">
@@ -203,54 +243,57 @@ export default function LeadDetail() {
                         <TableRow className="border-border/50">
                           <TableHead className="whitespace-nowrap">Data</TableHead>
                           <TableHead className="whitespace-nowrap">Tipo</TableHead>
-                          <TableHead className="whitespace-nowrap">NF</TableHead>
-                          <TableHead className="whitespace-nowrap">Produto</TableHead>
-                          <TableHead className="whitespace-nowrap text-right">Qtd</TableHead>
-                          <TableHead className="whitespace-nowrap text-right">Vlr Unid</TableHead>
-                          <TableHead className="whitespace-nowrap text-right">Total</TableHead>
-                          <TableHead className="whitespace-nowrap text-right">
-                            Total c/ Frete
-                          </TableHead>
+                          <TableHead className="whitespace-nowrap">Título/Produto</TableHead>
+                          <TableHead className="whitespace-nowrap">Status</TableHead>
+                          <TableHead className="whitespace-nowrap text-right">Valor</TableHead>
+                          <TableHead className="whitespace-nowrap text-center">Ação</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {purchases.map((p) => (
-                          <TableRow key={p.id} className="border-border/50">
+                        {unifiedHistory.map((item) => (
+                          <TableRow key={`${item.type}-${item.id}`} className="border-border/50">
                             <TableCell className="whitespace-nowrap text-muted-foreground">
-                              {format(new Date(p.purchase_date), 'dd/MM/yyyy')}
+                              {item.date ? format(new Date(item.date), 'dd/MM/yyyy') : '-'}
                             </TableCell>
                             <TableCell className="whitespace-nowrap">
-                              <Badge variant={p.sale_type === 'VENDA' ? 'default' : 'secondary'}>
-                                {p.sale_type || '-'}
+                              <Badge
+                                variant="outline"
+                                className={
+                                  item.type === 'Venda'
+                                    ? 'border-green-500 text-green-600'
+                                    : item.type === 'Proposta Comercial'
+                                      ? 'border-blue-500 text-blue-600'
+                                      : 'border-orange-500 text-orange-600'
+                                }
+                              >
+                                {item.type}
                               </Badge>
                             </TableCell>
-                            <TableCell className="whitespace-nowrap text-muted-foreground">
-                              {p.invoice_number || '-'}
-                            </TableCell>
                             <TableCell className="whitespace-nowrap font-medium">
-                              {p.product_name}
+                              {item.title}
                             </TableCell>
-                            <TableCell className="whitespace-nowrap text-right">
-                              {p.quantity}
+                            <TableCell className="whitespace-nowrap">
+                              <Badge variant="secondary" className="uppercase text-[10px]">
+                                {item.status}
+                              </Badge>
                             </TableCell>
-                            <TableCell className="whitespace-nowrap text-right">
-                              {fmtCurrency(p.unit_price)}
+                            <TableCell className="whitespace-nowrap text-right font-semibold text-primary">
+                              {fmtCurrency(item.value)}
                             </TableCell>
-                            <TableCell className="whitespace-nowrap text-right font-semibold">
-                              {fmtCurrency(p.total_price)}
-                            </TableCell>
-                            <TableCell className="whitespace-nowrap text-right font-bold text-primary">
-                              {fmtCurrency(p.grand_total)}
+                            <TableCell className="whitespace-nowrap text-center">
+                              <Button variant="ghost" size="sm" onClick={() => navigate(item.link)}>
+                                Ver
+                              </Button>
                             </TableCell>
                           </TableRow>
                         ))}
-                        {purchases.length === 0 && (
+                        {unifiedHistory.length === 0 && (
                           <TableRow>
                             <TableCell
-                              colSpan={8}
-                              className="text-center py-4 text-muted-foreground"
+                              colSpan={6}
+                              className="text-center py-8 text-muted-foreground"
                             >
-                              Nenhuma compra registrada.
+                              Nenhum histórico encontrado para este cliente.
                             </TableCell>
                           </TableRow>
                         )}
