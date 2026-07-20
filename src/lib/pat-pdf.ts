@@ -15,8 +15,25 @@ export function exportPatPDF(proposal: TechnicalProposal, lead?: Lead) {
   const items = proposal.items || []
 
   const itemsHtml = items
-    .map(
-      (item, index) => `
+    .map((item, index) => {
+      const diagnostics = item.diagnostics || []
+      const diagnosticsHtml = diagnostics
+        .map(
+          (diag: any, di: number) => `
+      <tr>
+        <td colspan="2" style="font-weight: bold; text-align: center; vertical-align: middle;">DEFEITO ${di + 1}</td>
+        <td colspan="2" style="white-space: pre-wrap; vertical-align: top;">${diag.defect || '-'}</td>
+        <td style="font-weight: bold; text-align: center; vertical-align: middle; background-color: #f2f2f2;">VALOR (R$)</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="font-weight: bold; text-align: center; vertical-align: middle;">SOLUÇÃO ${di + 1}</td>
+        <td colspan="2" style="white-space: pre-wrap; vertical-align: top;">${diag.solution || '-'}</td>
+        <td style="text-align: right; vertical-align: middle;">${fmtCurrency(diag.price || 0)}</td>
+      </tr>`,
+        )
+        .join('')
+
+      return `
     <tbody>
       <tr class="item-header">
         <td style="width: 50px; font-weight: bold; text-align: center;">ITEM</td>
@@ -31,23 +48,18 @@ export function exportPatPDF(proposal: TechnicalProposal, lead?: Lead) {
         <td style="text-align: center;">${item.serial_number || '-'}</td>
         <td style="text-align: center;">${item.manufacture_date ? new Date(item.manufacture_date).toLocaleDateString('pt-BR') : '-'}</td>
       </tr>
+      ${diagnosticsHtml}
       <tr>
-        <td colspan="2" style="font-weight: bold; text-align: center; vertical-align: middle;">DEFEITO</td>
-        <td colspan="2" style="white-space: pre-wrap; vertical-align: top;">${item.defect || '-'}</td>
-        <td style="font-weight: bold; text-align: center; vertical-align: middle; background-color: #f2f2f2;">VALOR UNIT.(R$)</td>
-      </tr>
-      <tr>
-        <td colspan="2" style="font-weight: bold; text-align: center; vertical-align: middle;">SOLUÇÃO</td>
-        <td colspan="2" style="white-space: pre-wrap; vertical-align: top;">${item.solution || '-'}</td>
-        <td style="text-align: right; vertical-align: middle;">${fmtCurrency(item.unit_price || 0)}</td>
+        <td colspan="4" style="text-align: right; font-weight: bold;">VALOR UNIT. (Qtd: ${item.quantity || 1}):</td>
+        <td style="text-align: right; font-weight: bold; background-color: #f0f0f0;">${fmtCurrency(item.unit_price || 0)}</td>
       </tr>
       <tr>
         <td colspan="4" style="text-align: right; font-weight: bold;">SUBTOTAL ${index + 1}:</td>
         <td style="text-align: right; font-weight: bold; background-color: #e8ebf5;">${fmtCurrency(item.total_price || 0)}</td>
       </tr>
     </tbody>
-  `,
-    )
+  `
+    })
     .join('')
 
   const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">

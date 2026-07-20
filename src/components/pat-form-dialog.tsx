@@ -71,14 +71,27 @@ export function PatFormDialog({
     else setSelectedLead(null)
     setItems(
       proposal?.items?.length
-        ? proposal.items
+        ? proposal.items.map((item: any) => ({
+            ...item,
+            diagnostics:
+              item.diagnostics && item.diagnostics.length > 0
+                ? item.diagnostics
+                : item.defect || item.solution
+                  ? [
+                      {
+                        defect: item.defect || '',
+                        solution: item.solution || '',
+                        price: item.unit_price || 0,
+                      },
+                    ]
+                  : [{ defect: '', solution: '', price: 0 }],
+          }))
         : [
             {
               description: '',
               serial_number: '',
               manufacture_date: '',
-              defect: '',
-              solution: '',
+              diagnostics: [{ defect: '', solution: '', price: 0 }],
               unit_price: 0,
               quantity: 1,
               total_price: 0,

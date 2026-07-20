@@ -7,6 +7,19 @@ import type { TechnicalProposalItem } from '@/services/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { fmtCurrency } from '@/lib/utils'
 
+interface Diagnostic {
+  defect: string
+  solution: string
+  price: number
+}
+
+function recalcItem(item: TechnicalProposalItem): TechnicalProposalItem {
+  const diagnostics: Diagnostic[] = item.diagnostics || []
+  const unitPrice = diagnostics.reduce((sum, d) => sum + (Number(d.price) || 0), 0)
+  const qty = Number(item.quantity) || 1
+  return { ...item, unit_price: unitPrice, total_price: unitPrice * qty }
+}
+
 export function PatItemsTable({
   items,
   onChange,
@@ -21,8 +34,7 @@ export function PatItemsTable({
         description: '',
         serial_number: '',
         manufacture_date: '',
-        defect: '',
-        solution: '',
+        diagnostics: [{ defect: '', solution: '', price: 0 }],
         unit_price: 0,
         quantity: 1,
         total_price: 0,
@@ -34,13 +46,48 @@ export function PatItemsTable({
   const updateItem = (index: number, field: keyof TechnicalProposalItem, value: string) => {
     const updated = [...items]
     const item = { ...updated[index] }
-    if (field === 'quantity' || field === 'unit_price') {
-      item[field] = Number(value) || 0
-      item.total_price = item.quantity * item.unit_price
+    if (field === 'quantity') {
+      item.quantity = Number(value) || 1
     } else {
       ;(item as any)[field] = value
     }
-    updated[index] = item
+    updated[index] = recalcItem(item)
+    onChange(updated)
+  }
+
+  const addDiagnostic = (itemIndex: number) => {
+    const updated = [...items]
+    const item = { ...updated[itemIndex] }
+    item.diagnostics = [...(item.diagnostics || []), { defect: '', solution: '', price: 0 }]
+    updated[itemIndex] = item
+    onChange(updated)
+  }
+
+  const removeDiagnostic = (itemIndex: number, diagIndex: number) => {
+    const updated = [...items]
+    const item = { ...updated[itemIndex] }
+    item.diagnostics = (item.diagnostics || []).filter((_, i) => i !== diagIndex)
+    updated[itemIndex] = recalcItem(item)
+    onChange(updated)
+  }
+
+  const updateDiagnostic = (
+    itemIndex: number,
+    diagIndex: number,
+    field: keyof Diagnostic,
+    value: string,
+  ) => {
+    const updated = [...items]
+    const item = { ...updated[itemIndex] }
+    item.diagnostics = [...(item.diagnostics || [])]
+    const diag = { ...item.diagnostics[diagIndex] }
+    if (field === 'price') {
+      diag.price = Number(value) || 0
+    } else {
+      ;(diag as any)[field] = value
+    }
+    item.diagnostics[diagIndex] = diag
+    updated[itemIndex] = recalcItem(item)
     onChange(updated)
   }
 
@@ -90,24 +137,62 @@ export function PatItemsTable({
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label>Defeito</Label>
-              <Textarea
-                value={item.defect}
-                onChange={(e) => updateItem(i, 'defect', e.target.value)}
-                placeholder="Descreva os defeitos apresentados..."
-                rows={2}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label>Solução</Label>
-              <Textarea
-                value={item.solution}
-                onChange={(e) => updateItem(i, 'solution', e.target.value)}
-                placeholder="Descreva a solução proposta..."
-                rows={2}
-              />
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-primary">
+                Laudo Técnico (Diagnósticos)
+              </Label>
+              <div className="space-y-3">
+                {(item.diagnostics || []).map((diag: Diagnostic, di: number) => (
+                  <div
+                    key={di}
+                    className="relative border border-border/50 rounded-lg p-3 space-y-3 bg-secondary/10"
+                  >
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 z-10"
+                      onClick={() => removeDiagnostic(i, di)}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">Defeito {di + 1}</Label>
+                      <Textarea
+                        value={diag.defect}
+                        onChange={(e) => updateDiagnostic(i, di, 'defect', e.target.value)}
+                        placeholder="Descreva o defeito encontrado..."
+                        rows={2}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">Solução {di + 1}</Label>
+                      <Textarea
+                        value={diag.solution}
+                        onChange={(e) => updateDiagnostic(i, di, 'solution', e.target.value)}
+                        placeholder="Descreva a solução técnica..."
+                        rows={2}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Preço (R$)</Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={diag.price || ''}
+                          onChange={(e) => updateDiagnostic(i, di, 'price', e.target.value)}
+                          placeholder="0,00"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={() => addDiagnostic(i)}>
+                <Plus className="w-3.5 h-3.5 mr-1.5" /> Adicionar Diagnóstico
+              </Button>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
@@ -122,18 +207,14 @@ export function PatItemsTable({
               </div>
               <div className="space-y-1.5">
                 <Label>Valor Unit. (R$)</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={item.unit_price || ''}
-                  onChange={(e) => updateItem(i, 'unit_price', e.target.value)}
-                />
+                <div className="h-10 flex items-center px-3 bg-secondary/50 rounded-md font-semibold text-primary">
+                  {fmtCurrency(item.unit_price || 0)}
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label>Subtotal</Label>
                 <div className="h-10 flex items-center px-3 bg-secondary/50 rounded-md font-semibold text-primary">
-                  {fmtCurrency(item.total_price)}
+                  {fmtCurrency(item.total_price || 0)}
                 </div>
               </div>
             </div>
