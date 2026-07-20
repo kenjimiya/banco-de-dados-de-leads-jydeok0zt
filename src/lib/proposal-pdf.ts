@@ -45,12 +45,12 @@ ul{list-style:none}
 @media print{body{padding:0}}
 </style></head><body>
 <div class="header"><div>
-<div class="company-name">Sigmaq Máquinas LTDA</div>
-<div class="company-info">Engº Sergio Yoshio Miyawaki — Gerente Comercial</div>
-<div class="company-info">Tel: (41) 3385-8840 | sigma.sergio@gmail.com</div>
+<div class="company-name">Sigma Transformadores Ltda</div>
+<div class="company-info">Mauro Miyawaki — Gerente Comercial</div>
+<div class="company-info">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
 </div><div style="text-align:right">
 <div style="font-size:14px;font-weight:bold">PROPOSTA COMERCIAL</div>
-<div class="company-info">Nº ${proposal.id?.slice(0, 8) || '—'}</div>
+<div class="company-info">Nº ${proposal.title || '—'}</div>
 <div class="company-info">Data: ${new Date().toLocaleDateString('pt-BR')}</div>
 </div></div>
 <div class="section"><div class="section-title">Dados do Cliente</div>
@@ -66,8 +66,8 @@ ul{list-style:none}
 </tbody></table></div>
 ${proposal.composition ? `<div class="section"><div class="section-title">Composição da Proposta</div><p>${proposal.composition}</p></div>` : ''}
 <div class="section"><div class="section-title">Escopo da Proposta</div>
-<p>Fornecimento do(s) equipamento(s) relacionado(s) na Descrição da Proposta para instalação pela equipe de manutenção elétrica do cliente ou empresa terceirizada autorizada, contando com o manual de instalação do equipamento, assim como as devidas identificações no equipamento e suporte via telefone da Sigmaq Máquinas LTDA.</p>
-<p style="margin-top:6px">Caso haja necessidade de novo deslocamento técnico por parte da Sigmaq, a mesma será por conta e ordem do cliente, assim como alimentação e hospedagem.</p></div>
+<p>Fornecimento do(s) equipamento(s) relacionado(s) na Descrição da Proposta para instalação pela equipe de manutenção elétrica do cliente ou empresa terceirizada autorizada, contando com o manual de instalação do equipamento, assim como as devidas identificações no equipamento e suporte via telefone da Sigma Transformadores Ltda.</p>
+<p style="margin-top:6px">Caso haja necessidade de novo deslocamento técnico por parte da Sigma Transformadores, a mesma será por conta e ordem do cliente, assim como alimentação e hospedagem.</p></div>
 <div class="section"><div class="section-title">Benefícios da Proposta</div>
 <p>Ao adquirir um produto Sigma Transformadores, além da superior performance, qualidade e design, você conta com o melhor atendimento pós-venda.</p>
 <p style="margin-top:6px">Através de sua Assistência Técnica Autorizada, responsável por um atendimento de credibilidade e empatia, em que você encontra preços justos e profissionais treinados para realizar o melhor serviço dentro e fora de garantia.</p></div>
@@ -84,7 +84,7 @@ ${proposal.composition ? `<div class="section"><div class="section-title">Compos
 <div class="approval"><div class="approval-box"><br><br>_______________________<br><br>Nome<br>Título<br>Data</div></div>
 <p style="margin-top:20px;font-size:10px;color:#999;text-align:center">
 Obrigado pela oportunidade. Aguardamos a confirmação do seu pedido.<br>
-Atenciosamente, Engº Sergio Yoshio Miyawaki — Gerente Comercial — Sigmaq Máquinas LTDA</p>
+Atenciosamente, Mauro Miyawaki — Gerente Comercial — Sigma Transformadores Ltda</p>
 </body></html>`
 
   const win = window.open('', '_blank')
