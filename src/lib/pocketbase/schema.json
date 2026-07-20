@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-20T14:38:32.395Z",
+  "generatedAt": "2026-07-20T14:50:26.966Z",
   "collections": [
     {
       "name": "users",
@@ -251,7 +251,10 @@
           "system": false
         }
       ],
-      "indexes": ["CREATE INDEX idx_purchases_lead_id ON purchases (lead_id)"]
+      "indexes": [
+        "CREATE INDEX idx_purchases_lead_id ON purchases (lead_id)",
+        "CREATE INDEX `idx_purchases_purchase_date` ON `purchases` (purchase_date)"
+      ]
     },
     {
       "name": "proposals",

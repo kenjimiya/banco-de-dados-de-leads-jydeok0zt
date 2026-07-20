@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { format } from 'date-fns'
-import { ShoppingCart, Search } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { format, isValid, parseISO } from 'date-fns'
+import { ShoppingCart, Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import { ExcelImportDialog } from '@/components/excel-import-dialog'
 import { PurchaseRowActions } from '@/components/purchase-row-actions'
 import { CreatePurchaseDialog } from '@/components/create-purchase-dialog'
@@ -21,11 +22,21 @@ import { SalesKpiCards } from '@/components/sales-kpi-cards'
 import { SalesByUf } from '@/components/sales-by-uf'
 import { AiInsightsPanel } from '@/components/ai-insights-panel'
 
-const fmtCurrency = (v: number | undefined) => `R$ ${(v || 0).toFixed(2)}`
+const fmtCurrency = (v: number | undefined) =>
+  `R$ ${(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+
+const fmtDate = (dateStr: string | undefined) => {
+  if (!dateStr) return '-'
+  const parsed = parseISO(dateStr)
+  return isValid(parsed) ? format(parsed, 'dd/MM/yyyy') : '-'
+}
+
+type SortDirection = 'desc' | 'asc'
 
 export default function Purchases() {
   const [purchases, setPurchases] = useState<Purchase[]>([])
   const [search, setSearch] = useState('')
+  const [sortDir, setSortDir] = useState<SortDirection>('desc')
 
   const loadData = async () => setPurchases(await getPurchases())
   useEffect(() => {
@@ -34,15 +45,23 @@ export default function Purchases() {
   useRealtime('purchases', loadData)
   useRealtime('leads', loadData)
 
+  const toggleSort = () => setSortDir((prev) => (prev === 'desc' ? 'asc' : 'desc'))
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
-    return purchases.filter(
+    const result = purchases.filter(
       (p) =>
         p.expand?.lead_id?.name?.toLowerCase().includes(q) ||
         p.product_name?.toLowerCase().includes(q) ||
         p.invoice_number?.toLowerCase().includes(q),
     )
-  }, [purchases, search])
+    return result.sort((a, b) => {
+      const dateA = a.purchase_date || ''
+      const dateB = b.purchase_date || ''
+      if (sortDir === 'desc') return dateB.localeCompare(dateA)
+      return dateA.localeCompare(dateB)
+    })
+  }, [purchases, search, sortDir])
 
   return (
     <div className="space-y-6">
@@ -88,7 +107,21 @@ export default function Purchases() {
                   <TableHead className="whitespace-nowrap">Tipo</TableHead>
                   <TableHead className="whitespace-nowrap">NF</TableHead>
                   <TableHead className="whitespace-nowrap">PI</TableHead>
-                  <TableHead className="whitespace-nowrap">Data</TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={toggleSort}
+                      className="h-8 px-2 -ml-2 font-medium hover:bg-secondary/60"
+                    >
+                      Data da Venda
+                      {sortDir === 'desc' ? (
+                        <ArrowDown className="ml-1 w-3.5 h-3.5" />
+                      ) : (
+                        <ArrowUp className="ml-1 w-3.5 h-3.5" />
+                      )}
+                    </Button>
+                  </TableHead>
                   <TableHead className="whitespace-nowrap text-right">Unid</TableHead>
                   <TableHead className="whitespace-nowrap">Produto</TableHead>
                   <TableHead className="whitespace-nowrap text-right">Custo MP</TableHead>
@@ -96,7 +129,8 @@ export default function Purchases() {
                   <TableHead className="whitespace-nowrap text-right">Vlr Unid</TableHead>
                   <TableHead className="whitespace-nowrap text-right">Total</TableHead>
                   <TableHead className="whitespace-nowrap text-right">Frete</TableHead>
-                  <TableHead className="whitespace-nowrap text-right">Total c/ Frete</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">Faturamento</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">Última Compra</TableHead>
                   <TableHead className="whitespace-nowrap text-right">Prazo</TableHead>
                   <TableHead className="whitespace-nowrap text-center">Ações</TableHead>
                 </TableRow>
@@ -125,7 +159,7 @@ export default function Purchases() {
                       {p.pi_number || '-'}
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-muted-foreground">
-                      {format(new Date(p.purchase_date), 'dd/MM/yyyy')}
+                      {fmtDate(p.purchase_date)}
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-right">{p.quantity}</TableCell>
                     <TableCell className="whitespace-nowrap">{p.product_name}</TableCell>
@@ -148,6 +182,9 @@ export default function Purchases() {
                       {fmtCurrency(p.grand_total)}
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-right text-muted-foreground">
+                      {fmtDate(p.expand?.lead_id?.last_purchase_date)}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-right text-muted-foreground">
                       {p.payment_term || 0} dias
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-center">
@@ -157,7 +194,7 @@ export default function Purchases() {
                 ))}
                 {filtered.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={17} className="text-center py-12 text-muted-foreground">
+                    <TableCell colSpan={18} className="text-center py-12 text-muted-foreground">
                       <ShoppingCart className="w-12 h-12 mx-auto mb-3 opacity-30" />
                       <p className="font-medium">Nenhuma venda encontrada.</p>
                       <p className="text-sm">Importe um Excel ou registre uma venda manualmente.</p>
