@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getLeads, getPurchases, Lead, Purchase } from '@/services/api'
+import { MonthlyRevenueDashboard } from '@/components/monthly-revenue-dashboard'
+import { fmtCurrency } from '@/lib/utils'
 import { useRealtime } from '@/hooks/use-realtime'
 import { Users, DollarSign, Activity, Percent } from 'lucide-react'
 import {
@@ -65,13 +67,13 @@ export default function Index() {
     { title: 'Total de Leads', value: totalLeads, icon: Users, color: 'text-blue-500' },
     {
       title: 'Receita Total',
-      value: `R$ ${totalRevenue.toFixed(2)}`,
+      value: fmtCurrency(totalRevenue),
       icon: DollarSign,
       color: 'text-primary',
     },
     {
       title: 'Ticket Médio',
-      value: `R$ ${avgTicket.toFixed(2)}`,
+      value: fmtCurrency(avgTicket),
       icon: Activity,
       color: 'text-accent',
     },
@@ -173,7 +175,7 @@ export default function Index() {
                     variant="secondary"
                     className="bg-accent/10 text-accent font-semibold border-none"
                   >
-                    R$ {lead.total_spent.toFixed(0)}
+                    {fmtCurrency(lead.total_spent)}
                   </Badge>
                 </div>
               ))}
@@ -184,6 +186,8 @@ export default function Index() {
           </CardContent>
         </Card>
       </div>
+
+      <MonthlyRevenueDashboard purchases={purchases} />
     </div>
   )
 }

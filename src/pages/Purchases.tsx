@@ -20,7 +20,6 @@ import { PurchaseRowActions } from '@/components/purchase-row-actions'
 import { CreatePurchaseDialog } from '@/components/create-purchase-dialog'
 import { SalesKpiCards } from '@/components/sales-kpi-cards'
 import { SalesByUf } from '@/components/sales-by-uf'
-import { MonthlyRevenueDashboard } from '@/components/monthly-revenue-dashboard'
 
 const fmtCurrency = (v: number | undefined) =>
   `R$ ${(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -74,8 +73,6 @@ export default function Purchases() {
         </div>
         <ExcelImportDialog onImported={loadData} />
       </div>
-
-      <MonthlyRevenueDashboard purchases={purchases} />
 
       <SalesKpiCards purchases={filtered} />
 

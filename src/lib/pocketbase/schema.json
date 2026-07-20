@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-20T18:14:57.921Z",
+  "generatedAt": "2026-07-20T18:31:39.674Z",
   "collections": [
     {
       "name": "users",
@@ -351,6 +351,84 @@
         }
       ],
       "indexes": ["CREATE INDEX idx_proposals_lead_id ON proposals (lead_id)"]
+    },
+    {
+      "name": "technical_proposals",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "lead_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "leads"
+        },
+        {
+          "name": "proposal_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "invoice_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "date",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "defect",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "solution",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_price",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["rascunho", "enviado", "aceito", "recusado"]
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_technical_proposals_lead_id ON technical_proposals (lead_id)"]
     }
   ]
 }

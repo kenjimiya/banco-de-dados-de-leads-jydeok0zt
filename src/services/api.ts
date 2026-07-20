@@ -141,3 +141,31 @@ export const updateProposal = (id: string, data: Partial<Proposal>) =>
   pb.collection<Proposal>('proposals').update(id, data)
 
 export const deleteProposal = (id: string) => pb.collection('proposals').delete(id)
+
+export interface TechnicalProposal extends RecordModel {
+  lead_id: string
+  proposal_number: string
+  invoice_number: string
+  date: string
+  defect: string
+  solution: string
+  total_price: number
+  status: 'rascunho' | 'enviado' | 'aceito' | 'recusado'
+  expand?: {
+    lead_id: Lead
+  }
+}
+
+export const getTechnicalProposals = () =>
+  pb
+    .collection<TechnicalProposal>('technical_proposals')
+    .getFullList({ sort: '-created', expand: 'lead_id' })
+
+export const createTechnicalProposal = (data: Partial<TechnicalProposal>) =>
+  pb.collection<TechnicalProposal>('technical_proposals').create(data)
+
+export const updateTechnicalProposal = (id: string, data: Partial<TechnicalProposal>) =>
+  pb.collection<TechnicalProposal>('technical_proposals').update(id, data)
+
+export const deleteTechnicalProposal = (id: string) =>
+  pb.collection('technical_proposals').delete(id)

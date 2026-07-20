@@ -28,8 +28,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
-
-const fmtCurrency = (v: number | undefined) => `R$ ${(v || 0).toFixed(2)}`
+import { fmtCurrency } from '@/lib/utils'
 
 export default function LeadDetail() {
   const { id } = useParams()
@@ -135,7 +134,7 @@ export default function LeadDetail() {
             </div>
             <div className="pt-4 border-t border-border/50 text-left">
               <p className="text-sm text-muted-foreground">Total Gasto</p>
-              <p className="text-2xl font-bold text-primary">R$ {lead.total_spent.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-primary">{fmtCurrency(lead.total_spent)}</p>
             </div>
           </CardContent>
         </Card>

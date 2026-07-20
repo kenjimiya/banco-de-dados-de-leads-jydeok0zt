@@ -11,4 +11,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Add any other utility functions here
+export function fmtCurrency(v: number | undefined | null): string {
+  return `R$ ${(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
+export function fmtNumber(v: number | undefined | null): string {
+  return (v || 0).toLocaleString('pt-BR')
+}

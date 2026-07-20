@@ -10,6 +10,7 @@ import Leads from '@/pages/Leads'
 import LeadDetail from '@/pages/LeadDetail'
 import Purchases from '@/pages/Purchases'
 import Propostas from '@/pages/Propostas'
+import PatPropostas from '@/pages/PatPropostas'
 import Login from '@/pages/Login'
 import NotFound from '@/pages/NotFound'
 
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/leads/:id" element={<LeadDetail />} />
             <Route path="/vendas" element={<Purchases />} />
             <Route path="/propostas" element={<Propostas />} />
+            <Route path="/pat" element={<PatPropostas />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

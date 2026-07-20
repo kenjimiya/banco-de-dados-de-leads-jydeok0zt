@@ -27,6 +27,7 @@ import { format } from 'date-fns'
 import { Search, Plus } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { ExcelImportDialog } from '@/components/excel-import-dialog'
+import { fmtCurrency } from '@/lib/utils'
 
 const STATUS_COLORS = {
   novo: 'bg-gray-100 text-gray-700',
@@ -194,7 +195,7 @@ export default function Leads() {
                       : 'Nunca'}
                   </TableCell>
                   <TableCell className="text-right font-semibold text-primary">
-                    R$ {lead.total_spent.toFixed(2)}
+                    {fmtCurrency(lead.total_spent)}
                   </TableCell>
                 </TableRow>
               ))}
