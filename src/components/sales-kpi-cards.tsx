@@ -3,22 +3,27 @@ import { Card, CardContent } from '@/components/ui/card'
 import { DollarSign, TrendingUp, Package, Percent } from 'lucide-react'
 import type { Purchase } from '@/services/api'
 
-const fmtCurrency = (v: number) => `R$ ${v.toFixed(2)}`
+const fmtCurrency = (v: number) =>
+  `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 export function SalesKpiCards({ purchases }: { purchases: Purchase[] }) {
   const stats = useMemo(() => {
     const revenue = purchases.reduce((s, p) => s + (p.grand_total || p.total_price || 0), 0)
-    const margin = purchases.reduce(
-      (s, p) => s + ((p.grand_total || 0) - (p.total_cost || 0) - (p.shipping_cost || 0)),
-      0,
-    )
+    const margin = purchases.reduce((s, p) => s + ((p.grand_total || 0) - (p.total_cost || 0)), 0)
     const avg = purchases.length > 0 ? revenue / purchases.length : 0
     return { count: purchases.length, revenue, margin, avg }
   }, [purchases])
 
   const cards = [
     {
-      label: 'Total Faturado',
+      label: 'Total de Vendas',
+      value: String(stats.count),
+      icon: Package,
+      color: 'text-primary',
+      bg: 'bg-primary/10',
+    },
+    {
+      label: 'Valor Total',
       value: fmtCurrency(stats.revenue),
       icon: DollarSign,
       color: 'text-green-600',
@@ -30,13 +35,6 @@ export function SalesKpiCards({ purchases }: { purchases: Purchase[] }) {
       icon: Percent,
       color: 'text-blue-600',
       bg: 'bg-blue-500/10',
-    },
-    {
-      label: 'Total de Vendas',
-      value: String(stats.count),
-      icon: Package,
-      color: 'text-primary',
-      bg: 'bg-primary/10',
     },
     {
       label: 'Ticket Médio',

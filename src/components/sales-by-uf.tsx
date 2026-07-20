@@ -3,7 +3,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { MapPin } from 'lucide-react'
 import type { Purchase } from '@/services/api'
 
-const fmtCurrency = (v: number) => `R$ ${v.toFixed(2)}`
+const fmtCurrency = (v: number) =>
+  `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 export function SalesByUf({ purchases }: { purchases: Purchase[] }) {
   const ufData = useMemo(() => {

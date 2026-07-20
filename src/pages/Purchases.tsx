@@ -20,6 +20,7 @@ import { PurchaseRowActions } from '@/components/purchase-row-actions'
 import { CreatePurchaseDialog } from '@/components/create-purchase-dialog'
 import { SalesKpiCards } from '@/components/sales-kpi-cards'
 import { SalesByUf } from '@/components/sales-by-uf'
+import { MonthlyRevenueDashboard } from '@/components/monthly-revenue-dashboard'
 import { AiInsightsPanel } from '@/components/ai-insights-panel'
 
 const fmtCurrency = (v: number | undefined) =>
@@ -75,7 +76,9 @@ export default function Purchases() {
         <ExcelImportDialog onImported={loadData} />
       </div>
 
-      <SalesKpiCards purchases={purchases} />
+      <MonthlyRevenueDashboard purchases={purchases} />
+
+      <SalesKpiCards purchases={filtered} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SalesByUf purchases={purchases} />
