@@ -76,23 +76,47 @@ export function PatFormDialog({
             ...item,
             diagnostics:
               item.diagnostics && item.diagnostics.length > 0
-                ? item.diagnostics
+                ? item.diagnostics.map((d: any) => ({
+                    defect: d.defect || '',
+                    solution: d.solution || '',
+                    replace_quantity: d.replace_quantity ?? 1,
+                    replace_item: d.replace_item ?? '',
+                    replace_unit_price: d.replace_unit_price ?? d.price ?? 0,
+                  }))
                 : item.defect || item.solution
                   ? [
                       {
                         defect: item.defect || '',
                         solution: item.solution || '',
-                        price: item.unit_price || 0,
+                        replace_quantity: 1,
+                        replace_item: '',
+                        replace_unit_price: item.unit_price || 0,
                       },
                     ]
-                  : [{ defect: '', solution: '', price: 0 }],
+                  : [
+                      {
+                        defect: '',
+                        solution: '',
+                        replace_quantity: 1,
+                        replace_item: '',
+                        replace_unit_price: 0,
+                      },
+                    ],
           }))
         : [
             {
               description: '',
               serial_number: '',
               manufacture_date: '',
-              diagnostics: [{ defect: '', solution: '', price: 0 }],
+              diagnostics: [
+                {
+                  defect: '',
+                  solution: '',
+                  replace_quantity: 1,
+                  replace_item: '',
+                  replace_unit_price: 0,
+                },
+              ],
               unit_price: 0,
               quantity: 1,
               total_price: 0,

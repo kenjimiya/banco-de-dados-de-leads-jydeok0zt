@@ -59,7 +59,7 @@ ul{list-style:none}
     <div style="font-size:18px;font-weight:bold;color:#2563eb">PROPOSTA COMERCIAL</div>
     <div class="company-info" style="font-size:15px;margin-top:5px">Nº ${proposal.title || '—'}</div>
     <div class="company-info">Data: ${new Date().toLocaleDateString('pt-BR')}</div>
-    <div class="company-info" style="margin-top:10px;font-weight:bold">Mauro Miyawaki — Comercial</div>
+    <div class="company-info" style="margin-top:10px;font-weight:bold">Eng. Mauro - gerente comercial</div>
     <div class="company-info">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
   </div>
 </div>
@@ -97,8 +97,7 @@ ${proposal.composition ? `<div class="section"><div class="section-title">Compos
   <div class="signature-text">Eng. Mauro Miyawaki - Gerente comercial</div>
 </div>
 <p style="margin-top:20px;font-size:13px;color:#999;text-align:center">
-Obrigado pela oportunidade. Aguardamos a confirmação do seu pedido.<br>
-Sigma Transformadores Ltda</p>
+Obrigado pela oportunidade. Aguardamos a confirmação do seu pedido. Atenciosamente, Eng Mauro Miyawaki — Gerente Comercial — Sigma Transformadores Ltda</p>
 </body></html>`
 
   const win = window.open('', '_blank')

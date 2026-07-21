@@ -3,19 +3,16 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Plus, Trash2 } from 'lucide-react'
-import type { TechnicalProposalItem } from '@/services/api'
+import type { TechnicalProposalItem, Diagnostic } from '@/services/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { fmtCurrency } from '@/lib/utils'
 
-interface Diagnostic {
-  defect: string
-  solution: string
-  price: number
-}
-
 function recalcItem(item: TechnicalProposalItem): TechnicalProposalItem {
   const diagnostics: Diagnostic[] = item.diagnostics || []
-  const unitPrice = diagnostics.reduce((sum, d) => sum + (Number(d.price) || 0), 0)
+  const unitPrice = diagnostics.reduce(
+    (sum, d) => sum + (Number(d.replace_quantity) || 0) * (Number(d.replace_unit_price) || 0),
+    0,
+  )
   const qty = Number(item.quantity) || 1
   return { ...item, unit_price: unitPrice, total_price: unitPrice * qty }
 }
@@ -34,7 +31,15 @@ export function PatItemsTable({
         description: '',
         serial_number: '',
         manufacture_date: '',
-        diagnostics: [{ defect: '', solution: '', price: 0 }],
+        diagnostics: [
+          {
+            defect: '',
+            solution: '',
+            replace_quantity: 1,
+            replace_item: '',
+            replace_unit_price: 0,
+          },
+        ],
         unit_price: 0,
         quantity: 1,
         total_price: 0,
@@ -58,7 +63,16 @@ export function PatItemsTable({
   const addDiagnostic = (itemIndex: number) => {
     const updated = [...items]
     const item = { ...updated[itemIndex] }
-    item.diagnostics = [...(item.diagnostics || []), { defect: '', solution: '', price: 0 }]
+    item.diagnostics = [
+      ...(item.diagnostics || []),
+      {
+        defect: '',
+        solution: '',
+        replace_quantity: 1,
+        replace_item: '',
+        replace_unit_price: 0,
+      },
+    ]
     updated[itemIndex] = item
     onChange(updated)
   }
@@ -81,8 +95,8 @@ export function PatItemsTable({
     const item = { ...updated[itemIndex] }
     item.diagnostics = [...(item.diagnostics || [])]
     const diag = { ...item.diagnostics[diagIndex] }
-    if (field === 'price') {
-      diag.price = Number(value) || 0
+    if (field === 'replace_quantity' || field === 'replace_unit_price') {
+      ;(diag as any)[field] = Number(value) || 0
     } else {
       ;(diag as any)[field] = value
     }
@@ -174,15 +188,40 @@ export function PatItemsTable({
                         rows={2}
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1.5">
-                        <Label className="text-xs">Preço (R$)</Label>
+                    <div className="grid grid-cols-12 gap-2 items-end">
+                      <div className="col-span-2 flex items-center justify-center h-10 bg-primary/10 rounded-md">
+                        <span className="text-sm font-bold text-primary">Substituir</span>
+                      </div>
+                      <div className="col-span-2 space-y-1.5">
+                        <Label className="text-xs">Quantidade</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={diag.replace_quantity || ''}
+                          onChange={(e) =>
+                            updateDiagnostic(i, di, 'replace_quantity', e.target.value)
+                          }
+                          placeholder="0"
+                        />
+                      </div>
+                      <div className="col-span-4 space-y-1.5">
+                        <Label className="text-xs">Item</Label>
+                        <Input
+                          value={diag.replace_item || ''}
+                          onChange={(e) => updateDiagnostic(i, di, 'replace_item', e.target.value)}
+                          placeholder="Descrição do item de substituição"
+                        />
+                      </div>
+                      <div className="col-span-4 space-y-1.5">
+                        <Label className="text-xs">Valor Unitário (R$)</Label>
                         <Input
                           type="number"
                           min="0"
                           step="0.01"
-                          value={diag.price || ''}
-                          onChange={(e) => updateDiagnostic(i, di, 'price', e.target.value)}
+                          value={diag.replace_unit_price || ''}
+                          onChange={(e) =>
+                            updateDiagnostic(i, di, 'replace_unit_price', e.target.value)
+                          }
                           placeholder="0,00"
                         />
                       </div>

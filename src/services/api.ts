@@ -159,6 +159,15 @@ export const updateProposal = (id: string, data: Partial<Proposal>) =>
 
 export const deleteProposal = (id: string) => pb.collection('proposals').delete(id)
 
+export interface Diagnostic {
+  defect: string
+  solution: string
+  price?: number
+  replace_quantity?: number
+  replace_item?: string
+  replace_unit_price?: number
+}
+
 export interface TechnicalProposalItem {
   description: string
   serial_number: string
@@ -168,6 +177,7 @@ export interface TechnicalProposalItem {
   unit_price: number
   quantity: number
   total_price: number
+  diagnostics: Diagnostic[]
 }
 
 export interface TechnicalProposal extends RecordModel {

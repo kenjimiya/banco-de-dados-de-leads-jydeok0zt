@@ -65,19 +65,46 @@ onRecordAfterUpdateSuccess((e) => {
 
   var piItems = []
   var totalValue = 0
+
   for (var j = 0; j < itemsArray.length; j++) {
     var item = itemsArray[j]
-    var desc = item.description || ''
-    if (item.serial_number) desc += ' [Serie: ' + item.serial_number + ']'
-    var subtotal = item.total_price || (item.quantity || 1) * (item.unit_price || 0)
-    piItems.push({
-      description: desc,
-      quantity: item.quantity || 1,
-      unit_price: item.unit_price || 0,
-      ncm: '',
-      subtotal: subtotal,
-    })
-    totalValue += subtotal
+    var diagnostics = item.diagnostics || []
+    var hasReplaceItems = false
+
+    for (var k = 0; k < diagnostics.length; k++) {
+      var diag = diagnostics[k]
+      var replaceItem = diag.replace_item || ''
+      if (!replaceItem || !String(replaceItem).trim()) continue
+      hasReplaceItems = true
+      var replaceQty = diag.replace_quantity || 1
+      var replacePrice = diag.replace_unit_price || diag.price || 0
+      var diagSubtotal = replaceQty * replacePrice
+      piItems.push({
+        description: replaceItem,
+        quantity: replaceQty,
+        unit_price: replacePrice,
+        ncm: '',
+        subtotal: diagSubtotal,
+      })
+      totalValue += diagSubtotal
+    }
+
+    if (!hasReplaceItems) {
+      var desc = item.description || ''
+      if (item.serial_number) desc += ' [Serie: ' + item.serial_number + ']'
+      if (!desc || !String(desc).trim()) continue
+      var fallbackQty = item.quantity || 1
+      var fallbackPrice = item.unit_price || 0
+      var fallbackSubtotal = item.total_price || fallbackQty * fallbackPrice
+      piItems.push({
+        description: desc,
+        quantity: fallbackQty,
+        unit_price: fallbackPrice,
+        ncm: '',
+        subtotal: fallbackSubtotal,
+      })
+      totalValue += fallbackSubtotal
+    }
   }
 
   var invoiceNumber = e.record.getString('invoice_number') || ''

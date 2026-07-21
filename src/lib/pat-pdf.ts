@@ -23,19 +23,28 @@ export function exportPatPDF(proposal: TechnicalProposal, lead?: Lead) {
     .map((item, index) => {
       const diagnostics = item.diagnostics || []
       const diagnosticsHtml = diagnostics
-        .map(
-          (diag: any, di: number) => `
+        .map((diag: any, di: number) => {
+          const replaceQty = diag.replace_quantity || 1
+          const replaceItem = diag.replace_item || ''
+          const replacePrice = diag.replace_unit_price || diag.price || 0
+          const replaceTotal = replaceQty * replacePrice
+          return `
       <tr>
         <td colspan="2" style="font-weight: bold; text-align: center; vertical-align: middle;">DEFEITO ${di + 1}</td>
-        <td colspan="2" style="white-space: pre-wrap; vertical-align: top;">${diag.defect || '-'}</td>
-        <td style="font-weight: bold; text-align: center; vertical-align: middle; background-color: #f2f2f2;">VALOR (R$)</td>
+        <td colspan="3" style="white-space: pre-wrap; vertical-align: top;">${diag.defect || '-'}</td>
       </tr>
       <tr>
         <td colspan="2" style="font-weight: bold; text-align: center; vertical-align: middle;">SOLUÇÃO ${di + 1}</td>
-        <td colspan="2" style="white-space: pre-wrap; vertical-align: top;">${diag.solution || '-'}</td>
-        <td style="text-align: right; vertical-align: middle;">${fmtCurrency(diag.price || 0)}</td>
-      </tr>`,
-        )
+        <td colspan="3" style="white-space: pre-wrap; vertical-align: top;">${diag.solution || '-'}</td>
+      </tr>
+      <tr style="background-color: #f8f8f8;">
+        <td style="font-weight: bold; text-align: center; vertical-align: middle;">SUBSTITUIR</td>
+        <td style="text-align: center; vertical-align: middle;">${replaceQty}</td>
+        <td style="vertical-align: middle;">${replaceItem || '-'}</td>
+        <td style="text-align: right; vertical-align: middle;">${fmtCurrency(replacePrice)}</td>
+        <td style="text-align: right; vertical-align: middle; font-weight: bold;">${fmtCurrency(replaceTotal)}</td>
+      </tr>`
+        })
         .join('')
 
       return `
