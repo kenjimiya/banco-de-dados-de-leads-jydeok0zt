@@ -115,6 +115,8 @@ export function PatFormDialog({
         ? format(new Date(proposal.date), 'yyyy-MM-dd')
         : format(new Date(), 'yyyy-MM-dd'),
       status: proposal?.status || 'rascunho',
+      defect: proposal?.defect || '',
+      solution: proposal?.solution || '',
       payment_condition: proposal?.payment_condition || DEFAULT_TERMS.payment_condition,
       delivery_time: proposal?.delivery_time || DEFAULT_TERMS.delivery_time,
       validity: proposal?.validity || DEFAULT_TERMS.validity,
@@ -147,8 +149,8 @@ export function PatFormDialog({
         delivery_time: form.delivery_time || '',
         validity: form.validity || '',
         guarantee: form.guarantee || '',
-        defect: '', // Legacy
-        solution: '', // Legacy
+        defect: form.defect || '',
+        solution: form.solution || '',
       }
       if (isEdit && proposal) {
         await updateTechnicalProposal(proposal.id, data)
@@ -228,11 +230,32 @@ export function PatFormDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Data de Emissão (PAT)</Label>
+              <Label>Data da Nota Fiscal</Label>
               <Input
                 type="date"
                 value={form.date || ''}
                 onChange={(e) => set('date', e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label>Defeito do Equipamento</Label>
+              <Textarea
+                value={form.defect || ''}
+                onChange={(e) => set('defect', e.target.value)}
+                placeholder="Descreva o defeito ou problema identificado..."
+                rows={3}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Solução do Problema</Label>
+              <Textarea
+                value={form.solution || ''}
+                onChange={(e) => set('solution', e.target.value)}
+                placeholder="Descreva a solução técnica proposta..."
+                rows={3}
               />
             </div>
           </div>
