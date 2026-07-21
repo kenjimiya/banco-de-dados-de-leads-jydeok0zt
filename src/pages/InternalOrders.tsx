@@ -81,6 +81,7 @@ export default function InternalOrders() {
               <TableHeader className="bg-secondary/50">
                 <TableRow className="border-none hover:bg-transparent">
                   <TableHead>Data</TableHead>
+                  <TableHead>Nº PI</TableHead>
                   <TableHead>Cliente</TableHead>
                   <TableHead>Operação</TableHead>
                   <TableHead>Entrega</TableHead>
@@ -93,6 +94,9 @@ export default function InternalOrders() {
                   <TableRow key={o.id} className="border-b border-border/50 hover:bg-secondary/30">
                     <TableCell className="text-muted-foreground">
                       {format(new Date(o.created), 'dd/MM/yyyy')}
+                    </TableCell>
+                    <TableCell className="font-semibold text-primary">
+                      {o.pi_number || '-'}
                     </TableCell>
                     <TableCell className="font-medium">
                       {o.expand?.lead_id?.name || 'Cliente excluído'}
@@ -140,7 +144,7 @@ export default function InternalOrders() {
                 ))}
                 {orders.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                       <ClipboardList className="w-12 h-12 mx-auto mb-3 opacity-30" />
                       <p className="font-medium">Nenhum PI encontrado.</p>
                     </TableCell>

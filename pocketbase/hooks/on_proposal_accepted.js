@@ -91,6 +91,7 @@ onRecordAfterUpdateSuccess((e) => {
   pi.set('shipping_cost', 0)
   pi.set('volumes_quantity', 1)
   pi.set('packaging_type', 'papelao')
+  pi.set('notes', '')
 
   try {
     $app.save(pi)

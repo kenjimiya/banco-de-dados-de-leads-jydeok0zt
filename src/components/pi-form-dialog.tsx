@@ -26,11 +26,12 @@ import {
   type InternalOrderItem,
 } from '@/services/api'
 import { useToast } from '@/hooks/use-toast'
-import { Plus, Loader2 } from 'lucide-react'
+import { Plus, Loader2, Hash } from 'lucide-react'
 import { format } from 'date-fns'
 import { LeadSelect } from './lead-select'
 import { PiItemsTable } from './pi-items-table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
 
 interface PiFormDialogProps {
   order?: InternalOrder | null
@@ -92,6 +93,7 @@ export function PiFormDialog({
       pi_number: order?.pi_number || '',
       billing_date: order?.billing_date ? format(new Date(order.billing_date), 'yyyy-MM-dd') : '',
       source_reference: order?.source_reference || '',
+      notes: order?.notes || '',
     })
   }, [open, order])
 
@@ -154,6 +156,7 @@ export function PiFormDialog({
         pi_number: form.pi_number || '',
         billing_date: form.billing_date ? new Date(form.billing_date).toISOString() : '',
         source_reference: form.source_reference || '',
+        notes: form.notes || '',
       }
       if (isEdit && order) {
         await updateInternalOrder(order.id, data)
@@ -184,6 +187,12 @@ export function PiFormDialog({
           <DialogTitle>
             {isEdit ? 'Editar Pedido Interno (PI)' : 'Novo Pedido Interno (PI)'}
           </DialogTitle>
+          {form.pi_number && (
+            <div className="flex items-center gap-2 mt-1 text-primary">
+              <Hash className="w-4 h-4" />
+              <span className="text-lg font-bold tracking-wide">{form.pi_number}</span>
+            </div>
+          )}
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <Tabs defaultValue="client" className="w-full">
@@ -452,6 +461,17 @@ export function PiFormDialog({
               </div>
             </TabsContent>
           </Tabs>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="notes">OBS: (Observações)</Label>
+            <Textarea
+              id="notes"
+              value={form.notes || ''}
+              onChange={(e) => set('notes', e.target.value)}
+              placeholder="Observações gerais sobre o pedido..."
+              rows={3}
+            />
+          </div>
 
           <Button type="submit" className="w-full" disabled={saving}>
             {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

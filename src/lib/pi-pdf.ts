@@ -62,6 +62,7 @@ table.info-table td{border:1px solid #ccc;padding:4px 6px;}
   </div>
   <div style="text-align:right">
     <div class="title">PEDIDO INTERNO (PI)</div>
+    ${order.pi_number ? `<div class="pat-cell" style="font-size:14px;color:#2563eb">Nº ${order.pi_number}</div>` : ''}
     <div class="pat-cell">OPERAÇÃO: ${order.operation_type === 'novo' ? 'EQUIPAMENTO NOVO' : 'RETORNO DE CONSERTO'}</div>
     <div class="pat-cell">Data: ${dateStr}</div>
   </div>
@@ -176,6 +177,14 @@ ${
   </tr>
 </table>
 
+${
+  order.notes
+    ? `
+<div class="section-title">Observações</div>
+<div style="border:1px solid #ccc;padding:8px 10px;margin-bottom:15px;min-height:40px;white-space:pre-wrap;font-size:11px">${order.notes}</div>
+`
+    : ''
+}
 <div style="margin-top:40px;text-align:center;color:#6b7280;font-size:10px;border-top:1px solid #e5e7eb;padding-top:10px">
   Sigma Transformadores Ltda - Pedido Interno Gerado Eletronicamente
 </div>
