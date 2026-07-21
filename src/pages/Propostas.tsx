@@ -96,6 +96,7 @@ export default function Propostas() {
                 <TableRow className="border-none hover:bg-transparent">
                   <TableHead>Cliente</TableHead>
                   <TableHead>Título</TableHead>
+                  <TableHead>Revisão</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Valor Total</TableHead>
                   <TableHead>Validade</TableHead>
@@ -109,6 +110,7 @@ export default function Propostas() {
                       {p.expand?.lead_id?.name || 'Cliente excluído'}
                     </TableCell>
                     <TableCell>{p.title}</TableCell>
+                    <TableCell className="text-muted-foreground">{p.revision || '00'}</TableCell>
                     <TableCell>
                       <Select
                         value={p.status}
@@ -172,7 +174,7 @@ export default function Propostas() {
                 ))}
                 {proposals.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                       <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
                       <p className="font-medium">Nenhuma proposta encontrada.</p>
                       <p className="text-sm">Crie uma nova proposta para começar.</p>

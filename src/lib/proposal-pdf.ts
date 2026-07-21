@@ -75,7 +75,15 @@ ul{list-style:none}
 <tbody>${itemsRows || '<tr><td colspan="4" style="text-align:center;color:#999">Nenhum item</td></tr>'}
 <tr class="total-row"><td colspan="3" style="text-align:right">PREÇO TOTAL:</td><td style="text-align:right">${fmtCurrency(grandTotal)}</td></tr>
 </tbody></table></div>
-${proposal.composition ? `<div class="section"><div class="section-title">Composição da Proposta</div><p style="white-space: pre-wrap;">${proposal.composition}</p></div>` : ''}
+${
+  proposal.composition
+    ? `<div class="section"><div class="section-title">Composição da Proposta</div><ul style="list-style:disc;padding-left:20px;line-height:1.8;">${proposal.composition
+        .split('\n')
+        .filter((l: string) => l.trim())
+        .map((l: string) => `<li>${l.trim()}</li>`)
+        .join('')}</ul></div>`
+    : ''
+}
 <div class="section"><div class="section-title">Escopo da Proposta</div>
 <p>Fornecimento do(s) equipamento(s) relacionado(s) na Descrição da Proposta para instalação pela equipe de manutenção elétrica do cliente ou empresa terceirizada autorizada, contando com o manual de instalação do equipamento, assim como as devidas identificações no equipamento e suporte via telefone da Sigma Transformadores Ltda.</p>
 <p style="margin-top:8px">Caso haja necessidade de novo deslocamento técnico por parte da Sigma Transformadores, a mesma será por conta e ordem do cliente, assim como alimentação e hospedagem.</p></div>
@@ -92,9 +100,9 @@ ${proposal.composition ? `<div class="section"><div class="section-title">Compos
 <li><strong>Garantia:</strong> Garantimos os equipamentos por 06 meses contra eventuais defeitos de fabricação, exceto materiais elétricos e pneumáticos.</li>
 <li><strong>Frete / Seguro:</strong> ${proposal.freight_info || 'FOB – Favor indicar a transportadora de sua preferência'}</li>
 </ul></div>
-<div class="approval"><div class="approval-box"><br><br>_______________________<br><br>Nome<br>Título<br>Data</div></div>
-<p style="margin-top:20px;font-size:13px;color:#999;text-align:center">
-Obrigado pela oportunidade. Aguardamos a confirmação do seu pedido.</p>
+<p style="margin-top:30px;font-size:14px;color:#333;text-align:center;line-height:1.8">
+Obrigado pela oportunidade. Aguardamos a confirmação do seu pedido.<br>
+Atenciosamente, Eng Mauro Miyawaki — Gerente Comercial — Sigma Transformadores Ltda</p>
 </body></html>`
 
   const win = window.open('', '_blank')

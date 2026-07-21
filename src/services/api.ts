@@ -50,6 +50,7 @@ export interface ProposalItem {
 export interface Proposal extends RecordModel {
   lead_id: string
   title: string
+  revision: string
   description: string
   status: 'rascunho' | 'enviado' | 'aceito' | 'recusado'
   total_value: number

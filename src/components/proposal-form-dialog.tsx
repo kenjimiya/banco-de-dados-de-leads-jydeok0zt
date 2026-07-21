@@ -56,6 +56,7 @@ export function ProposalFormDialog({
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
   const [items, setItems] = useState<ProposalItem[]>([])
   const [form, setForm] = useState<Record<string, string>>({})
+  const [originalRevision, setOriginalRevision] = useState('')
 
   useEffect(() => {
     if (!open) return
@@ -72,6 +73,7 @@ export function ProposalFormDialog({
     )
     setForm({
       title: proposal?.title || '',
+      revision: proposal?.revision || '00',
       description: proposal?.description || '',
       status: proposal?.status || 'rascunho',
       expiry_date: proposal?.expiry_date
@@ -82,6 +84,7 @@ export function ProposalFormDialog({
       composition: proposal?.composition || '',
       freight_info: proposal?.freight_info || DEFAULT_FREIGHT,
     })
+    setOriginalRevision(proposal?.revision || '00')
   }, [open, proposal])
 
   const grandTotal = useMemo(() => items.reduce((s, i) => s + (i.total_price || 0), 0), [items])
@@ -102,6 +105,7 @@ export function ProposalFormDialog({
       const data = {
         lead_id: selectedLead.id,
         title: form.title,
+        revision: form.revision || '00',
         description: form.description || '',
         status: form.status || 'rascunho',
         total_value: grandTotal,
@@ -112,12 +116,17 @@ export function ProposalFormDialog({
         composition: form.composition || '',
         freight_info: form.freight_info || DEFAULT_FREIGHT,
       }
-      if (isEdit && proposal) {
+      const revisionChanged = isEdit && (form.revision || '00') !== originalRevision
+      if (isEdit && proposal && !revisionChanged) {
         await updateProposal(proposal.id, data)
         toast({ title: 'Proposta atualizada com sucesso!' })
       } else {
         await createProposal(data)
-        toast({ title: 'Proposta criada com sucesso!' })
+        toast({
+          title: revisionChanged
+            ? 'Nova revisão criada com sucesso!'
+            : 'Proposta criada com sucesso!',
+        })
       }
       setOpen(false)
       onSaved()
@@ -146,13 +155,23 @@ export function ProposalFormDialog({
             <LeadSelect value={selectedLead} onChange={setSelectedLead} />
           </div>
           {selectedLead && <LeadInfoCard lead={selectedLead} />}
-          <div className="space-y-1.5">
-            <Label>Título *</Label>
-            <Input
-              value={form.title || ''}
-              onChange={(e) => set('title', e.target.value)}
-              required
-            />
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-1.5 col-span-2">
+              <Label>Título *</Label>
+              <Input
+                value={form.title || ''}
+                onChange={(e) => set('title', e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Revisão</Label>
+              <Input
+                value={form.revision || ''}
+                onChange={(e) => set('revision', e.target.value)}
+                placeholder="Ex: 00"
+              />
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label>Itens da Proposta</Label>

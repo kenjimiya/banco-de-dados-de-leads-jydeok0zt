@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-21T15:02:53.888Z",
+  "generatedAt": "2026-07-21T17:44:12.783Z",
   "collections": [
     {
       "name": "users",
@@ -387,6 +387,12 @@
         },
         {
           "name": "freight_info",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "revision",
           "type": "text",
           "required": false,
           "system": false

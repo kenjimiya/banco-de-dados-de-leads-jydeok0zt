@@ -21,7 +21,9 @@ import {
   updateInternalOrder,
   updateLead,
   getLead,
+  getLeadProposals,
   type Lead,
+  type Proposal,
   type InternalOrder,
   type InternalOrderItem,
 } from '@/services/api'
@@ -56,6 +58,8 @@ export function PiFormDialog({
   const [items, setItems] = useState<InternalOrderItem[]>([])
   const [form, setForm] = useState<Record<string, any>>({})
   const [leadForm, setLeadForm] = useState<Record<string, string>>({})
+  const [proposals, setProposals] = useState<Proposal[]>([])
+  const [selectedProposalId, setSelectedProposalId] = useState('')
 
   useEffect(() => {
     if (!open) return
@@ -117,12 +121,44 @@ export function PiFormDialog({
     }
   }, [selectedLead])
 
+  useEffect(() => {
+    if (selectedLead) {
+      getLeadProposals(selectedLead.id)
+        .then(setProposals)
+        .catch(() => setProposals([]))
+    } else {
+      setProposals([])
+    }
+    setSelectedProposalId('')
+  }, [selectedLead])
+
   const itemsTotal = useMemo(() => items.reduce((s, i) => s + (i.subtotal || 0), 0), [items])
   const grandTotal =
     itemsTotal - (Number(form.discount_amount) || 0) + (Number(form.shipping_cost) || 0)
 
   const set = (k: string, v: any) => setForm((p) => ({ ...p, [k]: v }))
   const setL = (k: string, v: string) => setLeadForm((p) => ({ ...p, [k]: v }))
+
+  const importProposalItems = (proposalId: string) => {
+    setSelectedProposalId(proposalId)
+    const proposal = proposals.find((p) => p.id === proposalId)
+    if (!proposal?.items?.length) return
+    setItems(
+      proposal.items
+        .filter((i) => i.description?.trim())
+        .map((item) => ({
+          description: item.description || '',
+          quantity: item.quantity || 1,
+          unit_price: item.unit_price || 0,
+          ncm: '',
+          subtotal: (item.quantity || 1) * (item.unit_price || 0),
+        })),
+    )
+    set(
+      'source_reference',
+      `PCS: ${proposal.title}${proposal.revision ? ` Rev. ${proposal.revision}` : ''}`,
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -325,6 +361,24 @@ export function PiFormDialog({
                       required
                     />
                   </div>
+                </div>
+              )}
+
+              {proposals.length > 0 && (
+                <div className="space-y-1.5">
+                  <Label>Importar Itens de Proposta Comercial (PCS)</Label>
+                  <Select value={selectedProposalId} onValueChange={importProposalItems}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar proposta para importar itens..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {proposals.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.title} {p.revision ? `— Rev. ${p.revision}` : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               )}
 
