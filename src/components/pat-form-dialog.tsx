@@ -23,6 +23,7 @@ import {
   getLead,
   type Lead,
   type TechnicalProposal,
+  type TechnicalDiagnostic,
 } from '@/services/api'
 import { useToast } from '@/hooks/use-toast'
 import { Plus, Loader2 } from 'lucide-react'
@@ -59,7 +60,7 @@ export function PatFormDialog({
   const setOpen = onOpenChange ?? setInternalOpen
   const [saving, setSaving] = useState(false)
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
-  const [items, setItems] = useState<any[]>([])
+  const [items, setItems] = useState<TechnicalDiagnostic[]>([])
   const [form, setForm] = useState<Record<string, string>>({})
 
   useEffect(() => {
@@ -72,38 +73,21 @@ export function PatFormDialog({
     else setSelectedLead(null)
     setItems(
       proposal?.items?.length
-        ? proposal.items.map((item: any) => ({
-            ...item,
-            diagnostics:
-              item.diagnostics && item.diagnostics.length > 0
-                ? item.diagnostics.map((d: any) => ({
-                    replace_quantity: d.replace_quantity ?? 1,
-                    replace_item: d.replace_item ?? '',
-                    replace_unit_price: d.replace_unit_price ?? d.price ?? 0,
-                  }))
-                : [
-                    {
-                      replace_quantity: 1,
-                      replace_item: '',
-                      replace_unit_price: item.unit_price || 0,
-                    },
-                  ],
+        ? (proposal.items as TechnicalDiagnostic[]).map((d) => ({
+            defect: d.defect || '',
+            solution: d.solution || '',
+            parts: (d.parts || []).map((p) => ({
+              description: p.description || '',
+              quantity: p.quantity ?? 1,
+              unit_price: p.unit_price ?? 0,
+              total_price: (p.quantity ?? 1) * (p.unit_price ?? 0),
+            })),
           }))
         : [
             {
-              description: '',
-              serial_number: '',
-              manufacture_date: '',
-              diagnostics: [
-                {
-                  replace_quantity: 1,
-                  replace_item: '',
-                  replace_unit_price: 0,
-                },
-              ],
-              unit_price: 0,
-              quantity: 1,
-              total_price: 0,
+              defect: '',
+              solution: '',
+              parts: [{ description: '', quantity: 1, unit_price: 0, total_price: 0 }],
             },
           ],
     )
@@ -115,8 +99,6 @@ export function PatFormDialog({
         ? format(new Date(proposal.date), 'yyyy-MM-dd')
         : format(new Date(), 'yyyy-MM-dd'),
       status: proposal?.status || 'rascunho',
-      defect: proposal?.defect || '',
-      solution: proposal?.solution || '',
       payment_condition: proposal?.payment_condition || DEFAULT_TERMS.payment_condition,
       delivery_time: proposal?.delivery_time || DEFAULT_TERMS.delivery_time,
       validity: proposal?.validity || DEFAULT_TERMS.validity,
@@ -149,8 +131,6 @@ export function PatFormDialog({
         delivery_time: form.delivery_time || '',
         validity: form.validity || '',
         guarantee: form.guarantee || '',
-        defect: form.defect || '',
-        solution: form.solution || '',
       }
       if (isEdit && proposal) {
         await updateTechnicalProposal(proposal.id, data)
@@ -235,27 +215,6 @@ export function PatFormDialog({
                 type="date"
                 value={form.date || ''}
                 onChange={(e) => set('date', e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label>Defeito do Equipamento</Label>
-              <Textarea
-                value={form.defect || ''}
-                onChange={(e) => set('defect', e.target.value)}
-                placeholder="Descreva o defeito ou problema identificado..."
-                rows={3}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Solução do Problema</Label>
-              <Textarea
-                value={form.solution || ''}
-                onChange={(e) => set('solution', e.target.value)}
-                placeholder="Descreva a solução técnica proposta..."
-                rows={3}
               />
             </div>
           </div>
