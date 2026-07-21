@@ -14,6 +14,9 @@ export function exportPatPDF(proposal: TechnicalProposal, lead?: Lead) {
     ? new Date(proposal.date).toLocaleDateString('pt-BR')
     : new Date().toLocaleDateString('pt-BR')
 
+  const rawPatNumber = proposal.proposal_number || '---'
+  const patNumber = rawPatNumber.replace(/^PAT\s*/i, '').trim()
+
   const items = proposal.items || []
 
   const itemsHtml = items
@@ -65,25 +68,28 @@ export function exportPatPDF(proposal: TechnicalProposal, lead?: Lead) {
     .join('')
 
   const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
-<title>PAT ${proposal.proposal_number || ''}</title>
+<title>PAT ${patNumber}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:20px}
+body{font-family:Arial,sans-serif;font-size:14px;color:#000;padding:20px}
 .header-table{width:100%;border-collapse:collapse;margin-bottom:10px}
-.header-table td{border:1px solid #000;padding:4px}
+.header-table td{border:1px solid #000;padding:6px}
 .logo-cell{width:250px;text-align:center;vertical-align:middle;}
-.title-cell{text-align:center;font-weight:bold;font-size:14px;color:#1e3a8a;}
-.pat-cell{text-align:center;font-weight:bold;font-size:12px;color:#1e3a8a;}
-.address{font-style:italic;font-size:9px;margin-bottom:15px}
+.title-cell{text-align:center;font-weight:bold;font-size:16px;color:#1e3a8a;}
+.pat-cell{text-align:center;font-weight:bold;font-size:15px;color:#1e3a8a;}
+.address{font-style:italic;font-size:12px;margin-bottom:15px}
 .info-table{width:100%;border-collapse:collapse;margin-bottom:15px}
-.info-table td{border:1px solid #000;padding:4px 6px;}
+.info-table td{border:1px solid #000;padding:6px 8px;}
 .label{font-weight:bold;color:#1e3a8a;width:120px;}
-.section-title{font-size:12px;font-weight:bold;color:#1e3a8a;margin-top:15px;margin-bottom:5px;text-transform:uppercase;}
+.section-title{font-size:15px;font-weight:bold;color:#1e3a8a;margin-top:15px;margin-bottom:5px;text-transform:uppercase;}
 .tech-table{width:100%;border-collapse:collapse;margin-bottom:15px;border:2px solid #000;}
-.tech-table td{border:1px solid #000;padding:4px;}
+.tech-table td{border:1px solid #000;padding:6px;}
 .item-header{background-color:#cdd4ea;}
-.grand-total{font-weight:bold;font-size:12px;}
-.text-block{line-height:1.4;margin-bottom:15px;text-align:justify;}
+.grand-total{font-weight:bold;font-size:15px;}
+.text-block{line-height:1.6;margin-bottom:15px;text-align:justify;font-size:14px;}
+.signature{margin-top:35px;text-align:center}
+.signature-line{border-top:1px solid #333;width:300px;margin:0 auto 8px}
+.signature-text{font-size:14px;color:#333;font-weight:bold}
 @media print{body{padding:0}}
 </style></head><body>
 
@@ -96,7 +102,7 @@ body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:20px}
     <td style="text-align:center;width:100px;"><b>Data:</b></td>
   </tr>
   <tr>
-    <td class="pat-cell">PAT &nbsp;&nbsp; ${proposal.proposal_number || '---'} &nbsp;&nbsp; Rev.${proposal.revision || '00'}</td>
+    <td class="pat-cell">PAT &nbsp;&nbsp; ${patNumber} &nbsp;&nbsp; Rev.${proposal.revision || '00'}</td>
     <td style="text-align:center;font-weight:bold;color:#1e3a8a;">${dateStr}</td>
   </tr>
 </table>
@@ -132,12 +138,12 @@ body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:20px}
   <span>Conforme o envio de remessa de bens próprios para conserto</span>
   <table style="border-collapse:collapse;">
     <tr>
-      <td style="border:1px solid #000;padding:2px 10px;font-weight:bold;">Nfe</td>
-      <td style="border:1px solid #000;padding:2px 10px;text-align:right;">${proposal.invoice_number || '-'}</td>
+      <td style="border:1px solid #000;padding:4px 12px;font-weight:bold;">Nfe</td>
+      <td style="border:1px solid #000;padding:4px 12px;text-align:right;">${proposal.invoice_number || '-'}</td>
     </tr>
     <tr>
-      <td style="border:1px solid #000;padding:2px 10px;font-weight:bold;">Data:</td>
-      <td style="border:1px solid #000;padding:2px 10px;text-align:right;">${dateStr}</td>
+      <td style="border:1px solid #000;padding:4px 12px;font-weight:bold;">Data:</td>
+      <td style="border:1px solid #000;padding:4px 12px;text-align:right;">${dateStr}</td>
     </tr>
   </table>
 </div>
@@ -146,8 +152,8 @@ body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:20px}
 <table class="tech-table">
   ${itemsHtml}
   <tr>
-    <td colspan="4" style="text-align:right;font-weight:bold;font-size:12px;padding:6px;">TOTAL R$</td>
-    <td style="text-align:right;font-weight:bold;font-size:12px;padding:6px;background-color:#e8ebf5;">${fmtCurrency(proposal.total_price || 0)}</td>
+    <td colspan="4" style="text-align:right;font-weight:bold;font-size:15px;padding:8px;">TOTAL R$</td>
+    <td style="text-align:right;font-weight:bold;font-size:15px;padding:8px;background-color:#e8ebf5;">${fmtCurrency(proposal.total_price || 0)}</td>
   </tr>
 </table>
 
@@ -169,7 +175,7 @@ body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:20px}
   Prevalecem as Condições Gerais de Fornecimento da Associação Brasileira da Indústria de Máquinas e Equipamentos, departamento Nacional de Máquinas e Ferramentas;<br><br>
   
   <table style="width:100%;border:none;margin-bottom:10px;">
-    <tr><td style="width:200px;font-weight:bold;">VALOR TOTAL DA PROPOSTA:</td><td style="font-weight:bold;">${fmtCurrency(proposal.total_price || 0)}</td></tr>
+    <tr><td style="width:220px;font-weight:bold;">VALOR TOTAL DA PROPOSTA:</td><td style="font-weight:bold;">${fmtCurrency(proposal.total_price || 0)}</td></tr>
     <tr><td style="font-weight:bold;">PRAZO DE ENTREGA:</td><td>${proposal.delivery_time || 'A combinar'}</td></tr>
     <tr><td style="font-weight:bold;">COND. PAGAMENTO:</td><td>${proposal.payment_condition || '28DDL'}</td></tr>
     <tr><td style="font-weight:bold;">IMPOSTOS:</td><td>Inclusos (Empresa optante pelo regime SIMPLES);</td></tr>
@@ -184,6 +190,11 @@ body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:20px}
 
   <b>CONDIÇÕES PROPOSTA/SEGURO:</b><br>
   Esta proposta uma vez dada como aceita, sendo a mesma firmada e reconhecida e aceita pelas partes de competência, passa automaticamente a ter cunho e força de pedido, prevalecendo sobre a mesma todas às garantias cabíveis a uma transação mercantil, sendo amparada pelos itens tabulados no anverso do pedido de produtos Sigma Transformadores;
+</div>
+
+<div class="signature">
+  <div class="signature-line"></div>
+  <div class="signature-text">Eng. Mauro Miyawaki - Gerente comercial</div>
 </div>
 
 </body></html>`
