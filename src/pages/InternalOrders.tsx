@@ -83,6 +83,7 @@ export default function InternalOrders() {
                   <TableHead>Data</TableHead>
                   <TableHead>Nº PI</TableHead>
                   <TableHead>Cliente</TableHead>
+                  <TableHead>Referência</TableHead>
                   <TableHead>Operação</TableHead>
                   <TableHead>Entrega</TableHead>
                   <TableHead className="text-right">Valor Total</TableHead>
@@ -99,7 +100,10 @@ export default function InternalOrders() {
                       {o.pi_number || '-'}
                     </TableCell>
                     <TableCell className="font-medium">
-                      {o.expand?.lead_id?.name || 'Cliente excluído'}
+                      {o.cliente_nome || o.expand?.lead_id?.name || 'Cliente excluído'}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {o.expand?.pcs_id?.title || o.source_reference || '-'}
                     </TableCell>
                     <TableCell>
                       <Badge variant={o.operation_type === 'novo' ? 'default' : 'secondary'}>
@@ -144,9 +148,10 @@ export default function InternalOrders() {
                 ))}
                 {orders.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
                       <ClipboardList className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                      <p className="font-medium">Nenhum PI encontrado.</p>
+                      <p className="font-medium">Nenhum Pedido Interno gerado ainda.</p>
+                      <p className="text-sm">Aceite uma Proposta Comercial (PCS) para iniciar.</p>
                     </TableCell>
                   </TableRow>
                 )}

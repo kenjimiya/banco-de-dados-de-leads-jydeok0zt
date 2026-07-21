@@ -239,15 +239,26 @@ export interface InternalOrder extends RecordModel {
   pi_number: string
   billing_date: string
   source_reference: string
+  notes: string
+  cliente_nome: string
+  cliente_endereco: string
+  cliente_cep: string
+  cliente_cnpj: string
+  cliente_ie: string
+  cliente_email: string
+  cliente_telefone: string
+  cliente_contato: string
+  pcs_id: string
   expand?: {
     lead_id: Lead
+    pcs_id: Proposal
   }
 }
 
 export const getInternalOrders = () =>
   pb
     .collection<InternalOrder>('internal_orders')
-    .getFullList({ sort: '-created', expand: 'lead_id' })
+    .getFullList({ sort: '-created', expand: 'lead_id,pcs_id' })
 
 export const getLeadInternalOrders = (leadId: string) =>
   pb

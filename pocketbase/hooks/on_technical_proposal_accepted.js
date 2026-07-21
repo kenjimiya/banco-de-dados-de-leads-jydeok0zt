@@ -13,8 +13,9 @@ onRecordAfterUpdateSuccess((e) => {
   var leadId = e.record.getString('lead_id')
   if (!leadId) return e.next()
 
+  var lead
   try {
-    $app.findRecordById('leads', leadId)
+    lead = $app.findRecordById('leads', leadId)
   } catch (_) {
     return e.next()
   }
@@ -128,6 +129,14 @@ onRecordAfterUpdateSuccess((e) => {
   pi.set('volumes_quantity', 1)
   pi.set('packaging_type', 'papelao')
   pi.set('notes', '')
+  pi.set('cliente_nome', lead.getString('name') || '')
+  pi.set('cliente_endereco', lead.getString('address') || '')
+  pi.set('cliente_cep', lead.getString('cep') || '')
+  pi.set('cliente_cnpj', lead.getString('cnpj') || '')
+  pi.set('cliente_ie', lead.getString('ie') || '')
+  pi.set('cliente_email', lead.getString('email') || '')
+  pi.set('cliente_telefone', lead.getString('phone') || '')
+  pi.set('cliente_contato', lead.getString('contact_name') || '')
 
   try {
     $app.save(pi)

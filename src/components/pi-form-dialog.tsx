@@ -193,6 +193,14 @@ export function PiFormDialog({
         billing_date: form.billing_date ? new Date(form.billing_date).toISOString() : '',
         source_reference: form.source_reference || '',
         notes: form.notes || '',
+        cliente_nome: leadForm.name || '',
+        cliente_endereco: leadForm.address || '',
+        cliente_cep: leadForm.cep || '',
+        cliente_cnpj: leadForm.cnpj || '',
+        cliente_ie: leadForm.ie || '',
+        cliente_email: leadForm.email || '',
+        cliente_telefone: leadForm.phone || '',
+        cliente_contato: leadForm.contact_name || '',
       }
       if (isEdit && order) {
         await updateInternalOrder(order.id, data)

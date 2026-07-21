@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-21T17:57:32.456Z",
+  "generatedAt": "2026-07-21T18:09:48.187Z",
   "collections": [
     {
       "name": "users",
@@ -661,6 +661,61 @@
           "type": "text",
           "required": false,
           "system": false
+        },
+        {
+          "name": "cliente_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cliente_endereco",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cliente_cep",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cliente_cnpj",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cliente_ie",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cliente_email",
+          "type": "email",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cliente_telefone",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cliente_contato",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pcs_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "proposals"
         }
       ],
       "indexes": ["CREATE INDEX idx_internal_orders_lead_id ON internal_orders (lead_id)"]
