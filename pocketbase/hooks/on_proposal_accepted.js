@@ -67,10 +67,11 @@ onRecordAfterUpdateSuccess((e) => {
   var totalValue = 0
   for (var j = 0; j < itemsArray.length; j++) {
     var item = itemsArray[j]
-    if (!item.description || !String(item.description).trim()) continue
+    var desc = item.product_name || item.description || ''
+    if (!desc || !String(desc).trim()) continue
     var subtotal = item.total_price || (item.quantity || 1) * (item.unit_price || 0)
     piItems.push({
-      description: item.description || '',
+      description: desc,
       quantity: item.quantity || 1,
       unit_price: item.unit_price || 0,
       ncm: '',

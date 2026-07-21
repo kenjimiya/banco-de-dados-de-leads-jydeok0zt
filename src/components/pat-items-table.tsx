@@ -32,8 +32,6 @@ export function PatItemsTable({
         manufacture_date: '',
         diagnostics: [
           {
-            defect: '',
-            solution: '',
             replace_quantity: 1,
             replace_item: '',
             replace_unit_price: 0,
@@ -65,8 +63,6 @@ export function PatItemsTable({
     item.diagnostics = [
       ...(item.diagnostics || []),
       {
-        defect: '',
-        solution: '',
         replace_quantity: 1,
         replace_item: '',
         replace_unit_price: 0,
@@ -154,30 +150,21 @@ export function PatItemsTable({
               <Label className="text-sm font-semibold text-primary">
                 Laudo Técnico (Diagnósticos)
               </Label>
-              <div className="space-y-3">
+              <div className="space-y-3 mt-2">
                 {(item.diagnostics || []).map((diag: Diagnostic, di: number) => (
                   <div
                     key={di}
-                    className="relative border border-border/50 rounded-lg p-3 space-y-3 bg-secondary/10"
+                    className="relative border border-border/50 rounded-lg p-3 bg-secondary/10"
                   >
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 z-10"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 z-10 shadow-sm"
                       onClick={() => removeDiagnostic(i, di)}
                     >
                       <Trash2 className="w-3 h-3" />
                     </Button>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Defeito {di + 1}</Label>
-                      <Textarea
-                        value={diag.defect}
-                        onChange={(e) => updateDiagnostic(i, di, 'defect', e.target.value)}
-                        placeholder="Descreva o defeito encontrado..."
-                        rows={2}
-                      />
-                    </div>
                     <div className="grid grid-cols-12 gap-2 items-end">
                       <div className="col-span-2 flex items-center justify-center h-10 bg-primary/10 rounded-md">
                         <span className="text-sm font-bold text-primary">Substituir</span>

@@ -29,10 +29,6 @@ export function exportPatPDF(proposal: TechnicalProposal, lead?: Lead) {
           const replacePrice = diag.replace_unit_price || diag.price || 0
           const replaceTotal = replaceQty * replacePrice
           return `
-      <tr>
-        <td colspan="2" style="font-weight: bold; text-align: center; vertical-align: middle;">DEFEITO ${di + 1}</td>
-        <td colspan="3" style="white-space: pre-wrap; vertical-align: top;">${diag.defect || '-'}</td>
-      </tr>
       <tr style="background-color: #f8f8f8;">
         <td style="font-weight: bold; text-align: center; vertical-align: middle;">SUBSTITUIR</td>
         <td style="text-align: center; vertical-align: middle;">${replaceQty}</td>

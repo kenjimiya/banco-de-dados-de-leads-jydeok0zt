@@ -67,7 +67,7 @@ export function PiFormDialog({
     else setSelectedLead(null)
 
     setItems(
-      order?.items?.length
+      order?.items
         ? order.items
         : [{ description: '', quantity: 1, unit_price: 0, ncm: '', subtotal: 0 }],
     )
@@ -184,15 +184,14 @@ export function PiFormDialog({
       )}
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="flex items-center gap-3">
             {isEdit ? 'Editar Pedido Interno (PI)' : 'Novo Pedido Interno (PI)'}
+            {form.pi_number && (
+              <span className="text-base font-bold text-primary tracking-wide bg-primary/10 px-2 py-0.5 rounded-md">
+                # {form.pi_number}
+              </span>
+            )}
           </DialogTitle>
-          {form.pi_number && (
-            <div className="flex items-center gap-2 mt-1 text-primary">
-              <Hash className="w-4 h-4" />
-              <span className="text-lg font-bold tracking-wide">{form.pi_number}</span>
-            </div>
-          )}
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <Tabs defaultValue="client" className="w-full">
