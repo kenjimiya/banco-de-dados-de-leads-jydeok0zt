@@ -162,7 +162,7 @@ export function PatItemsTable({
                         value={part.quantity || ''}
                         onChange={(e) => updatePart(i, pi, 'quantity', e.target.value)}
                         placeholder="0"
-                        className="h-auto py-2 text-center font-semibold min-w-[90px]"
+                        className="h-auto py-2 text-center font-semibold min-w-[120px]"
                       />
                     </div>
                     <div className="col-span-2 space-y-1.5">

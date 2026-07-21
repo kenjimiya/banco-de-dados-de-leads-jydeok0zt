@@ -65,7 +65,7 @@ onRecordAfterUpdateSuccess((e) => {
     } catch (_) {}
   }
 
-  var piItems = []
+  var rawPiItems = []
   for (var j = 0; j < itemsArray.length; j++) {
     var diag = itemsArray[j]
     var parts = diag.parts || []
@@ -78,8 +78,8 @@ onRecordAfterUpdateSuccess((e) => {
       var qty = part.quantity || 1
       var price = part.unit_price || 0
       var subtotal = part.total_price || qty * price
-      piItems.push({
-        description: desc,
+      rawPiItems.push({
+        description: String(desc).trim(),
         quantity: qty,
         unit_price: price,
         ncm: '',
@@ -91,15 +91,34 @@ onRecordAfterUpdateSuccess((e) => {
       var fallbackDesc = diag.equipment || ''
       if (diag.serial_number) fallbackDesc += ' [Serie: ' + diag.serial_number + ']'
       if (!fallbackDesc || !String(fallbackDesc).trim()) continue
-      var fallbackQty = 1
-      var fallbackPrice = 0
-      var fallbackSubtotal = 0
-      piItems.push({
-        description: fallbackDesc,
-        quantity: fallbackQty,
-        unit_price: fallbackPrice,
+      rawPiItems.push({
+        description: String(fallbackDesc).trim(),
+        quantity: 1,
+        unit_price: 0,
         ncm: '',
-        subtotal: fallbackSubtotal,
+        subtotal: 0,
+      })
+    }
+  }
+
+  var aggregatedMap = {}
+  var piItems = []
+  for (var n = 0; n < rawPiItems.length; n++) {
+    var rawItem = rawPiItems[n]
+    var key = rawItem.description.toLowerCase()
+    if (aggregatedMap.hasOwnProperty(key)) {
+      var existingIdx = aggregatedMap[key]
+      piItems[existingIdx].quantity = (piItems[existingIdx].quantity || 0) + (rawItem.quantity || 0)
+      piItems[existingIdx].subtotal =
+        piItems[existingIdx].quantity * piItems[existingIdx].unit_price
+    } else {
+      aggregatedMap[key] = piItems.length
+      piItems.push({
+        description: rawItem.description,
+        quantity: rawItem.quantity,
+        unit_price: rawItem.unit_price,
+        ncm: '',
+        subtotal: rawItem.quantity * rawItem.unit_price,
       })
     }
   }
