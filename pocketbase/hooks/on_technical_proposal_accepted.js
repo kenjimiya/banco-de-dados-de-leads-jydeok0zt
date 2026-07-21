@@ -69,6 +69,7 @@ onRecordAfterUpdateSuccess((e) => {
   for (var j = 0; j < itemsArray.length; j++) {
     var diag = itemsArray[j]
     var parts = diag.parts || []
+    if (!Array.isArray(parts)) parts = []
 
     for (var k = 0; k < parts.length; k++) {
       var part = parts[k]
@@ -103,7 +104,12 @@ onRecordAfterUpdateSuccess((e) => {
     }
   }
 
-  var totalValue = e.record.get('total_price') || 0
+  var patTotal = e.record.get('total_price') || 0
+  var itemsSum = 0
+  for (var m = 0; m < piItems.length; m++) {
+    itemsSum += piItems[m].subtotal || 0
+  }
+  var totalValue = patTotal > 0 ? patTotal : itemsSum
 
   var invoiceNumber = e.record.getString('invoice_number') || ''
   var patDate = e.record.getString('date') || ''

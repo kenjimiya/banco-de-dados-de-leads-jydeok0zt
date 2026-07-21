@@ -39,7 +39,7 @@ export function PiItemsTable({
             <Input
               value={item.description}
               onChange={(e) => updateItem(i, 'description', e.target.value)}
-              className="col-span-4"
+              className="col-span-3"
               placeholder="Descrição"
             />
             <Input
@@ -53,7 +53,7 @@ export function PiItemsTable({
               min="1"
               value={item.quantity || ''}
               onChange={(e) => updateItem(i, 'quantity', e.target.value)}
-              className="col-span-2"
+              className="col-span-3 min-w-[90px]"
               placeholder="Qtd"
             />
             <Input
