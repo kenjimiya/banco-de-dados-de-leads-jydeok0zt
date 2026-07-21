@@ -353,3 +353,4 @@ export default function Index() {
       <MonthlyRevenueDashboard purchases={purchases} />
     </div>
   )
+}
