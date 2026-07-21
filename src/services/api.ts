@@ -168,6 +168,9 @@ export interface ReplacementPart {
 }
 
 export interface TechnicalDiagnostic {
+  equipment: string
+  serial_number: string
+  manufacturing_date: string
   defect: string
   solution: string
   parts: ReplacementPart[]

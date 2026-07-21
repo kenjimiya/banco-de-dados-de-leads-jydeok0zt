@@ -74,6 +74,9 @@ export function PatFormDialog({
     setItems(
       proposal?.items?.length
         ? (proposal.items as TechnicalDiagnostic[]).map((d) => ({
+            equipment: d.equipment || '',
+            serial_number: d.serial_number || '',
+            manufacturing_date: d.manufacturing_date || '',
             defect: d.defect || '',
             solution: d.solution || '',
             parts: (d.parts || []).map((p) => ({
@@ -85,6 +88,9 @@ export function PatFormDialog({
           }))
         : [
             {
+              equipment: '',
+              serial_number: '',
+              manufacturing_date: '',
               defect: '',
               solution: '',
               parts: [{ description: '', quantity: 1, unit_price: 0, total_price: 0 }],
@@ -106,7 +112,10 @@ export function PatFormDialog({
     })
   }, [open, proposal])
 
-  const grandTotal = items.reduce((sum, item) => sum + (item.total_price || 0), 0)
+  const grandTotal = items.reduce(
+    (sum, item) => sum + (item.parts || []).reduce((s, p) => s + (p.total_price || 0), 0),
+    0,
+  )
 
   const set = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }))
 

@@ -28,6 +28,9 @@ export function PatItemsTable({
     onChange([
       ...items,
       {
+        equipment: '',
+        serial_number: '',
+        manufacturing_date: '',
         defect: '',
         solution: '',
         parts: [{ description: '', quantity: 1, unit_price: 0, total_price: 0 }],
@@ -101,6 +104,32 @@ export function PatItemsTable({
             <CardTitle className="text-sm font-medium">Laudo Técnico {i + 1}</CardTitle>
           </CardHeader>
           <CardContent className="p-4 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-sm font-semibold text-primary">Equipamento</Label>
+                <Input
+                  value={diag.equipment || ''}
+                  onChange={(e) => updateDiagnostic(i, 'equipment', e.target.value)}
+                  placeholder="Nome do equipamento"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-sm font-semibold text-primary">Número de Série</Label>
+                <Input
+                  value={diag.serial_number || ''}
+                  onChange={(e) => updateDiagnostic(i, 'serial_number', e.target.value)}
+                  placeholder="Ex: SN-001234"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-sm font-semibold text-primary">Data de Fabricação</Label>
+                <Input
+                  type="date"
+                  value={diag.manufacturing_date || ''}
+                  onChange={(e) => updateDiagnostic(i, 'manufacturing_date', e.target.value)}
+                />
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-sm font-semibold text-primary">Defeito {i + 1}</Label>

@@ -41,6 +41,10 @@ export function exportPatPDF(proposal: TechnicalProposal, lead?: Lead) {
         0,
       )
 
+      const mfgDate = diag.manufacturing_date
+        ? new Date(diag.manufacturing_date).toLocaleDateString('pt-BR')
+        : '-'
+
       return `
     <div style="margin-bottom:15px;border:2px solid #000;">
       <div style="background-color:#cdd4ea;padding:6px 8px;font-weight:bold;color:#1e3a8a;font-size:14px;">
@@ -48,7 +52,19 @@ export function exportPatPDF(proposal: TechnicalProposal, lead?: Lead) {
       </div>
       <table style="width:100%;border-collapse:collapse;">
         <tr>
-          <td style="width:120px;border:1px solid #000;padding:6px 8px;font-weight:bold;color:#1e3a8a;vertical-align:top;">DEFEITO ${index + 1}:</td>
+          <td style="width:120px;border:1px solid #000;padding:6px 8px;font-weight:bold;color:#1e3a8a;vertical-align:top;">EQUIPAMENTO:</td>
+          <td style="border:1px solid #000;padding:6px 8px;">${diag.equipment || '-'}</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #000;padding:6px 8px;font-weight:bold;color:#1e3a8a;vertical-align:top;">Nº SÉRIE:</td>
+          <td style="border:1px solid #000;padding:6px 8px;">${diag.serial_number || '-'}</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #000;padding:6px 8px;font-weight:bold;color:#1e3a8a;vertical-align:top;">FABRICAÇÃO:</td>
+          <td style="border:1px solid #000;padding:6px 8px;">${mfgDate}</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #000;padding:6px 8px;font-weight:bold;color:#1e3a8a;vertical-align:top;">DEFEITO ${index + 1}:</td>
           <td style="border:1px solid #000;padding:6px 8px;">${diag.defect || '-'}</td>
         </tr>
         <tr>
