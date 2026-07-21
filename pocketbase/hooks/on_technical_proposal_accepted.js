@@ -4,7 +4,8 @@ onRecordAfterUpdateSuccess((e) => {
 
   if (oldStatus === 'aceito' || newStatus !== 'aceito') return e.next()
 
-  var sourceRef = 'PAT:' + e.record.id
+  var proposalNumber = e.record.getString('proposal_number') || ''
+  var sourceRef = 'PAT:' + (proposalNumber || e.record.id)
   try {
     $app.findFirstRecordByData('internal_orders', 'source_reference', sourceRef)
     return e.next()
@@ -65,48 +66,44 @@ onRecordAfterUpdateSuccess((e) => {
   }
 
   var piItems = []
-  var totalValue = 0
-
   for (var j = 0; j < itemsArray.length; j++) {
-    var item = itemsArray[j]
-    var diagnostics = item.diagnostics || []
-    var hasReplaceItems = false
+    var diag = itemsArray[j]
+    var parts = diag.parts || []
 
-    for (var k = 0; k < diagnostics.length; k++) {
-      var diag = diagnostics[k]
-      var replaceItem = diag.replace_item || ''
-      if (!replaceItem || !String(replaceItem).trim()) continue
-      hasReplaceItems = true
-      var replaceQty = diag.replace_quantity || 1
-      var replacePrice = diag.replace_unit_price || diag.price || 0
-      var diagSubtotal = replaceQty * replacePrice
-      piItems.push({
-        description: replaceItem,
-        quantity: replaceQty,
-        unit_price: replacePrice,
-        ncm: '',
-        subtotal: diagSubtotal,
-      })
-      totalValue += diagSubtotal
-    }
-
-    if (!hasReplaceItems) {
-      var desc = item.description || ''
-      if (item.serial_number) desc += ' [Serie: ' + item.serial_number + ']'
+    for (var k = 0; k < parts.length; k++) {
+      var part = parts[k]
+      var desc = part.description || ''
       if (!desc || !String(desc).trim()) continue
-      var fallbackQty = item.quantity || 1
-      var fallbackPrice = item.unit_price || 0
-      var fallbackSubtotal = item.total_price || fallbackQty * fallbackPrice
+      var qty = part.quantity || 1
+      var price = part.unit_price || 0
+      var subtotal = part.total_price || qty * price
       piItems.push({
         description: desc,
+        quantity: qty,
+        unit_price: price,
+        ncm: '',
+        subtotal: subtotal,
+      })
+    }
+
+    if (parts.length === 0) {
+      var fallbackDesc = diag.equipment || ''
+      if (diag.serial_number) fallbackDesc += ' [Serie: ' + diag.serial_number + ']'
+      if (!fallbackDesc || !String(fallbackDesc).trim()) continue
+      var fallbackQty = 1
+      var fallbackPrice = 0
+      var fallbackSubtotal = 0
+      piItems.push({
+        description: fallbackDesc,
         quantity: fallbackQty,
         unit_price: fallbackPrice,
         ncm: '',
         subtotal: fallbackSubtotal,
       })
-      totalValue += fallbackSubtotal
     }
   }
+
+  var totalValue = e.record.get('total_price') || 0
 
   var invoiceNumber = e.record.getString('invoice_number') || ''
   var patDate = e.record.getString('date') || ''

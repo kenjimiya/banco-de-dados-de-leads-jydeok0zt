@@ -136,7 +136,7 @@ export function PatItemsTable({
                     key={pi}
                     className="relative grid grid-cols-12 gap-3 items-start border border-border/50 rounded-lg p-3 bg-secondary/10"
                   >
-                    <div className="col-span-4 space-y-1.5">
+                    <div className="col-span-3 space-y-1.5">
                       <Label className="text-xs">Defeito</Label>
                       <Textarea
                         value={part.defect || ''}
@@ -154,7 +154,7 @@ export function PatItemsTable({
                         rows={2}
                       />
                     </div>
-                    <div className="col-span-1 space-y-1.5">
+                    <div className="col-span-2 space-y-1.5">
                       <Label className="text-xs">Qtd</Label>
                       <Input
                         type="number"
@@ -162,7 +162,7 @@ export function PatItemsTable({
                         value={part.quantity || ''}
                         onChange={(e) => updatePart(i, pi, 'quantity', e.target.value)}
                         placeholder="0"
-                        className="h-auto py-2"
+                        className="h-auto py-2 text-center font-semibold"
                       />
                     </div>
                     <div className="col-span-2 space-y-1.5">
