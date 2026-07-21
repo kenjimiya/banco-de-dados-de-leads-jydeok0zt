@@ -29,6 +29,7 @@ import { Plus, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { LeadSelect } from './lead-select'
 import { PatItemsTable } from './pat-items-table'
+import { LeadInfoCard } from './lead-info-card'
 
 const DEFAULT_TERMS = {
   payment_condition: '28DDL',
@@ -176,6 +177,7 @@ export function PatFormDialog({
             <Label>Cliente *</Label>
             <LeadSelect value={selectedLead} onChange={setSelectedLead} />
           </div>
+          {selectedLead && <LeadInfoCard lead={selectedLead} />}
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1.5">
               <Label>Nº Proposta</Label>

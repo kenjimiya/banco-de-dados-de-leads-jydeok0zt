@@ -89,6 +89,9 @@ export function PiFormDialog({
       net_weight: order?.net_weight || 0,
       gross_weight: order?.gross_weight || 0,
       packaging_type: order?.packaging_type || 'papelao',
+      pi_number: order?.pi_number || '',
+      billing_date: order?.billing_date ? format(new Date(order.billing_date), 'yyyy-MM-dd') : '',
+      source_reference: order?.source_reference || '',
     })
   }, [open, order])
 
@@ -148,6 +151,9 @@ export function PiFormDialog({
         net_weight: Number(form.net_weight) || 0,
         gross_weight: Number(form.gross_weight) || 0,
         packaging_type: form.packaging_type,
+        pi_number: form.pi_number || '',
+        billing_date: form.billing_date ? new Date(form.billing_date).toISOString() : '',
+        source_reference: form.source_reference || '',
       }
       if (isEdit && order) {
         await updateInternalOrder(order.id, data)
@@ -260,6 +266,25 @@ export function PiFormDialog({
             </TabsContent>
 
             <TabsContent value="items" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label>Nº do PI</Label>
+                  <Input
+                    value={form.pi_number || ''}
+                    onChange={(e) => set('pi_number', e.target.value)}
+                    placeholder="Gerado automaticamente"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Data de Faturamento</Label>
+                  <Input
+                    type="date"
+                    value={form.billing_date || ''}
+                    onChange={(e) => set('billing_date', e.target.value)}
+                  />
+                </div>
+              </div>
+
               <div className="space-y-1.5">
                 <Label>Tipo de Operação</Label>
                 <Select value={form.operation_type} onValueChange={(v) => set('operation_type', v)}>
@@ -337,11 +362,21 @@ export function PiFormDialog({
                   </div>
                   <div className="space-y-1.5">
                     <Label>Tipo de Frete</Label>
-                    <Input
-                      value={form.shipping_type}
-                      onChange={(e) => set('shipping_type', e.target.value)}
-                      placeholder="Ex: CIF, FOB, SEDEX"
-                    />
+                    <Select
+                      value={form.shipping_type || ''}
+                      onValueChange={(v) => set('shipping_type', v)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecionar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="CIF">CIF</SelectItem>
+                        <SelectItem value="FOB">FOB</SelectItem>
+                        <SelectItem value="SEDEX/Correio">SEDEX/Correio</SelectItem>
+                        <SelectItem value="Retirada">Retirada</SelectItem>
+                        <SelectItem value="Transportadora">Transportadora</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="bg-primary/10 p-3 rounded-xl">

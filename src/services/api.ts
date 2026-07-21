@@ -229,6 +229,9 @@ export interface InternalOrder extends RecordModel {
   net_weight: number
   gross_weight: number
   packaging_type: 'papelao' | 'madeira'
+  pi_number: string
+  billing_date: string
+  source_reference: string
   expand?: {
     lead_id: Lead
   }
