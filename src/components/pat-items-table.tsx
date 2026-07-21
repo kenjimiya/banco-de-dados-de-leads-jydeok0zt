@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Plus, Trash2 } from 'lucide-react'
 import type { TechnicalProposalItem, Diagnostic } from '@/services/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -176,15 +175,6 @@ export function PatItemsTable({
                         value={diag.defect}
                         onChange={(e) => updateDiagnostic(i, di, 'defect', e.target.value)}
                         placeholder="Descreva o defeito encontrado..."
-                        rows={2}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Solução {di + 1}</Label>
-                      <Textarea
-                        value={diag.solution}
-                        onChange={(e) => updateDiagnostic(i, di, 'solution', e.target.value)}
-                        placeholder="Descreva a solução técnica..."
                         rows={2}
                       />
                     </div>

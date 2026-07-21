@@ -33,10 +33,6 @@ export function exportPatPDF(proposal: TechnicalProposal, lead?: Lead) {
         <td colspan="2" style="font-weight: bold; text-align: center; vertical-align: middle;">DEFEITO ${di + 1}</td>
         <td colspan="3" style="white-space: pre-wrap; vertical-align: top;">${diag.defect || '-'}</td>
       </tr>
-      <tr>
-        <td colspan="2" style="font-weight: bold; text-align: center; vertical-align: middle;">SOLUÇÃO ${di + 1}</td>
-        <td colspan="3" style="white-space: pre-wrap; vertical-align: top;">${diag.solution || '-'}</td>
-      </tr>
       <tr style="background-color: #f8f8f8;">
         <td style="font-weight: bold; text-align: center; vertical-align: middle;">SUBSTITUIR</td>
         <td style="text-align: center; vertical-align: middle;">${replaceQty}</td>
@@ -203,7 +199,7 @@ body{font-family:Arial,sans-serif;font-size:14px;color:#000;padding:20px}
 
 <div class="signature">
   <div class="signature-line"></div>
-  <div class="signature-text">Eng. Mauro Miyawaki - Gerente comercial</div>
+  <div class="signature-text">Eng. Mauro Miyawaki - Gerente Comercial</div>
 </div>
 
 </body></html>`

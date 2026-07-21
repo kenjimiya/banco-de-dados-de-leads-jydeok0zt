@@ -1,5 +1,6 @@
 import type { Proposal, Lead } from '@/services/api'
 import logoSrc from '@/assets/logosigma-04ba5.jpg'
+import { valueToWords } from '@/lib/number-to-words'
 
 const fmtCurrency = (v: number) =>
   `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -59,7 +60,7 @@ ul{list-style:none}
     <div style="font-size:18px;font-weight:bold;color:#2563eb">PROPOSTA COMERCIAL</div>
     <div class="company-info" style="font-size:15px;margin-top:5px">Nº ${proposal.title || '—'}</div>
     <div class="company-info">Data: ${new Date().toLocaleDateString('pt-BR')}</div>
-    <div class="company-info" style="margin-top:10px;font-weight:bold">Eng. Mauro - gerente comercial</div>
+    <div class="company-info" style="margin-top:10px;font-weight:bold">Eng. Mauro - Gerente Comercial</div>
     <div class="company-info">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
   </div>
 </div>
@@ -83,7 +84,7 @@ ${proposal.composition ? `<div class="section"><div class="section-title">Compos
 <p style="margin-top:8px">Através de sua Assistência Técnica Autorizada, responsável por um atendimento de credibilidade e empatia, em que você encontra preços justos e profissionais treinados para realizar o melhor serviço dentro e fora de garantia.</p></div>
 <div class="section"><div class="section-title">Termos e Condições Comerciais</div>
 <ul class="terms">
-<li><strong>Valor Total:</strong> ${fmtCurrency(grandTotal)}</li>
+<li><strong>Valor Total:</strong> ${fmtCurrency(grandTotal)} (${valueToWords(grandTotal)})</li>
 <li><strong>Prazo de Entrega:</strong> ${proposal.delivery_time || 'A Combinar'}</li>
 <li><strong>Condição de Pagamento:</strong> ${proposal.payment_condition || 'A Combinar'}</li>
 <li><strong>Impostos:</strong> Inclusos (Empresa optante pelo regime SIMPLES)</li>
@@ -92,10 +93,6 @@ ${proposal.composition ? `<div class="section"><div class="section-title">Compos
 <li><strong>Frete / Seguro:</strong> ${proposal.freight_info || 'FOB – Favor indicar a transportadora de sua preferência'}</li>
 </ul></div>
 <div class="approval"><div class="approval-box"><br><br>_______________________<br><br>Nome<br>Título<br>Data</div></div>
-<div class="signature">
-  <div class="signature-line"></div>
-  <div class="signature-text">Eng. Mauro Miyawaki - Gerente comercial</div>
-</div>
 <p style="margin-top:20px;font-size:13px;color:#999;text-align:center">
 Obrigado pela oportunidade. Aguardamos a confirmação do seu pedido. Atenciosamente, Eng Mauro Miyawaki — Gerente Comercial — Sigma Transformadores Ltda</p>
 </body></html>`
