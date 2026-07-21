@@ -21,72 +21,89 @@ export function exportPatPDF(proposal: TechnicalProposal, lead?: Lead) {
 
   const diagnosticsHtml = diagnostics
     .map((diag, index) => {
-      const partsHtml = (diag.parts || [])
-        .map((part) => {
-          const qty = part.quantity || 1
-          const price = part.unit_price || 0
-          const total = qty * price
-          return `
-        <tr style="background-color: #f8f8f8;">
-          <td style="text-align: center; vertical-align: middle;">${qty}</td>
-          <td style="vertical-align: middle;">${part.description || '-'}</td>
-          <td style="text-align: right; vertical-align: middle;">${fmtCurrency(price)}</td>
-          <td style="text-align: right; vertical-align: middle; font-weight: bold;">${fmtCurrency(total)}</td>
-        </tr>`
-        })
-        .join('')
-
-      const diagTotal = (diag.parts || []).reduce(
-        (sum, p) => sum + (p.quantity || 1) * (p.unit_price || 0),
-        0,
-      )
+      const parts = diag.parts || []
+      const diagTotal = parts.reduce((sum, p) => sum + (p.quantity || 1) * (p.unit_price || 0), 0)
 
       const mfgDate = diag.manufacturing_date
         ? new Date(diag.manufacturing_date).toLocaleDateString('pt-BR')
         : '-'
 
+      // Ensure we have at least 1 part so the rows don't break
+      const safeParts =
+        parts.length > 0
+          ? parts
+          : [{ defect: '-', description: '-', quantity: 1, unit_price: 0, total_price: 0 }]
+
+      const defectRows = safeParts
+        .map((p, i) => {
+          if (i === 0) {
+            return `
+            <tr>
+              <td style="border: 1px solid #000; font-weight: bold; text-align: center; padding: 4px; vertical-align: top;" rowspan="${safeParts.length}">DEFEITO:</td>
+              <td style="border: 1px solid #000; padding: 4px;" colspan="2">${p.defect || '-'}</td>
+              <td style="border: 1px solid #000; text-align: center; padding: 4px; vertical-align: middle;" rowspan="${safeParts.length}" colspan="2">VALOR UNIT.(R$)</td>
+            </tr>
+          `
+          }
+          return `
+          <tr>
+            <td style="border: 1px solid #000; padding: 4px;" colspan="2">${p.defect || '-'}</td>
+          </tr>
+        `
+        })
+        .join('')
+
+      const solutionRows = safeParts
+        .map((p, i) => {
+          const qtyStr = p.quantity && p.quantity > 1 ? `${p.quantity} x ` : ''
+          const valStr = (p.total_price || 0).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+          if (i === 0) {
+            return `
+            <tr>
+              <td style="border: 1px solid #000; font-weight: bold; text-align: center; padding: 4px; vertical-align: top;" rowspan="${safeParts.length}">SOLUÇÃO:</td>
+              <td style="border: 1px solid #000; padding: 4px;" colspan="2">${qtyStr}${p.description || '-'}</td>
+              <td style="border: 1px solid #000; padding: 4px; border-right: none; width: 30px;">R$</td>
+              <td style="border: 1px solid #000; padding: 4px; text-align: right; border-left: none;">${valStr}</td>
+            </tr>
+          `
+          }
+          return `
+          <tr>
+            <td style="border: 1px solid #000; padding: 4px;" colspan="2">${qtyStr}${p.description || '-'}</td>
+            <td style="border: 1px solid #000; padding: 4px; border-right: none;">R$</td>
+            <td style="border: 1px solid #000; padding: 4px; text-align: right; border-left: none;">${valStr}</td>
+          </tr>
+        `
+        })
+        .join('')
+
       return `
-    <div style="margin-bottom:15px;border:2px solid #000;">
-      <div style="background-color:#cdd4ea;padding:6px 8px;font-weight:bold;color:#1e3a8a;font-size:14px;">
-        LAUDO TÉCNICO ${index + 1}
-      </div>
-      <table style="width:100%;border-collapse:collapse;">
-        <tr>
-          <td style="width:120px;border:1px solid #000;padding:6px 8px;font-weight:bold;color:#1e3a8a;vertical-align:top;">EQUIPAMENTO:</td>
-          <td style="border:1px solid #000;padding:6px 8px;">${diag.equipment || '-'}</td>
+      <table style="width:100%; border-collapse:collapse; border: 2px solid #000; margin-bottom: 20px; font-size: 13px;">
+        <tr style="background-color: #a4c2f4; font-weight: bold; text-align: center;">
+          <td style="border: 1px solid #000; width: 12%; padding: 4px;">ITEM</td>
+          <td style="border: 1px solid #000; width: 5%; padding: 4px;">${index + 1}</td>
+          <td style="border: 1px solid #000; width: 43%; padding: 4px;">DESCRIÇÃO:</td>
+          <td style="border: 1px solid #000; width: 20%; padding: 4px;">Nº Série:</td>
+          <td style="border: 1px solid #000; width: 20%; padding: 4px;">Data de Fabricação:</td>
         </tr>
-        <tr>
-          <td style="border:1px solid #000;padding:6px 8px;font-weight:bold;color:#1e3a8a;vertical-align:top;">Nº SÉRIE:</td>
-          <td style="border:1px solid #000;padding:6px 8px;">${diag.serial_number || '-'}</td>
+        <tr style="text-align: center;">
+          <td style="border: 1px solid #000; padding: 4px;"></td>
+          <td style="border: 1px solid #000; padding: 4px;" colspan="2">${diag.equipment || '-'}</td>
+          <td style="border: 1px solid #000; padding: 4px;">${diag.serial_number || '-'}</td>
+          <td style="border: 1px solid #000; padding: 4px;">${mfgDate}</td>
         </tr>
-        <tr>
-          <td style="border:1px solid #000;padding:6px 8px;font-weight:bold;color:#1e3a8a;vertical-align:top;">FABRICAÇÃO:</td>
-          <td style="border:1px solid #000;padding:6px 8px;">${mfgDate}</td>
-        </tr>
-        <tr>
-          <td style="border:1px solid #000;padding:6px 8px;font-weight:bold;color:#1e3a8a;vertical-align:top;">DEFEITO ${index + 1}:</td>
-          <td style="border:1px solid #000;padding:6px 8px;">${diag.defect || '-'}</td>
-        </tr>
-        <tr>
-          <td style="border:1px solid #000;padding:6px 8px;font-weight:bold;color:#1e3a8a;vertical-align:top;">SOLUÇÃO ${index + 1}:</td>
-          <td style="border:1px solid #000;padding:6px 8px;">${diag.solution || '-'}</td>
+        ${defectRows}
+        ${solutionRows}
+        <tr style="font-weight: bold;">
+          <td style="border: 1px solid #000; text-align: right; padding: 4px;" colspan="3">SUBTOTAL</td>
+          <td style="border: 1px solid #000; padding: 4px; border-right: none;">R$</td>
+          <td style="border: 1px solid #000; padding: 4px; text-align: right; border-left: none;">${diagTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
         </tr>
       </table>
-      <table style="width:100%;border-collapse:collapse;">
-        <tr style="background-color:#e8ebf5;">
-          <td style="width:60px;border:1px solid #000;padding:4px 8px;font-weight:bold;text-align:center;">Qtd</td>
-          <td style="border:1px solid #000;padding:4px 8px;font-weight:bold;text-align:center;">Descrição do Item</td>
-          <td style="width:120px;border:1px solid #000;padding:4px 8px;font-weight:bold;text-align:center;">Valor Unit.</td>
-          <td style="width:120px;border:1px solid #000;padding:4px 8px;font-weight:bold;text-align:center;">Total</td>
-        </tr>
-        ${partsHtml}
-        <tr>
-          <td colspan="3" style="text-align:right;font-weight:bold;padding:6px 8px;border:1px solid #000;">SUBTOTAL LAUDO ${index + 1}:</td>
-          <td style="text-align:right;font-weight:bold;padding:6px 8px;border:1px solid #000;background-color:#e8ebf5;">${fmtCurrency(diagTotal)}</td>
-        </tr>
-      </table>
-    </div>
-  `
+      `
     })
     .join('')
 
@@ -171,9 +188,14 @@ body{font-family:Arial,sans-serif;font-size:14px;color:#000;padding:20px}
 
 ${diagnosticsHtml}
 
-<div style="border:2px solid #000;padding:8px;margin-bottom:15px;text-align:right;background-color:#e8ebf5;">
-  <span style="font-weight:bold;font-size:15px;">TOTAL R$ &nbsp; ${fmtCurrency(proposal.total_price || 0)}</span>
-</div>
+<table style="width: 100%; border: none; margin-bottom: 20px;">
+  <tr>
+    <td style="text-align: right; width: 60%;"></td>
+    <td style="border: 2px solid #000; font-weight: bold; text-align: right; padding: 6px 10px; font-size: 14px;">
+      VALOR TOTAL= R$ <span style="margin-left: 10px;">${(proposal.total_price || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+    </td>
+  </tr>
+</table>
 
 <div class="section-title">2-ESCOPO DA PROPOSTA:</div>
 <div class="text-block">

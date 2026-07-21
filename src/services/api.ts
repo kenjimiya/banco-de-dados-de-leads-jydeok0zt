@@ -161,6 +161,7 @@ export const updateProposal = (id: string, data: Partial<Proposal>) =>
 export const deleteProposal = (id: string) => pb.collection('proposals').delete(id)
 
 export interface ReplacementPart {
+  defect?: string
   description: string
   quantity: number
   unit_price: number
@@ -171,8 +172,8 @@ export interface TechnicalDiagnostic {
   equipment: string
   serial_number: string
   manufacturing_date: string
-  defect: string
-  solution: string
+  defect?: string
+  solution?: string
   parts: ReplacementPart[]
 }
 

@@ -31,9 +31,7 @@ export function PatItemsTable({
         equipment: '',
         serial_number: '',
         manufacturing_date: '',
-        defect: '',
-        solution: '',
-        parts: [{ description: '', quantity: 1, unit_price: 0, total_price: 0 }],
+        parts: [{ defect: '', description: '', quantity: 1, unit_price: 0, total_price: 0 }],
       },
     ])
 
@@ -51,7 +49,7 @@ export function PatItemsTable({
       ...updated[diagIndex],
       parts: [
         ...(updated[diagIndex].parts || []),
-        { description: '', quantity: 1, unit_price: 0, total_price: 0 },
+        { defect: '', description: '', quantity: 1, unit_price: 0, total_price: 0 },
       ],
     }
     onChange(updated)
@@ -130,51 +128,41 @@ export function PatItemsTable({
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label className="text-sm font-semibold text-primary">Defeito {i + 1}</Label>
-                <Textarea
-                  value={diag.defect}
-                  onChange={(e) => updateDiagnostic(i, 'defect', e.target.value)}
-                  placeholder="Descreva o defeito identificado..."
-                  rows={3}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-sm font-semibold text-primary">Solução {i + 1}</Label>
-                <Textarea
-                  value={diag.solution}
-                  onChange={(e) => updateDiagnostic(i, 'solution', e.target.value)}
-                  placeholder="Descreva a solução técnica aplicada..."
-                  rows={3}
-                />
-              </div>
-            </div>
-
             <div className="space-y-2">
-              <Label className="text-sm font-semibold text-primary">Itens a Substituir</Label>
-              <div className="space-y-2">
+              <Label className="text-sm font-semibold text-primary">Análise e Soluções</Label>
+              <div className="space-y-3">
                 {(diag.parts || []).map((part: ReplacementPart, pi: number) => (
                   <div
                     key={pi}
-                    className="relative grid grid-cols-12 gap-2 items-end border border-border/50 rounded-lg p-3 bg-secondary/10"
+                    className="relative grid grid-cols-12 gap-3 items-start border border-border/50 rounded-lg p-3 bg-secondary/10"
                   >
-                    <div className="col-span-5 space-y-1.5">
-                      <Label className="text-xs">Descrição</Label>
-                      <Input
-                        value={part.description}
-                        onChange={(e) => updatePart(i, pi, 'description', e.target.value)}
-                        placeholder="Descrição do item de substituição"
+                    <div className="col-span-4 space-y-1.5">
+                      <Label className="text-xs">Defeito</Label>
+                      <Textarea
+                        value={part.defect || ''}
+                        onChange={(e) => updatePart(i, pi, 'defect', e.target.value)}
+                        placeholder="Descreva o defeito"
+                        rows={2}
                       />
                     </div>
-                    <div className="col-span-2 space-y-1.5">
-                      <Label className="text-xs">Quantidade</Label>
+                    <div className="col-span-3 space-y-1.5">
+                      <Label className="text-xs">Solução / Item a Substituir</Label>
+                      <Textarea
+                        value={part.description}
+                        onChange={(e) => updatePart(i, pi, 'description', e.target.value)}
+                        placeholder="Item de substituição"
+                        rows={2}
+                      />
+                    </div>
+                    <div className="col-span-1 space-y-1.5">
+                      <Label className="text-xs">Qtd</Label>
                       <Input
                         type="number"
                         min="1"
                         value={part.quantity || ''}
                         onChange={(e) => updatePart(i, pi, 'quantity', e.target.value)}
                         placeholder="0"
+                        className="h-auto py-2"
                       />
                     </div>
                     <div className="col-span-2 space-y-1.5">
@@ -186,28 +174,37 @@ export function PatItemsTable({
                         value={part.unit_price || ''}
                         onChange={(e) => updatePart(i, pi, 'unit_price', e.target.value)}
                         placeholder="0,00"
+                        className="h-auto py-2"
                       />
                     </div>
                     <div className="col-span-2 space-y-1.5">
                       <Label className="text-xs">Subtotal</Label>
-                      <div className="h-10 flex items-center px-3 bg-secondary/50 rounded-md font-semibold text-primary text-sm">
-                        {fmtCurrency(part.total_price || 0)}
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-[38px] flex items-center px-3 bg-secondary/50 rounded-md font-semibold text-primary text-sm">
+                          {fmtCurrency(part.total_price || 0)}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-[38px] w-[38px] text-destructive shrink-0"
+                          onClick={() => removePart(i, pi)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="col-span-1 h-10 w-10 text-destructive"
-                      onClick={() => removePart(i, pi)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
                   </div>
                 ))}
               </div>
-              <Button type="button" variant="outline" size="sm" onClick={() => addPart(i)}>
-                <Plus className="w-3.5 h-3.5 mr-1.5" /> Adicionar Item
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => addPart(i)}
+                className="mt-2"
+              >
+                <Plus className="w-3.5 h-3.5 mr-1.5" /> Adicionar Linha (Defeito/Solução)
               </Button>
             </div>
 
