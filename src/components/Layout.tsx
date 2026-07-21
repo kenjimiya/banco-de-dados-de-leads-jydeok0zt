@@ -1,6 +1,16 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
-import { Home, Users, ShoppingCart, Sparkles, LogOut, Menu, FileText, Wrench } from 'lucide-react'
+import {
+  Home,
+  Users,
+  ShoppingCart,
+  Sparkles,
+  LogOut,
+  Menu,
+  FileText,
+  Wrench,
+  ClipboardList,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -19,6 +29,7 @@ const NavItems = [
   { to: '/vendas', icon: ShoppingCart, label: 'Vendas' },
   { to: '/propostas', icon: FileText, label: 'Propostas Comerciais (PCS)' },
   { to: '/pat', icon: Wrench, label: 'Assistência Técnica (PAT)' },
+  { to: '/pi', icon: ClipboardList, label: 'Pedido Interno (PI)' },
 ]
 
 export default function Layout() {

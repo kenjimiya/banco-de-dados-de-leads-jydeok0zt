@@ -1,8 +1,11 @@
 import type { Proposal, Lead } from '@/services/api'
+import logoSrc from '@/assets/logosigma-04ba5.jpg'
 
-const fmtCurrency = (v: number) => `R$ ${v.toFixed(2)}`
+const fmtCurrency = (v: number) =>
+  `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 export function exportProposalPDF(proposal: Proposal, lead?: Lead) {
+  const logoUrl = new URL(logoSrc, window.location.href).href
   const items = proposal.items || []
   const grandTotal = items.reduce((sum, item) => sum + (item.total_price || 0), 0)
   const leadName = lead?.name || proposal.expand?.lead_id?.name || 'Cliente'
@@ -28,13 +31,14 @@ export function exportProposalPDF(proposal: Proposal, lead?: Lead) {
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;font-size:12px;color:#333;padding:20px}
-.header{display:flex;justify-content:space-between;border-bottom:2px solid #1a56db;padding-bottom:15px;margin-bottom:20px}
-.company-name{font-size:18px;font-weight:bold;color:#1a56db}
-.company-info{font-size:11px;color:#666;margin-top:4px}
+.header{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #2563eb;padding-bottom:15px;margin-bottom:20px}
+.logo-img{max-width:180px;}
+.company-name{font-size:18px;font-weight:bold;color:#2563eb;margin-bottom:4px}
+.company-info{font-size:11px;color:#4b5563;margin-top:2px}
 .section{margin-bottom:15px}
-.section-title{font-size:13px;font-weight:bold;color:#1a56db;margin-bottom:8px;border-bottom:1px solid #ddd;padding-bottom:3px}
+.section-title{font-size:13px;font-weight:bold;color:#2563eb;margin-bottom:8px;border-bottom:1px solid #e5e7eb;padding-bottom:3px}
 table{width:100%;border-collapse:collapse;margin-bottom:10px}
-th{background:#1a56db;color:#fff;padding:6px 8px;font-size:11px;text-align:left}
+th{background:#2563eb;color:#fff;padding:6px 8px;font-size:11px;text-align:left}
 td{padding:6px 8px;border-bottom:1px solid #ddd}
 .total-row{font-weight:bold;font-size:14px;background:#f0f4ff}
 .terms{font-size:11px;line-height:1.6;list-style:none}
@@ -44,15 +48,18 @@ td{padding:6px 8px;border-bottom:1px solid #ddd}
 ul{list-style:none}
 @media print{body{padding:0}}
 </style></head><body>
-<div class="header"><div>
-<div class="company-name">Sigma Transformadores Ltda</div>
-<div class="company-info">Mauro Miyawaki — Gerente Comercial</div>
-<div class="company-info">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
-</div><div style="text-align:right">
-<div style="font-size:14px;font-weight:bold">PROPOSTA COMERCIAL</div>
-<div class="company-info">Nº ${proposal.title || '—'}</div>
-<div class="company-info">Data: ${new Date().toLocaleDateString('pt-BR')}</div>
-</div></div>
+<div class="header">
+  <div>
+    <img src="${logoUrl}" class="logo-img" alt="Sigma Transformadores" />
+  </div>
+  <div style="text-align:right">
+    <div style="font-size:16px;font-weight:bold;color:#2563eb">PROPOSTA COMERCIAL</div>
+    <div class="company-info" style="font-size:12px;margin-top:5px">Nº ${proposal.title || '—'}</div>
+    <div class="company-info">Data: ${new Date().toLocaleDateString('pt-BR')}</div>
+    <div class="company-info" style="margin-top:10px;font-weight:bold">Mauro Miyawaki — Comercial</div>
+    <div class="company-info">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
+  </div>
+</div>
 <div class="section"><div class="section-title">Dados do Cliente</div>
 <table>
 <tr><td style="width:120px;font-weight:bold">Cliente:</td><td>${leadName}</td><td style="width:80px;font-weight:bold">UF:</td><td>${leadUF || '—'}</td></tr>

@@ -1,9 +1,11 @@
 import type { TechnicalProposal, Lead } from '@/services/api'
+import logoSrc from '@/assets/logosigma-04ba5.jpg'
 
 const fmtCurrency = (v: number) =>
   `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 export function exportPatPDF(proposal: TechnicalProposal, lead?: Lead) {
+  const logoUrl = new URL(logoSrc, window.location.href).href
   const leadName = lead?.name || proposal.expand?.lead_id?.name || 'Cliente'
   const leadEmail = lead?.email || proposal.expand?.lead_id?.email || ''
   const leadPhone = lead?.phone || proposal.expand?.lead_id?.phone || ''
@@ -87,10 +89,8 @@ body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:20px}
 
 <table class="header-table">
   <tr>
-    <td rowspan="2" class="logo-cell">
-      <!-- Placeholder for Sigma Logo -->
-      <h1 style="color:#333;font-size:24px;margin:0;">Sigma</h1>
-      <div style="font-size:8px;font-weight:bold;">TRANSFORMADORES LTDA</div>
+    <td rowspan="2" class="logo-cell" style="padding:10px">
+      <img src="${logoUrl}" style="max-width:200px" alt="Sigma Transformadores" />
     </td>
     <td class="title-cell">PROPOSTA DE ASSISTÊNCIA TÉCNICA</td>
     <td style="text-align:center;width:100px;"><b>Data:</b></td>

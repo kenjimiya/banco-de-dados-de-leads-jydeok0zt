@@ -11,6 +11,13 @@ export interface Lead extends RecordModel {
   total_spent: number
   uf: string
   activity: string
+  cnpj: string
+  ie: string
+  address: string
+  cep: string
+  city: string
+  neighborhood: string
+  contact_name: string
 }
 
 export interface Purchase extends RecordModel {
@@ -196,3 +203,51 @@ export const updateTechnicalProposal = (id: string, data: Partial<TechnicalPropo
 
 export const deleteTechnicalProposal = (id: string) =>
   pb.collection('technical_proposals').delete(id)
+
+export interface InternalOrderItem {
+  description: string
+  quantity: number
+  unit_price: number
+  ncm: string
+  subtotal: number
+}
+
+export interface InternalOrder extends RecordModel {
+  lead_id: string
+  operation_type: 'novo' | 'conserto'
+  conserto_invoice_number: string
+  conserto_invoice_date: string
+  items: InternalOrderItem[]
+  discount_amount: number
+  shipping_cost: number
+  shipping_type: string
+  total_value: number
+  payment_condition: string
+  delivery_date: string
+  carrier_name: string
+  volumes_quantity: number
+  net_weight: number
+  gross_weight: number
+  packaging_type: 'papelao' | 'madeira'
+  expand?: {
+    lead_id: Lead
+  }
+}
+
+export const getInternalOrders = () =>
+  pb
+    .collection<InternalOrder>('internal_orders')
+    .getFullList({ sort: '-created', expand: 'lead_id' })
+
+export const getLeadInternalOrders = (leadId: string) =>
+  pb
+    .collection<InternalOrder>('internal_orders')
+    .getFullList({ filter: `lead_id = "${leadId}"`, sort: '-created' })
+
+export const createInternalOrder = (data: Partial<InternalOrder>) =>
+  pb.collection<InternalOrder>('internal_orders').create(data)
+
+export const updateInternalOrder = (id: string, data: Partial<InternalOrder>) =>
+  pb.collection<InternalOrder>('internal_orders').update(id, data)
+
+export const deleteInternalOrder = (id: string) => pb.collection('internal_orders').delete(id)

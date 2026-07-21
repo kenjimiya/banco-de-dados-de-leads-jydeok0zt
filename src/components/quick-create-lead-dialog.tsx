@@ -34,6 +34,13 @@ export function QuickCreateLeadDialog({ onCreated, trigger }: QuickCreateLeadDia
         phone: fd.get('phone') as string,
         uf: fd.get('uf') as string,
         activity: fd.get('activity') as string,
+        cnpj: fd.get('cnpj') as string,
+        ie: fd.get('ie') as string,
+        cep: fd.get('cep') as string,
+        address: fd.get('address') as string,
+        city: fd.get('city') as string,
+        neighborhood: fd.get('neighborhood') as string,
+        contact_name: fd.get('contact_name') as string,
         status: 'novo',
         notes: '',
         total_spent: 0,
@@ -65,23 +72,53 @@ export function QuickCreateLeadDialog({ onCreated, trigger }: QuickCreateLeadDia
             <Label>Nome *</Label>
             <Input name="name" required />
           </div>
-          <div className="space-y-1.5">
-            <Label>Email</Label>
-            <Input name="email" type="email" />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Telefone</Label>
-            <Input name="phone" />
-          </div>
           <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>Email</Label>
+              <Input name="email" type="email" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Telefone</Label>
+              <Input name="phone" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Contato</Label>
+              <Input name="contact_name" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>CNPJ</Label>
+              <Input name="cnpj" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>I.E</Label>
+              <Input name="ie" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>CEP</Label>
+              <Input name="cep" />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Endereço</Label>
+            <Input name="address" />
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <Label>Bairro</Label>
+              <Input name="neighborhood" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Cidade</Label>
+              <Input name="city" />
+            </div>
             <div className="space-y-1.5">
               <Label>UF</Label>
               <Input name="uf" maxLength={3} placeholder="Ex: SC" />
             </div>
-            <div className="space-y-1.5">
-              <Label>Atividade</Label>
-              <Input name="activity" placeholder="Ex: MOVELEIRO" />
-            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Atividade</Label>
+            <Input name="activity" placeholder="Ex: MOVELEIRO" />
           </div>
           <Button type="submit" className="w-full" disabled={saving}>
             {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

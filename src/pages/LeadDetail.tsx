@@ -5,12 +5,14 @@ import {
   getLeadPurchases,
   getLeadProposals,
   getLeadTechnicalProposals,
+  getLeadInternalOrders,
   createPurchase,
   askAnalyst,
   Lead,
   Purchase,
   Proposal,
   TechnicalProposal,
+  InternalOrder,
 } from '@/services/api'
 import { useRealtime } from '@/hooks/use-realtime'
 import { Card, CardContent } from '@/components/ui/card'
@@ -41,6 +43,7 @@ export default function LeadDetail() {
   const [purchases, setPurchases] = useState<Purchase[]>([])
   const [proposals, setProposals] = useState<Proposal[]>([])
   const [patProposals, setPatProposals] = useState<TechnicalProposal[]>([])
+  const [internalOrders, setInternalOrders] = useState<InternalOrder[]>([])
   const [isPurchaseOpen, setIsPurchaseOpen] = useState(false)
   const [chatLog, setChatLog] = useState<{ role: 'user' | 'agent'; content: string }[]>([])
   const [chatInput, setChatInput] = useState('')
@@ -54,6 +57,7 @@ export default function LeadDetail() {
       setPurchases(await getLeadPurchases(id))
       setProposals(await getLeadProposals(id))
       setPatProposals(await getLeadTechnicalProposals(id))
+      setInternalOrders(await getLeadInternalOrders(id))
     } catch {
       navigate('/leads')
     }
@@ -66,6 +70,7 @@ export default function LeadDetail() {
   useRealtime('purchases', loadData)
   useRealtime('proposals', loadData)
   useRealtime('technical_proposals', loadData)
+  useRealtime('internal_orders', loadData)
 
   const unifiedHistory = [
     ...purchases.map((p) => ({
@@ -94,6 +99,15 @@ export default function LeadDetail() {
       status: p.status,
       value: p.total_price || 0,
       link: '/pat',
+    })),
+    ...internalOrders.map((p) => ({
+      id: p.id,
+      type: 'Pedido Interno' as const,
+      date: p.created,
+      title: 'PI - ' + (p.operation_type === 'novo' ? 'Equipamento Novo' : 'Conserto'),
+      status: 'Aberto',
+      value: p.total_value || 0,
+      link: '/pi',
     })),
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 

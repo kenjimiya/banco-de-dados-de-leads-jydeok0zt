@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-20T18:47:59.722Z",
+  "generatedAt": "2026-07-21T12:17:26.211Z",
   "collections": [
     {
       "name": "users",
@@ -128,6 +128,48 @@
         },
         {
           "name": "activity",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cnpj",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ie",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cep",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "city",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "neighborhood",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contact_name",
           "type": "text",
           "required": false,
           "system": false
@@ -465,6 +507,133 @@
         }
       ],
       "indexes": ["CREATE INDEX idx_technical_proposals_lead_id ON technical_proposals (lead_id)"]
+    },
+    {
+      "name": "internal_orders",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "lead_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "leads"
+        },
+        {
+          "name": "operation_type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["novo", "conserto"]
+        },
+        {
+          "name": "conserto_invoice_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "conserto_invoice_date",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "items",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "discount_amount",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "shipping_cost",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "shipping_type",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_value",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "payment_condition",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "delivery_date",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "carrier_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "volumes_quantity",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "net_weight",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "gross_weight",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "packaging_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["papelao", "madeira"]
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_internal_orders_lead_id ON internal_orders (lead_id)"]
     }
   ]
 }
