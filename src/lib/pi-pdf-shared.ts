@@ -14,6 +14,7 @@ export interface PiPdfData {
   leadCity: string
   leadUF: string
   leadCep: string
+  leadNeighborhood: string
   leadPhone: string
   leadEmail: string
   leadContact: string
@@ -29,9 +30,10 @@ export function extractPiData(order: InternalOrder, lead?: Lead): PiPdfData {
     leadCnpj: order.cliente_cnpj || ld?.cnpj || '---',
     leadIe: order.cliente_ie || ld?.ie || '---',
     leadAddress: order.cliente_endereco || ld?.address || '---',
-    leadCity: ld?.city || '---',
-    leadUF: ld?.uf || '---',
+    leadCity: order.cliente_cidade || ld?.city || '---',
+    leadUF: order.cliente_uf || ld?.uf || '---',
     leadCep: order.cliente_cep || ld?.cep || '---',
+    leadNeighborhood: order.cliente_bairro || ld?.neighborhood || '---',
     leadPhone: order.cliente_telefone || ld?.phone || '---',
     leadEmail: order.cliente_email || ld?.email || '---',
     leadContact: order.cliente_contato || ld?.contact_name || '---',

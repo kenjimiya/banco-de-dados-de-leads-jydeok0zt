@@ -24,9 +24,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { format } from 'date-fns'
-import { Search, Plus } from 'lucide-react'
+import { Search, Plus, Pencil } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { ExcelImportDialog } from '@/components/excel-import-dialog'
+import { LeadEditDialog } from '@/components/lead-edit-dialog'
 import { fmtCurrency } from '@/lib/utils'
 
 const STATUS_COLORS = {
@@ -40,6 +41,8 @@ export default function Leads() {
   const [leads, setLeads] = useState<Lead[]>([])
   const [search, setSearch] = useState('')
   const [isAddOpen, setIsAddOpen] = useState(false)
+  const [editLead, setEditLead] = useState<Lead | null>(null)
+  const [editOpen, setEditOpen] = useState(false)
   const navigate = useNavigate()
   const { toast } = useToast()
 
@@ -160,6 +163,7 @@ export default function Leads() {
                 <TableHead>Status</TableHead>
                 <TableHead className="hidden md:table-cell">Última Compra</TableHead>
                 <TableHead className="text-right">Valor Gasto</TableHead>
+                <TableHead className="text-center w-[50px]">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -197,11 +201,25 @@ export default function Leads() {
                   <TableCell className="text-right font-semibold text-primary">
                     {fmtCurrency(lead.total_spent)}
                   </TableCell>
+                  <TableCell className="text-center">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setEditLead(lead)
+                        setEditOpen(true)
+                      }}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
               {filteredLeads.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     Nenhum lead encontrado.
                   </TableCell>
                 </TableRow>
@@ -210,6 +228,13 @@ export default function Leads() {
           </Table>
         </CardContent>
       </Card>
+
+      <LeadEditDialog
+        lead={editLead}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        onSaved={loadData}
+      />
     </div>
   )
 }

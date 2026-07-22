@@ -252,6 +252,9 @@ export interface InternalOrder extends RecordModel {
   cliente_email: string
   cliente_telefone: string
   cliente_contato: string
+  cliente_cidade: string
+  cliente_uf: string
+  cliente_bairro: string
   pcs_id: string
   production_notes: string
   expand?: {

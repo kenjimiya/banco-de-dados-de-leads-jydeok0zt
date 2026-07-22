@@ -11,6 +11,7 @@ export interface LeadInfo {
   city: string
   uf: string
   cep: string
+  neighborhood: string
   phone: string
   email: string
   contact: string
@@ -19,13 +20,14 @@ export interface LeadInfo {
 export function getLeadInfo(order: InternalOrder, lead?: Lead): LeadInfo {
   return {
     name: lead?.name || order.cliente_nome || '---',
+    address: lead?.address || order.cliente_endereco || '---',
+    cep: lead?.cep || order.cliente_cep || '---',
+    city: lead?.city || order.cliente_cidade || '---',
+    uf: lead?.uf || order.cliente_uf || '---',
+    neighborhood: lead?.neighborhood || order.cliente_bairro || '---',
+    phone: lead?.phone || order.cliente_telefone || '---',
     cnpj: lead?.cnpj || order.cliente_cnpj || '---',
     ie: lead?.ie || order.cliente_ie || '---',
-    address: lead?.address || order.cliente_endereco || '---',
-    city: lead?.city || '---',
-    uf: lead?.uf || '---',
-    cep: lead?.cep || order.cliente_cep || '---',
-    phone: lead?.phone || order.cliente_telefone || '---',
     email: lead?.email || order.cliente_email || '---',
     contact: lead?.contact_name || order.cliente_contato || '---',
   }
@@ -49,10 +51,28 @@ export function buildItemsRows(items: InternalOrderItem[]): string {
 }
 
 export function buildClientSection(info: LeadInfo, accent: string, accentBg: string): string {
+  const fields = [
+    { label: 'NOME:', value: info.name },
+    { label: 'ENDEREÇO:', value: info.address },
+    { label: 'CEP:', value: info.cep },
+    { label: 'CIDADE/UF:', value: `${info.city}/${info.uf}` },
+    { label: 'BAIRRO:', value: info.neighborhood },
+    { label: 'TELEFONE:', value: info.phone },
+    { label: 'CNPJ:', value: info.cnpj },
+    { label: 'I.E.:', value: info.ie },
+    { label: 'EMAIL:', value: info.email },
+    { label: 'CONTATO:', value: info.contact },
+  ].filter((r) => r.value && r.value !== '---')
+
+  const rowsHtml = fields
+    .map(
+      (r) =>
+        `<tr><td style="border:1px solid #ccc;padding:3px 6px;font-weight:bold;width:100px;background:${accentBg}">${r.label}</td><td style="border:1px solid #ccc;padding:3px 6px">${r.value}</td></tr>`,
+    )
+    .join('')
+
   return `<div style="font-size:10px;font-weight:bold;color:#fff;background:${accent};padding:3px 8px;margin-bottom:4px;text-transform:uppercase;border-radius:2px">Cliente</div>
-<table style="width:100%;border-collapse:collapse;margin-bottom:6px;font-size:10px">
-  <tr><td style="border:1px solid #ccc;padding:3px 6px;font-weight:bold;width:80px;background:${accentBg}">NOME:</td><td style="border:1px solid #ccc;padding:3px 6px">${info.name}</td></tr>
-</table>`
+<table style="width:100%;border-collapse:collapse;margin-bottom:6px;font-size:10px">${rowsHtml}</table>`
 }
 
 export function buildTotalsSection(

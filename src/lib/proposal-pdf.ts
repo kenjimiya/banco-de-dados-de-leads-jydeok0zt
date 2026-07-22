@@ -14,6 +14,13 @@ export function exportProposalPDF(proposal: Proposal, lead?: Lead) {
   const leadPhone = lead?.phone || proposal.expand?.lead_id?.phone || ''
   const leadUF = lead?.uf || proposal.expand?.lead_id?.uf || ''
   const leadActivity = lead?.activity || proposal.expand?.lead_id?.activity || ''
+  const leadAddress = lead?.address || proposal.expand?.lead_id?.address || '—'
+  const leadCep = lead?.cep || proposal.expand?.lead_id?.cep || '—'
+  const leadCity = lead?.city || proposal.expand?.lead_id?.city || '—'
+  const leadNeighborhood = lead?.neighborhood || proposal.expand?.lead_id?.neighborhood || '—'
+  const leadCnpj = lead?.cnpj || proposal.expand?.lead_id?.cnpj || '—'
+  const leadIe = lead?.ie || proposal.expand?.lead_id?.ie || '—'
+  const leadContact = lead?.contact_name || proposal.expand?.lead_id?.contact_name || '—'
 
   const itemsRows = items
     .map(
@@ -67,9 +74,13 @@ ul{list-style:none}
 </div>
 <div class="section"><div class="section-title">Dados do Cliente</div>
 <table>
-<tr><td style="width:130px;font-weight:bold">Cliente:</td><td>${leadName}</td><td style="width:90px;font-weight:bold">UF:</td><td>${leadUF || '—'}</td></tr>
-<tr><td style="font-weight:bold">Atividade:</td><td>${leadActivity || '—'}</td><td style="font-weight:bold">Telefone:</td><td>${leadPhone || '—'}</td></tr>
+<tr><td style="width:130px;font-weight:bold">Nome:</td><td colspan="3">${leadName}</td></tr>
+<tr><td style="font-weight:bold">Endereço:</td><td>${leadAddress}</td><td style="width:90px;font-weight:bold">CEP:</td><td>${leadCep}</td></tr>
+<tr><td style="font-weight:bold">Cidade/UF:</td><td>${leadCity}/${leadUF || '—'}</td><td style="font-weight:bold">Bairro:</td><td>${leadNeighborhood}</td></tr>
+<tr><td style="font-weight:bold">Telefone:</td><td>${leadPhone || '—'}</td><td style="font-weight:bold">Atividade:</td><td>${leadActivity || '—'}</td></tr>
+<tr><td style="font-weight:bold">CNPJ:</td><td>${leadCnpj}</td><td style="font-weight:bold">I.E.:</td><td>${leadIe}</td></tr>
 <tr><td style="font-weight:bold">Email:</td><td colspan="3">${leadEmail || '—'}</td></tr>
+<tr><td style="font-weight:bold">Contato:</td><td colspan="3">${leadContact}</td></tr>
 </table></div>
 <div class="section"><div class="section-title">Descrição da Proposta — ${proposal.title}</div>
 <table><thead><tr><th style="width:70px">Qtd</th><th>Descrição</th><th style="width:140px;text-align:right">Preço Unit.</th><th style="width:140px;text-align:right">Total</th></tr></thead>

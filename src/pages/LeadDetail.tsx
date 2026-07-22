@@ -20,7 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Sparkles, Plus, Send, MapPin, Briefcase } from 'lucide-react'
+import { ArrowLeft, Sparkles, Plus, Send, MapPin, Briefcase, Pencil } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -34,6 +34,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { LeadEditDialog } from '@/components/lead-edit-dialog'
 import { fmtCurrency } from '@/lib/utils'
 
 export default function LeadDetail() {
@@ -49,6 +50,7 @@ export default function LeadDetail() {
   const [chatInput, setChatInput] = useState('')
   const [convId, setConvId] = useState<string | null>(null)
   const [isChatting, setIsChatting] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
 
   const loadData = async () => {
     if (!id) return
@@ -170,6 +172,14 @@ export default function LeadDetail() {
               <h2 className="text-2xl font-bold">{lead.name}</h2>
               <p className="text-muted-foreground">{lead.email || 'Sem email'}</p>
               <p className="text-muted-foreground text-sm">{lead.phone || 'Sem telefone'}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => setEditOpen(true)}
+              >
+                <Pencil className="w-3.5 h-3.5 mr-1.5" /> Editar
+              </Button>
             </div>
             <div className="flex justify-center flex-wrap gap-2">
               <Badge className="bg-accent/20 text-accent-foreground hover:bg-accent/30 border-none px-4 py-1">
@@ -371,6 +381,7 @@ export default function LeadDetail() {
           </CardContent>
         </Card>
       </div>
+      <LeadEditDialog lead={lead} open={editOpen} onOpenChange={setEditOpen} onSaved={loadData} />
     </div>
   )
 }

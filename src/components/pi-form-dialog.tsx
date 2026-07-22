@@ -227,6 +227,9 @@ export function PiFormDialog({
         cliente_email: leadForm.email || '',
         cliente_telefone: leadForm.phone || '',
         cliente_contato: leadForm.contact_name || '',
+        cliente_cidade: leadForm.city || '',
+        cliente_uf: leadForm.uf || '',
+        cliente_bairro: leadForm.neighborhood || '',
       }
       if (isEdit && order) {
         await updateInternalOrder(order.id, data)
@@ -280,12 +283,48 @@ export function PiFormDialog({
               {selectedLead && (
                 <div className="grid grid-cols-2 gap-4 p-4 border rounded-xl bg-secondary/10">
                   <div className="space-y-1.5 col-span-2">
-                    <Label>Razão Social / Nome</Label>
+                    <Label>Nome do Cliente *</Label>
                     <Input
                       value={leadForm.name}
                       onChange={(e) => setL('name', e.target.value)}
                       required
                     />
+                  </div>
+                  <div className="space-y-1.5 col-span-2">
+                    <Label>Endereço</Label>
+                    <Input
+                      value={leadForm.address}
+                      onChange={(e) => setL('address', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>CEP</Label>
+                    <Input value={leadForm.cep} onChange={(e) => setL('cep', e.target.value)} />
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="col-span-2 space-y-1.5">
+                      <Label>Cidade</Label>
+                      <Input value={leadForm.city} onChange={(e) => setL('city', e.target.value)} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>UF</Label>
+                      <Input
+                        value={leadForm.uf}
+                        onChange={(e) => setL('uf', e.target.value)}
+                        maxLength={3}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 col-span-2">
+                    <Label>Bairro</Label>
+                    <Input
+                      value={leadForm.neighborhood}
+                      onChange={(e) => setL('neighborhood', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Telefone</Label>
+                    <Input value={leadForm.phone} onChange={(e) => setL('phone', e.target.value)} />
                   </div>
                   <div className="space-y-1.5">
                     <Label>CNPJ</Label>
@@ -295,50 +334,16 @@ export function PiFormDialog({
                     <Label>I.E.</Label>
                     <Input value={leadForm.ie} onChange={(e) => setL('ie', e.target.value)} />
                   </div>
-                  <div className="space-y-1.5">
-                    <Label>Contato (Nome)</Label>
-                    <Input
-                      value={leadForm.contact_name}
-                      onChange={(e) => setL('contact_name', e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Telefone</Label>
-                    <Input value={leadForm.phone} onChange={(e) => setL('phone', e.target.value)} />
-                  </div>
                   <div className="space-y-1.5 col-span-2">
                     <Label>Email</Label>
                     <Input value={leadForm.email} onChange={(e) => setL('email', e.target.value)} />
                   </div>
-                  <div className="space-y-1.5 col-span-2 grid grid-cols-12 gap-2">
-                    <div className="col-span-3 space-y-1.5">
-                      <Label>CEP</Label>
-                      <Input value={leadForm.cep} onChange={(e) => setL('cep', e.target.value)} />
-                    </div>
-                    <div className="col-span-9 space-y-1.5">
-                      <Label>Endereço</Label>
-                      <Input
-                        value={leadForm.address}
-                        onChange={(e) => setL('address', e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1.5 col-span-2 grid grid-cols-12 gap-2">
-                    <div className="col-span-5 space-y-1.5">
-                      <Label>Bairro</Label>
-                      <Input
-                        value={leadForm.neighborhood}
-                        onChange={(e) => setL('neighborhood', e.target.value)}
-                      />
-                    </div>
-                    <div className="col-span-5 space-y-1.5">
-                      <Label>Cidade</Label>
-                      <Input value={leadForm.city} onChange={(e) => setL('city', e.target.value)} />
-                    </div>
-                    <div className="col-span-2 space-y-1.5">
-                      <Label>UF</Label>
-                      <Input value={leadForm.uf} onChange={(e) => setL('uf', e.target.value)} />
-                    </div>
+                  <div className="space-y-1.5 col-span-2">
+                    <Label>Pessoa de Contato</Label>
+                    <Input
+                      value={leadForm.contact_name}
+                      onChange={(e) => setL('contact_name', e.target.value)}
+                    />
                   </div>
                 </div>
               )}
@@ -436,8 +441,34 @@ export function PiFormDialog({
               {selectedLead && (
                 <div className="grid grid-cols-2 gap-4 p-4 border rounded-xl bg-secondary/10">
                   <div className="space-y-1.5 col-span-2">
-                    <Label>Nome / Razão Social</Label>
+                    <Label>Nome do Cliente</Label>
                     <Input value={leadForm.name || ''} readOnly className="bg-background" />
+                  </div>
+                  <div className="space-y-1.5 col-span-2">
+                    <Label>Endereço</Label>
+                    <Input value={leadForm.address || ''} readOnly className="bg-background" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>CEP</Label>
+                    <Input value={leadForm.cep || ''} readOnly className="bg-background" />
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="col-span-2 space-y-1.5">
+                      <Label>Cidade</Label>
+                      <Input value={leadForm.city || ''} readOnly className="bg-background" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>UF</Label>
+                      <Input value={leadForm.uf || ''} readOnly className="bg-background" />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 col-span-2">
+                    <Label>Bairro</Label>
+                    <Input value={leadForm.neighborhood || ''} readOnly className="bg-background" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Telefone</Label>
+                    <Input value={leadForm.phone || ''} readOnly className="bg-background" />
                   </div>
                   <div className="space-y-1.5">
                     <Label>CNPJ</Label>
@@ -448,12 +479,12 @@ export function PiFormDialog({
                     <Input value={leadForm.ie || ''} readOnly className="bg-background" />
                   </div>
                   <div className="space-y-1.5 col-span-2">
-                    <Label>Endereço</Label>
-                    <Input value={leadForm.address || ''} readOnly className="bg-background" />
+                    <Label>Email</Label>
+                    <Input value={leadForm.email || ''} readOnly className="bg-background" />
                   </div>
-                  <div className="space-y-1.5">
-                    <Label>CEP</Label>
-                    <Input value={leadForm.cep || ''} readOnly className="bg-background" />
+                  <div className="space-y-1.5 col-span-2">
+                    <Label>Pessoa de Contato</Label>
+                    <Input value={leadForm.contact_name || ''} readOnly className="bg-background" />
                   </div>
                 </div>
               )}
@@ -631,6 +662,9 @@ export function PiFormDialog({
                     cliente_email: leadForm.email || '',
                     cliente_telefone: leadForm.phone || '',
                     cliente_contato: leadForm.contact_name || '',
+                    cliente_cidade: leadForm.city || '',
+                    cliente_uf: leadForm.uf || '',
+                    cliente_bairro: leadForm.neighborhood || '',
                   }
                   if (form.operation_type === 'conserto') {
                     exportPiConsertoPDF(updatedOrder, selectedLead || undefined)
@@ -657,6 +691,16 @@ export function PiFormDialog({
                     conserto_invoice_date: form.conserto_invoice_date,
                     pi_number: form.pi_number || '',
                     cliente_nome: leadForm.name || '',
+                    cliente_endereco: leadForm.address || '',
+                    cliente_cep: leadForm.cep || '',
+                    cliente_cidade: leadForm.city || '',
+                    cliente_uf: leadForm.uf || '',
+                    cliente_bairro: leadForm.neighborhood || '',
+                    cliente_cnpj: leadForm.cnpj || '',
+                    cliente_ie: leadForm.ie || '',
+                    cliente_email: leadForm.email || '',
+                    cliente_telefone: leadForm.phone || '',
+                    cliente_contato: leadForm.contact_name || '',
                   }
                   if (form.operation_type === 'conserto') {
                     exportProductionPdfConserto(updatedOrder, selectedLead || undefined)

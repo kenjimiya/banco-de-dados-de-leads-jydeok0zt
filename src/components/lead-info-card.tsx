@@ -1,56 +1,43 @@
-import { FileText, MapPin, Phone, Mail, User } from 'lucide-react'
+import { MapPin, Phone, Mail, User, FileText, Home, Building2 } from 'lucide-react'
 import { type Lead } from '@/services/api'
 
 export function LeadInfoCard({ lead }: { lead: Lead | null }) {
   if (!lead) return null
 
-  const addressParts = [lead.address, lead.neighborhood, lead.city, lead.uf, lead.cep].filter(
-    Boolean,
-  )
+  const fields = [
+    { icon: User, label: 'Nome', value: lead.name },
+    { icon: Home, label: 'Endereço', value: lead.address },
+    { icon: MapPin, label: 'CEP', value: lead.cep },
+    {
+      icon: Building2,
+      label: 'Cidade/UF',
+      value: [lead.city, lead.uf].filter(Boolean).join('/'),
+    },
+    { icon: Home, label: 'Bairro', value: lead.neighborhood },
+    { icon: Phone, label: 'Telefone', value: lead.phone },
+    { icon: FileText, label: 'CNPJ', value: lead.cnpj },
+    { icon: FileText, label: 'I.E.', value: lead.ie },
+    { icon: Mail, label: 'Email', value: lead.email },
+    { icon: User, label: 'Contato', value: lead.contact_name },
+  ].filter((f) => f.value)
 
   return (
     <div className="grid grid-cols-2 gap-3 p-4 border rounded-xl bg-secondary/10 text-sm animate-fade-in">
-      {lead.cnpj && (
-        <div className="flex items-center gap-2">
-          <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-          <span className="text-muted-foreground">CNPJ:</span>
-          <span className="font-medium">{lead.cnpj}</span>
-        </div>
-      )}
-      {lead.ie && (
-        <div className="flex items-center gap-2">
-          <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-          <span className="text-muted-foreground">I.E.:</span>
-          <span className="font-medium">{lead.ie}</span>
-        </div>
-      )}
-      {lead.contact_name && (
-        <div className="flex items-center gap-2">
-          <User className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-          <span className="text-muted-foreground">Contato:</span>
-          <span className="font-medium">{lead.contact_name}</span>
-        </div>
-      )}
-      {lead.phone && (
-        <div className="flex items-center gap-2">
-          <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-          <span className="text-muted-foreground">Telefone:</span>
-          <span className="font-medium">{lead.phone}</span>
-        </div>
-      )}
-      {lead.email && (
-        <div className="flex items-center gap-2 col-span-2">
-          <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-          <span className="text-muted-foreground">Email:</span>
-          <span className="font-medium truncate">{lead.email}</span>
-        </div>
-      )}
-      {addressParts.length > 0 && (
-        <div className="flex items-center gap-2 col-span-2">
-          <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-          <span className="font-medium">{addressParts.join(', ')}</span>
-        </div>
-      )}
+      {fields.map((f, i) => {
+        const Icon = f.icon
+        return (
+          <div
+            key={i}
+            className={`flex items-center gap-2 ${
+              f.label === 'Endereço' || f.label === 'Email' ? 'col-span-2' : ''
+            }`}
+          >
+            <Icon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+            <span className="text-muted-foreground whitespace-nowrap">{f.label}:</span>
+            <span className="font-medium truncate">{f.value}</span>
+          </div>
+        )
+      })}
     </div>
   )
 }

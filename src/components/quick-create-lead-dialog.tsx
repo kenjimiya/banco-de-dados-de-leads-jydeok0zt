@@ -69,45 +69,19 @@ export function QuickCreateLeadDialog({ onCreated, trigger }: QuickCreateLeadDia
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="space-y-1.5">
-            <Label>Nome *</Label>
+            <Label>Nome do Cliente *</Label>
             <Input name="name" required />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>Email</Label>
-              <Input name="email" type="email" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Telefone</Label>
-              <Input name="phone" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Contato</Label>
-              <Input name="contact_name" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>CNPJ</Label>
-              <Input name="cnpj" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>I.E</Label>
-              <Input name="ie" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>CEP</Label>
-              <Input name="cep" />
-            </div>
           </div>
           <div className="space-y-1.5">
             <Label>Endereço</Label>
             <Input name="address" />
           </div>
+          <div className="space-y-1.5">
+            <Label>CEP</Label>
+            <Input name="cep" />
+          </div>
           <div className="grid grid-cols-3 gap-3">
-            <div className="space-y-1.5">
-              <Label>Bairro</Label>
-              <Input name="neighborhood" />
-            </div>
-            <div className="space-y-1.5">
+            <div className="col-span-2 space-y-1.5">
               <Label>Cidade</Label>
               <Input name="city" />
             </div>
@@ -115,6 +89,32 @@ export function QuickCreateLeadDialog({ onCreated, trigger }: QuickCreateLeadDia
               <Label>UF</Label>
               <Input name="uf" maxLength={3} placeholder="Ex: SC" />
             </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Bairro</Label>
+            <Input name="neighborhood" />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Telefone</Label>
+            <Input name="phone" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>CNPJ</Label>
+              <Input name="cnpj" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>I.E.</Label>
+              <Input name="ie" />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Email</Label>
+            <Input name="email" type="email" />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Pessoa de Contato</Label>
+            <Input name="contact_name" />
           </div>
           <div className="space-y-1.5">
             <Label>Atividade</Label>

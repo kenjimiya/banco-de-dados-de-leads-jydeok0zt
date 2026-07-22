@@ -10,6 +10,13 @@ export function exportPatPDF(proposal: TechnicalProposal, lead?: Lead) {
   const leadEmail = lead?.email || proposal.expand?.lead_id?.email || ''
   const leadPhone = lead?.phone || proposal.expand?.lead_id?.phone || ''
   const leadUF = lead?.uf || proposal.expand?.lead_id?.uf || ''
+  const leadAddress = lead?.address || proposal.expand?.lead_id?.address || '-'
+  const leadCep = lead?.cep || proposal.expand?.lead_id?.cep || '-'
+  const leadCity = lead?.city || proposal.expand?.lead_id?.city || '-'
+  const leadNeighborhood = lead?.neighborhood || proposal.expand?.lead_id?.neighborhood || '-'
+  const leadCnpj = lead?.cnpj || proposal.expand?.lead_id?.cnpj || '-'
+  const leadIe = lead?.ie || proposal.expand?.lead_id?.ie || '-'
+  const leadContact = lead?.contact_name || proposal.expand?.lead_id?.contact_name || '-'
   const dateStr = proposal.date
     ? new Date(proposal.date).toLocaleDateString('pt-BR')
     : new Date().toLocaleDateString('pt-BR')
@@ -147,26 +154,36 @@ body{font-family:Arial,sans-serif;font-size:14px;color:#000;padding:20px}
 
 <table class="info-table">
   <tr>
-    <td class="label">RAZÃO SOCIAL:</td>
+    <td class="label">NOME:</td>
     <td colspan="3">${leadName}</td>
   </tr>
   <tr>
     <td class="label">ENDEREÇO:</td>
-    <td>-</td>
-    <td class="label" style="width:80px;">CEP:</td>
-    <td>-</td>
+    <td colspan="3">${leadAddress}</td>
   </tr>
   <tr>
-    <td class="label">CIDADE:</td>
-    <td>-</td>
+    <td class="label">CEP:</td>
+    <td>${leadCep}</td>
+    <td class="label" style="width:80px;">CIDADE/UF:</td>
+    <td>${leadCity}/${leadUF}</td>
+  </tr>
+  <tr>
     <td class="label">BAIRRO:</td>
-    <td>-</td>
+    <td>${leadNeighborhood}</td>
+    <td class="label">TELEFONE:</td>
+    <td>${leadPhone}</td>
+  </tr>
+  <tr>
+    <td class="label">CNPJ:</td>
+    <td>${leadCnpj}</td>
+    <td class="label">I.E.:</td>
+    <td>${leadIe}</td>
   </tr>
   <tr>
     <td class="label">EMAIL:</td>
     <td>${leadEmail}</td>
-    <td class="label">TELEFONE:</td>
-    <td>${leadPhone}</td>
+    <td class="label">CONTATO:</td>
+    <td>${leadContact}</td>
   </tr>
 </table>
 
