@@ -174,16 +174,6 @@ export function ProposalFormDialog({
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label>Descrição do Produto/Serviço</Label>
-            <Textarea
-              value={form.description || ''}
-              onChange={(e) => set('description', e.target.value)}
-              rows={4}
-              className="min-h-[100px] resize-y"
-              placeholder="Descreva o produto ou serviço proposto..."
-            />
-          </div>
-          <div className="space-y-1.5">
             <Label>Itens da Proposta</Label>
             <ProposalItemsTable items={items} onChange={setItems} />
           </div>
