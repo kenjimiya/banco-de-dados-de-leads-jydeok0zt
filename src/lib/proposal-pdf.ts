@@ -5,6 +5,34 @@ import { valueToWords } from '@/lib/number-to-words'
 const fmtCurrency = (v: number) =>
   `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
+function shortenName(name: string): string {
+  if (!name) return 'Cliente'
+  const words = name.trim().split(/\s+/)
+  if (words.length <= 1) return name
+  const stopWords = new Set([
+    'IND.',
+    'IND',
+    'COM.',
+    'COM',
+    'LTDA',
+    'E',
+    'DE',
+    'DA',
+    'DO',
+    'DAS',
+    'DOS',
+    'S.A.',
+    'SA',
+    'ME',
+    'EPP',
+    'LTD',
+    'ME.',
+  ])
+  const firstMeaningful = words.find((w) => !stopWords.has(w.replace(/[.-]/g, '').toUpperCase()))
+  const base = firstMeaningful || words[0]
+  return base.charAt(0).toUpperCase() + base.slice(1).toLowerCase().replace(/[.-]$/, '')
+}
+
 export function exportProposalPDF(proposal: Proposal, lead?: Lead) {
   const logoUrl = new URL(logoSrc, window.location.href).href
   const items = proposal.items || []
@@ -21,6 +49,20 @@ export function exportProposalPDF(proposal: Proposal, lead?: Lead) {
   const leadCnpj = lead?.cnpj || proposal.expand?.lead_id?.cnpj || '—'
   const leadIe = lead?.ie || proposal.expand?.lead_id?.ie || '—'
   const leadContact = lead?.contact_name || proposal.expand?.lead_id?.contact_name || '—'
+  const shortName = shortenName(leadName)
+
+  const rawTitle = proposal.title || ''
+  let cleanTitle = rawTitle.trim()
+  if (cleanTitle.toUpperCase().startsWith('PCS')) {
+    cleanTitle = cleanTitle.replace(/^PCS\s*/i, '').trim()
+  }
+  if (shortName !== 'Cliente' && shortName !== '') {
+    const re = new RegExp(`\\s*${shortName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, 'i')
+    cleanTitle = cleanTitle.replace(re, '').trim()
+  }
+  const proposalIdParts = ['PCS', cleanTitle]
+  if (shortName !== 'Cliente' && shortName !== '') proposalIdParts.push(shortName)
+  const proposalId = proposalIdParts.filter(Boolean).join(' ')
 
   const itemsRows = items
     .map(
@@ -39,17 +81,17 @@ export function exportProposalPDF(proposal: Proposal, lead?: Lead) {
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;font-size:15px;color:#333;padding:20px}
-.header{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-bottom:2px solid #2563eb;padding-bottom:28px;margin-bottom:28px;padding-top:10px}
-.logo-img{max-width:300px;margin-bottom:32px}
-.proposal-title{font-size:26px;font-weight:bold;color:#2563eb;letter-spacing:1px;margin-bottom:18px}
-.header-meta{font-size:15px;color:#374151;line-height:2}
-.header-meta strong{color:#1e40af}
-=======
-.header{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-bottom:2px solid #2563eb;padding-bottom:28px;margin-bottom:28px;padding-top:10px}
-.logo-img{max-width:300px;margin-bottom:32px}
-.proposal-title{font-size:26px;font-weight:bold;color:#2563eb;letter-spacing:1px;margin-bottom:18px}
-.header-meta{font-size:15px;color:#374151;line-height:2}
-.header-meta strong{color:#1e40af}
+.header{display:flex;flex-direction:row;align-items:stretch;justify-content:space-between;border-bottom:2px solid #2563eb;padding:20px 20px 28px;margin-bottom:28px;gap:50px}
+.header-left{flex:0 0 auto;display:flex;align-items:center}
+.header-center{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px}
+.header-right{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;text-align:right;gap:6px}
+.logo-img{max-width:260px;max-height:90px;width:auto;height:auto}
+.proposal-title{font-size:26px;font-weight:bold;color:#2563eb;letter-spacing:2px}
+.proposal-id{font-size:16px;color:#1e40af;font-weight:bold}
+.proposal-meta{font-size:15px;color:#374151;line-height:1.8}
+.proposal-meta strong{color:#1e40af}
+.contact-info{font-size:14px;color:#4b5563;line-height:1.6}
+.contact-info strong{color:#1e40af}
 .company-info{font-size:15px;color:#4b5563}
 .section{margin-bottom:15px}
 .section-title{font-size:16px;font-weight:bold;color:#2563eb;margin-bottom:8px;border-bottom:1px solid #e5e7eb;padding-bottom:3px}
@@ -68,15 +110,21 @@ ul{list-style:none}
 @media print{body{padding:0}}
 </style></head><body>
 <div class="header">
-  <img src="${logoUrl}" class="logo-img" alt="Sigma Transformadores" />
-  <div class="proposal-title">PROPOSTA COMERCIAL</div>
-  <div class="header-meta">
-    <div>Nº PCS <strong>${proposal.title || '—'}</strong>${leadName !== 'Cliente' ? ` &mdash; ${leadName}` : ''}</div>
-    <div>Revisão: <strong>${proposal.revision || '00'}</strong></div>
-    <div>Data: <strong>${new Date().toLocaleDateString('pt-BR')}</strong></div>
+  <div class="header-left">
+    <img src="${logoUrl}" class="logo-img" alt="Sigma Transformadores" />
   </div>
-  <div class="company-info" style="margin-top:24px;font-weight:bold">Eng. Mauro - Gerente Comercial</div>
-  <div class="company-info" style="margin-top:4px">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
+  <div class="header-center">
+    <div class="proposal-title">PROPOSTA COMERCIAL</div>
+    <div class="proposal-id">${proposalId}</div>
+    <div class="proposal-meta">
+      <div>Revisão: <strong>${proposal.revision || '00'}</strong></div>
+      <div>Data: <strong>${new Date().toLocaleDateString('pt-BR')}</strong></div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="contact-info"><strong>Eng. Mauro - Gerente Comercial</strong></div>
+    <div class="contact-info">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
+  </div>
 </div>
 <div class="section"><div class="section-title">Dados do Cliente</div>
 <table>
