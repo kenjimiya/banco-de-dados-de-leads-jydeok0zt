@@ -65,11 +65,33 @@ export function buildLogisticsHtml(order: InternalOrder, accent: string, accentB
 </table>`
 }
 
+export function buildConsertoItemsHtml(items: InternalOrder['items']): string {
+  if (!items || items.length === 0) {
+    return '<tr><td colspan="7" style="text-align:center;padding:10px">Nenhum item</td></tr>'
+  }
+  return items
+    .map(
+      (item, index) => `<tr>
+      <td style="text-align:center">${index + 1}</td>
+      <td style="text-align:center">${item.quantity}</td>
+      <td>${item.description || '-'}</td>
+      <td>${item.substitution || '-'}</td>
+      <td>${item.serial_number || '-'}</td>
+      <td style="text-align:center">${item.equipment_date ? new Date(item.equipment_date).toLocaleDateString('pt-BR') : '-'}</td>
+      <td style="text-align:center">${item.delivery_date ? new Date(item.delivery_date).toLocaleDateString('pt-BR') : '-'}</td>
+    </tr>`,
+    )
+    .join('')
+}
+
 export function buildSignaturesHtml(): string {
   return `<div style="margin-top:40px;display:flex;justify-content:space-around;text-align:center;font-size:11px;color:#4b5563">
   <div style="width:120px"><div style="border-top:1px solid #333;padding-top:4px;margin-bottom:2px">Mariano</div></div>
   <div style="width:120px"><div style="border-top:1px solid #333;padding-top:4px;margin-bottom:2px">Adão</div></div>
   <div style="width:120px"><div style="border-top:1px solid #333;padding-top:4px;margin-bottom:2px">Rosmar</div></div>
   <div style="width:120px"><div style="border-top:1px solid #333;padding-top:4px;margin-bottom:2px">Ivanildo</div></div>
+</div>
+<div style="margin-top:20px;font-size:11px;color:#4b5563">
+  <div style="display:inline-block;width:200px;border-top:1px solid #333;padding-top:4px">VISTO</div>
 </div>`
 }

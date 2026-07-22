@@ -217,6 +217,10 @@ export interface InternalOrderItem {
   unit_price: number
   ncm: string
   subtotal: number
+  substitution?: string
+  serial_number?: string
+  equipment_date?: string
+  delivery_date?: string
 }
 
 export interface InternalOrder extends RecordModel {

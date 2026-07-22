@@ -3,7 +3,7 @@ import {
   getLogoUrl,
   extractProductionData,
   openPrintWindow,
-  buildProductionItemsHtml,
+  buildConsertoItemsHtml,
   buildLogisticsHtml,
   buildSignaturesHtml,
 } from './pi-pdf-production-shared'
@@ -11,7 +11,7 @@ import {
 export function exportProductionPdfConserto(order: InternalOrder, lead?: Lead) {
   const logoUrl = getLogoUrl()
   const d = extractProductionData(order, lead)
-  const itemsHtml = buildProductionItemsHtml(d.items)
+  const itemsHtml = buildConsertoItemsHtml(d.items)
   const logisticsHtml = buildLogisticsHtml(order, '#ea580c', '#fff7ed')
   const signaturesHtml = buildSignaturesHtml()
   const notes = order.production_notes || order.notes || ''
@@ -69,9 +69,13 @@ table.info-table td{border:1px solid #ccc;padding:4px 6px}
 <div class="section-title">Retorno de Conserto — Itens da Produção</div>
 <table class="tech-table">
   <thead><tr>
-    <th style="width:40px;text-align:center">Item</th>
-    <th style="width:60px;text-align:center">Qtd</th>
-    <th>Composição / Descrição</th>
+    <th style="width:30px;text-align:center">Item</th>
+    <th style="width:40px;text-align:center">Qtd</th>
+    <th>Equipamento</th>
+    <th>Subst.</th>
+    <th style="width:80px">Nº Série</th>
+    <th style="width:70px;text-align:center">Data do EQ</th>
+    <th style="width:70px;text-align:center">Entrega em</th>
   </tr></thead>
   <tbody>${itemsHtml}</tbody>
 </table>

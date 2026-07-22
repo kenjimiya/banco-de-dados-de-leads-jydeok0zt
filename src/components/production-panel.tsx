@@ -51,10 +51,25 @@ export function ProductionPanel() {
     if (!selectedId) return
     const order = orders.find((o) => o.id === selectedId)
     if (!order) return
+    const isConserto = order.operation_type === 'conserto'
     setItems(
       order.items?.length
         ? order.items
-        : [{ description: '', quantity: 1, unit_price: 0, ncm: '', subtotal: 0 }],
+        : isConserto
+          ? [
+              {
+                description: '',
+                quantity: 1,
+                unit_price: 0,
+                ncm: '',
+                subtotal: 0,
+                substitution: '',
+                serial_number: '',
+                equipment_date: '',
+                delivery_date: '',
+              },
+            ]
+          : [{ description: '', quantity: 1, unit_price: 0, ncm: '', subtotal: 0 }],
     )
     setProductionNotes(order.production_notes || '')
     setConsertoNf(order.conserto_invoice_number || '')
@@ -167,9 +182,10 @@ export function ProductionPanel() {
                   {selected.operation_type === 'novo' ? 'EQUIPAMENTO NOVO' : 'CONSERTO'}
                 </Badge>
               </div>
-              <span className="text-sm text-muted-foreground">
-                {selected.cliente_nome || selected.expand?.lead_id?.name || '---'}
-              </span>
+              <div className="flex flex-col items-end text-sm text-muted-foreground">
+                <span>{selected.cliente_nome || selected.expand?.lead_id?.name || '---'}</span>
+                <span>Data: {format(new Date(selected.created), 'dd/MM/yyyy')}</span>
+              </div>
             </CardContent>
           </Card>
 
@@ -198,7 +214,11 @@ export function ProductionPanel() {
           <Card className="border-none shadow-subtle">
             <CardContent className="p-4 space-y-3">
               <h3 className="font-semibold text-sm">Itens da Produção</h3>
-              <ProductionItemsTable items={items} onChange={setItems} />
+              <ProductionItemsTable
+                items={items}
+                onChange={setItems}
+                operationType={selected.operation_type}
+              />
             </CardContent>
           </Card>
 
@@ -269,7 +289,7 @@ export function ProductionPanel() {
               <Textarea
                 value={productionNotes}
                 onChange={(e) => setProductionNotes(e.target.value)}
-                placeholder="Observações para a equipe de produção..."
+                placeholder="Observações para a equipe de produção (Ivanildo e Rosmar)..."
                 rows={4}
               />
             </CardContent>
