@@ -595,78 +595,80 @@ export function PiFormDialog({
           </div>
 
           {isEdit && order && (
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              disabled={saving}
-              onClick={() => {
-                const updatedOrder = {
-                  ...order,
-                  items: items.filter((i) => i.description.trim()),
-                  notes: form.notes || '',
-                  production_notes: form.production_notes || '',
-                  operation_type: form.operation_type,
-                  conserto_invoice_number: form.conserto_invoice_number,
-                  conserto_invoice_date: form.conserto_invoice_date,
-                  discount_amount: Number(form.discount_amount) || 0,
-                  shipping_cost: Number(form.shipping_cost) || 0,
-                  shipping_type: form.shipping_type || '',
-                  total_value: grandTotal,
-                  payment_condition: form.payment_condition || '',
-                  delivery_date: form.delivery_date,
-                  carrier_name: form.carrier_name || '',
-                  volumes_quantity: Number(form.volumes_quantity) || 0,
-                  net_weight: Number(form.net_weight) || 0,
-                  gross_weight: Number(form.gross_weight) || 0,
-                  packaging_type: form.packaging_type,
-                  pi_number: form.pi_number || '',
-                  billing_date: form.billing_date,
-                  cliente_nome: leadForm.name || '',
-                  cliente_endereco: leadForm.address || '',
-                  cliente_cep: leadForm.cep || '',
-                  cliente_cnpj: leadForm.cnpj || '',
-                  cliente_ie: leadForm.ie || '',
-                  cliente_email: leadForm.email || '',
-                  cliente_telefone: leadForm.phone || '',
-                  cliente_contato: leadForm.contact_name || '',
-                }
-                if (form.operation_type === 'conserto') {
-                  exportPiConsertoPDF(updatedOrder, selectedLead || undefined)
-                } else {
-                  exportPiNovoPDF(updatedOrder, selectedLead || undefined)
-                }
-              }}
-            >
-              <FileDown className="w-4 h-4 mr-2" />
-              Gerar PDF Financeiro
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              disabled={saving}
-              onClick={() => {
-                const updatedOrder = {
-                  ...order,
-                  items: items.filter((i) => i.description.trim()),
-                  production_notes: form.production_notes || '',
-                  operation_type: form.operation_type,
-                  conserto_invoice_number: form.conserto_invoice_number,
-                  conserto_invoice_date: form.conserto_invoice_date,
-                  pi_number: form.pi_number || '',
-                  cliente_nome: leadForm.name || '',
-                }
-                if (form.operation_type === 'conserto') {
-                  exportProductionPdfConserto(updatedOrder, selectedLead || undefined)
-                } else {
-                  exportProductionPdfNovo(updatedOrder, selectedLead || undefined)
-                }
-              }}
-            >
-              <FileDown className="w-4 h-4 mr-2" />
-              Gerar PDF Produção
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                disabled={saving}
+                onClick={() => {
+                  const updatedOrder = {
+                    ...order,
+                    items: items.filter((i) => i.description.trim()),
+                    notes: form.notes || '',
+                    production_notes: form.production_notes || '',
+                    operation_type: form.operation_type,
+                    conserto_invoice_number: form.conserto_invoice_number,
+                    conserto_invoice_date: form.conserto_invoice_date,
+                    discount_amount: Number(form.discount_amount) || 0,
+                    shipping_cost: Number(form.shipping_cost) || 0,
+                    shipping_type: form.shipping_type || '',
+                    total_value: grandTotal,
+                    payment_condition: form.payment_condition || '',
+                    delivery_date: form.delivery_date,
+                    carrier_name: form.carrier_name || '',
+                    volumes_quantity: Number(form.volumes_quantity) || 0,
+                    net_weight: Number(form.net_weight) || 0,
+                    gross_weight: Number(form.gross_weight) || 0,
+                    packaging_type: form.packaging_type,
+                    pi_number: form.pi_number || '',
+                    billing_date: form.billing_date,
+                    cliente_nome: leadForm.name || '',
+                    cliente_endereco: leadForm.address || '',
+                    cliente_cep: leadForm.cep || '',
+                    cliente_cnpj: leadForm.cnpj || '',
+                    cliente_ie: leadForm.ie || '',
+                    cliente_email: leadForm.email || '',
+                    cliente_telefone: leadForm.phone || '',
+                    cliente_contato: leadForm.contact_name || '',
+                  }
+                  if (form.operation_type === 'conserto') {
+                    exportPiConsertoPDF(updatedOrder, selectedLead || undefined)
+                  } else {
+                    exportPiNovoPDF(updatedOrder, selectedLead || undefined)
+                  }
+                }}
+              >
+                <FileDown className="w-4 h-4 mr-2" />
+                Gerar PDF Financeiro
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                disabled={saving}
+                onClick={() => {
+                  const updatedOrder = {
+                    ...order,
+                    items: items.filter((i) => i.description.trim()),
+                    production_notes: form.production_notes || '',
+                    operation_type: form.operation_type,
+                    conserto_invoice_number: form.conserto_invoice_number,
+                    conserto_invoice_date: form.conserto_invoice_date,
+                    pi_number: form.pi_number || '',
+                    cliente_nome: leadForm.name || '',
+                  }
+                  if (form.operation_type === 'conserto') {
+                    exportProductionPdfConserto(updatedOrder, selectedLead || undefined)
+                  } else {
+                    exportProductionPdfNovo(updatedOrder, selectedLead || undefined)
+                  }
+                }}
+              >
+                <FileDown className="w-4 h-4 mr-2" />
+                Gerar PDF Produção
+              </Button>
+            </div>
           )}
           <Button type="submit" className="w-full" disabled={saving}>
             {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
