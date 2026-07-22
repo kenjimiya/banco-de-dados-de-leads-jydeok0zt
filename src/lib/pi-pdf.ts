@@ -36,6 +36,7 @@ body{font-family:Arial,sans-serif;font-size:10px;color:#000;padding:15px}
 .pi-header{text-align:center;border-bottom:2px solid ${accent};padding-bottom:8px;margin-bottom:8px}
 .pi-header img{max-width:140px;margin:0 auto 4px}
 .pi-number{font-size:22px;font-weight:bold;color:${accent};margin-top:4px}
+.pi-op-type{font-size:12px;font-weight:bold;color:${accent};margin-top:4px;text-transform:uppercase}
 .pi-date{font-size:10px;color:#6b7280;margin-top:2px}
 .tech-table td, .tech-table th{border:1px solid #ccc;padding:4px 6px}
 .tech-table th{background:${accentBg};font-weight:bold;color:#4b5563;text-align:left}
@@ -45,6 +46,7 @@ body{font-family:Arial,sans-serif;font-size:10px;color:#000;padding:15px}
 <div class="pi-header">
   <img src="${logoUrl}" alt="Sigma Transformadores" />
   ${order.pi_number ? `<div class="pi-number">Nº ${order.pi_number}</div>` : ''}
+  <div class="pi-op-type">Tipo de Operação: ${isConserto ? 'Retorno de Conserto' : 'Equipamento Novo'}</div>
   <div class="pi-date">Data: ${dateStr}</div>
 </div>
 

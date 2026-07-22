@@ -24,6 +24,7 @@ body{font-family:Arial,sans-serif;font-size:10px;color:#000;padding:15px}
 .pi-header{text-align:center;border-bottom:2px solid #ea580c;padding-bottom:8px;margin-bottom:8px}
 .pi-header img{max-width:140px;margin:0 auto 4px}
 .pi-number{font-size:22px;font-weight:bold;color:#ea580c;margin-top:4px}
+.pi-op-type{font-size:12px;font-weight:bold;color:#9a3412;margin-top:4px;text-transform:uppercase}
 .pi-date{font-size:10px;color:#9a3412;margin-top:2px}
 .section-title{font-size:10px;font-weight:bold;color:#fff;background:#ea580c;padding:3px 8px;margin-bottom:4px;text-transform:uppercase;border-radius:2px}
 .section-title-blue{font-size:10px;font-weight:bold;color:#fff;background:#2563eb;padding:3px 8px;margin-bottom:4px;text-transform:uppercase;border-radius:2px}
@@ -41,6 +42,7 @@ table.info-table td{border:1px solid #ccc;padding:3px 6px}
 <div class="pi-header">
   <img src="${logoUrl}" alt="Sigma Transformadores" />
   ${order.pi_number ? `<div class="pi-number">Nº ${order.pi_number}</div>` : ''}
+  <div class="pi-op-type">Tipo de Operação: Retorno de Conserto</div>
   <div class="pi-date">Data: ${d.dateStr}</div>
 </div>
 <div class="remessa-box">

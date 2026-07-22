@@ -20,6 +20,7 @@ body{font-family:Arial,sans-serif;font-size:10px;color:#000;padding:15px}
 .pi-header{text-align:center;border-bottom:2px solid #2563eb;padding-bottom:8px;margin-bottom:8px}
 .pi-header img{max-width:140px;margin:0 auto 4px}
 .pi-number{font-size:22px;font-weight:bold;color:#2563eb;margin-top:4px}
+.pi-op-type{font-size:12px;font-weight:bold;color:#1e40af;margin-top:4px;text-transform:uppercase}
 .pi-date{font-size:10px;color:#6b7280;margin-top:2px}
 .section-title{font-size:10px;font-weight:bold;color:#fff;background:#2563eb;padding:3px 8px;margin-bottom:4px;text-transform:uppercase;border-radius:2px}
 table{width:100%;border-collapse:collapse;margin-bottom:6px;font-size:10px}
@@ -33,6 +34,7 @@ table.info-table td{border:1px solid #ccc;padding:3px 6px}
 <div class="pi-header">
   <img src="${logoUrl}" alt="Sigma Transformadores" />
   ${order.pi_number ? `<div class="pi-number">Nº ${order.pi_number}</div>` : ''}
+  <div class="pi-op-type">Tipo de Operação: Equipamento Novo</div>
   <div class="pi-date">Data: ${d.dateStr}</div>
 </div>
 <div class="section-title">Cliente</div>

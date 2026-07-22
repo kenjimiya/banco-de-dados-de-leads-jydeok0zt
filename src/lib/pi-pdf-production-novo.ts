@@ -37,6 +37,7 @@ table.info-table td{border:1px solid #ccc;padding:4px 6px}
 <div style="text-align:center;border-bottom:2px solid #2563eb;padding-bottom:10px;margin-bottom:12px">
   <img src="${logoUrl}" style="max-width:140px;margin:0 auto 4px" alt="Sigma Transformadores" />
   ${order.pi_number ? `<div style="font-size:22px;font-weight:bold;color:#2563eb;margin-top:4px">Nº ${order.pi_number}</div>` : ''}
+  <div style="font-size:12px;font-weight:bold;color:#1e40af;margin-top:4px;text-transform:uppercase">Tipo de Operação: Equipamento Novo</div>
   <div style="font-size:10px;color:#6b7280;margin-top:2px">Data: ${d.dateStr}</div>
 </div>
 <div class="section-title">Dados do Cliente</div>
