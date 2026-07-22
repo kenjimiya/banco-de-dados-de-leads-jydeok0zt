@@ -51,18 +51,19 @@ export function exportProposalPDF(proposal: Proposal, lead?: Lead) {
   const leadContact = lead?.contact_name || proposal.expand?.lead_id?.contact_name || '—'
   const shortName = shortenName(leadName)
 
-  const rawTitle = proposal.title || ''
-  let cleanTitle = rawTitle.trim()
-  if (cleanTitle.toUpperCase().startsWith('PCS')) {
-    cleanTitle = cleanTitle.replace(/^PCS\s*/i, '').trim()
-  }
+  let rawTitle = (proposal.title || '').trim()
+  rawTitle = rawTitle.replace(/^(?:PCS\W*)+/gi, '').trim()
+
   if (shortName !== 'Cliente' && shortName !== '') {
-    const re = new RegExp(`\\s*${shortName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, 'i')
-    cleanTitle = cleanTitle.replace(re, '').trim()
+    const escapedName = shortName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const trailingRe = new RegExp(`(?:\\W*${escapedName})+$`, 'gi')
+    rawTitle = rawTitle.replace(trailingRe, '').trim()
   }
-  const proposalIdParts = ['PCS', cleanTitle]
-  if (shortName !== 'Cliente' && shortName !== '') proposalIdParts.push(shortName)
-  const proposalId = proposalIdParts.filter(Boolean).join(' ')
+
+  let proposalId = `PCS ${rawTitle}`
+  if (shortName !== 'Cliente' && shortName !== '') {
+    proposalId += ` ${shortName}`
+  }
 
   const itemsRows = items
     .map(
@@ -81,17 +82,17 @@ export function exportProposalPDF(proposal: Proposal, lead?: Lead) {
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;font-size:15px;color:#333;padding:20px}
-.header{display:flex;flex-direction:row;align-items:stretch;justify-content:space-between;border-bottom:2px solid #2563eb;padding:20px 20px 28px;margin-bottom:28px;gap:50px}
-.header-left{flex:0 0 auto;display:flex;align-items:center}
-.header-center{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px}
-.header-right{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;text-align:right;gap:6px}
+.header{border-bottom:2px solid #2563eb;padding:10px 20px 20px;margin-bottom:28px}
+.header-content{display:flex;justify-content:space-between;align-items:center;gap:20px}
+.header-left{flex:0 0 auto}
+.header-center{flex:1 1 auto;text-align:center}
+.header-right{flex:0 0 auto;text-align:right}
 .logo-img{max-width:260px;max-height:90px;width:auto;height:auto}
-.proposal-title{font-size:26px;font-weight:bold;color:#2563eb;letter-spacing:2px}
-.proposal-id{font-size:16px;color:#1e40af;font-weight:bold}
-.proposal-meta{font-size:15px;color:#374151;line-height:1.8}
-.proposal-meta strong{color:#1e40af}
-.contact-info{font-size:14px;color:#4b5563;line-height:1.6}
-.contact-info strong{color:#1e40af}
+.proposal-title{font-size:24px;font-weight:bold;color:#2563eb;letter-spacing:1px}
+.proposal-id{font-size:15px;color:#4b5563;margin-bottom:4px}
+.proposal-meta{font-size:15px;color:#4b5563;margin-bottom:4px}
+.contact-info{font-size:15px;color:#4b5563;margin-top:4px}
+.contact-info strong{color:#4b5563}
 .company-info{font-size:15px;color:#4b5563}
 .section{margin-bottom:15px}
 .section-title{font-size:16px;font-weight:bold;color:#2563eb;margin-bottom:8px;border-bottom:1px solid #e5e7eb;padding-bottom:3px}
@@ -110,20 +111,21 @@ ul{list-style:none}
 @media print{body{padding:0}}
 </style></head><body>
 <div class="header">
-  <div class="header-left">
-    <img src="${logoUrl}" class="logo-img" alt="Sigma Transformadores" />
-  </div>
-  <div class="header-center">
-    <div class="proposal-title">PROPOSTA COMERCIAL</div>
-    <div class="proposal-id">${proposalId}</div>
-    <div class="proposal-meta">
-      <div>Revisão: <strong>${proposal.revision || '00'}</strong></div>
-      <div>Data: <strong>${new Date().toLocaleDateString('pt-BR')}</strong></div>
+  <div class="header-content">
+    <div class="header-left">
+      <img src="${logoUrl}" class="logo-img" alt="Sigma Transformadores" />
     </div>
-  </div>
-  <div class="header-right">
-    <div class="contact-info"><strong>Eng. Mauro - Gerente Comercial</strong></div>
-    <div class="contact-info">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
+    <div class="header-center">
+      <div class="proposal-title">PROPOSTA COMERCIAL</div>
+    </div>
+    <div class="header-right">
+      <div class="proposal-id">Nº ${proposalId}</div>
+      <div class="proposal-meta">Revisão: ${proposal.revision || '00'}</div>
+      <div class="proposal-meta">Data: ${new Date().toLocaleDateString('pt-BR')}</div>
+      <div style="height:12px"></div>
+      <div class="contact-info"><strong>Eng. Mauro - Gerente Comercial</strong></div>
+      <div class="contact-info">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
+    </div>
   </div>
 </div>
 <div class="section"><div class="section-title">Dados do Cliente</div>
