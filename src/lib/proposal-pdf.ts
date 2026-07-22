@@ -39,10 +39,18 @@ export function exportProposalPDF(proposal: Proposal, lead?: Lead) {
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;font-size:15px;color:#333;padding:20px}
-.header{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-bottom:2px solid #2563eb;padding-bottom:15px;margin-bottom:20px}
-.logo-img{max-width:300px;margin-bottom:10px}
-.company-name{font-size:20px;font-weight:bold;color:#2563eb;margin-bottom:4px}
-.company-info{font-size:14px;color:#4b5563;margin-top:2px}
+.header{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-bottom:2px solid #2563eb;padding-bottom:28px;margin-bottom:28px;padding-top:10px}
+.logo-img{max-width:300px;margin-bottom:32px}
+.proposal-title{font-size:26px;font-weight:bold;color:#2563eb;letter-spacing:1px;margin-bottom:18px}
+.header-meta{font-size:15px;color:#374151;line-height:2}
+.header-meta strong{color:#1e40af}
+=======
+.header{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-bottom:2px solid #2563eb;padding-bottom:28px;margin-bottom:28px;padding-top:10px}
+.logo-img{max-width:300px;margin-bottom:32px}
+.proposal-title{font-size:26px;font-weight:bold;color:#2563eb;letter-spacing:1px;margin-bottom:18px}
+.header-meta{font-size:15px;color:#374151;line-height:2}
+.header-meta strong{color:#1e40af}
+.company-info{font-size:15px;color:#4b5563}
 .section{margin-bottom:15px}
 .section-title{font-size:16px;font-weight:bold;color:#2563eb;margin-bottom:8px;border-bottom:1px solid #e5e7eb;padding-bottom:3px}
 table{width:100%;border-collapse:collapse;margin-bottom:10px}
@@ -61,12 +69,14 @@ ul{list-style:none}
 </style></head><body>
 <div class="header">
   <img src="${logoUrl}" class="logo-img" alt="Sigma Transformadores" />
-  <div style="font-size:18px;font-weight:bold;color:#2563eb">PROPOSTA COMERCIAL</div>
-  <div class="company-info" style="font-size:15px;margin-top:5px">Nº ${proposal.title || '—'} ${leadName !== 'Cliente' ? leadName : ''}</div>
-  <div class="company-info">Revisão: ${proposal.revision || '00'}</div>
-  <div class="company-info">Data: ${new Date().toLocaleDateString('pt-BR')}</div>
-  <div class="company-info" style="margin-top:10px;font-weight:bold">Eng. Mauro - Gerente Comercial</div>
-  <div class="company-info">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
+  <div class="proposal-title">PROPOSTA COMERCIAL</div>
+  <div class="header-meta">
+    <div>Nº PCS <strong>${proposal.title || '—'}</strong>${leadName !== 'Cliente' ? ` &mdash; ${leadName}` : ''}</div>
+    <div>Revisão: <strong>${proposal.revision || '00'}</strong></div>
+    <div>Data: <strong>${new Date().toLocaleDateString('pt-BR')}</strong></div>
+  </div>
+  <div class="company-info" style="margin-top:24px;font-weight:bold">Eng. Mauro - Gerente Comercial</div>
+  <div class="company-info" style="margin-top:4px">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
 </div>
 <div class="section"><div class="section-title">Dados do Cliente</div>
 <table>
