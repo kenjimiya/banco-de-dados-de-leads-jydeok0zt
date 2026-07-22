@@ -36,6 +36,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { exportPiNovoPDF } from '@/lib/pi-pdf-novo'
 import { exportPiConsertoPDF } from '@/lib/pi-pdf-conserto'
+import { exportProductionPdfNovo } from '@/lib/pi-pdf-production-novo'
+import { exportProductionPdfConserto } from '@/lib/pi-pdf-production-conserto'
+import { ProductionItemsTable } from './production-items-table'
 
 interface PiFormDialogProps {
   order?: InternalOrder | null
@@ -100,6 +103,7 @@ export function PiFormDialog({
       billing_date: order?.billing_date ? format(new Date(order.billing_date), 'yyyy-MM-dd') : '',
       source_reference: order?.source_reference || '',
       notes: order?.notes || '',
+      production_notes: order?.production_notes || '',
     })
   }, [open, order])
 
@@ -214,6 +218,7 @@ export function PiFormDialog({
         billing_date: form.billing_date ? new Date(form.billing_date).toISOString() : '',
         source_reference: form.source_reference || '',
         notes: form.notes || '',
+        production_notes: form.production_notes || '',
         cliente_nome: leadForm.name || '',
         cliente_endereco: leadForm.address || '',
         cliente_cep: leadForm.cep || '',
@@ -260,10 +265,11 @@ export function PiFormDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <Tabs defaultValue="client" className="w-full">
-            <TabsList className="w-full grid grid-cols-3 mb-4">
+            <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 mb-4">
               <TabsTrigger value="client">Cliente</TabsTrigger>
               <TabsTrigger value="items">Operação & Itens</TabsTrigger>
               <TabsTrigger value="finance">Financeiro & Logística</TabsTrigger>
+              <TabsTrigger value="production">Produção</TabsTrigger>
             </TabsList>
 
             <TabsContent value="client" className="space-y-4">
@@ -427,6 +433,30 @@ export function PiFormDialog({
             </TabsContent>
 
             <TabsContent value="finance" className="space-y-4">
+              {selectedLead && (
+                <div className="grid grid-cols-2 gap-4 p-4 border rounded-xl bg-secondary/10">
+                  <div className="space-y-1.5 col-span-2">
+                    <Label>Nome / Razão Social</Label>
+                    <Input value={leadForm.name || ''} readOnly className="bg-background" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>CNPJ</Label>
+                    <Input value={leadForm.cnpj || ''} readOnly className="bg-background" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>I.E.</Label>
+                    <Input value={leadForm.ie || ''} readOnly className="bg-background" />
+                  </div>
+                  <div className="space-y-1.5 col-span-2">
+                    <Label>Endereço</Label>
+                    <Input value={leadForm.address || ''} readOnly className="bg-background" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>CEP</Label>
+                    <Input value={leadForm.cep || ''} readOnly className="bg-background" />
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <h3 className="font-semibold border-b pb-2">Financeiro</h3>
@@ -575,6 +605,7 @@ export function PiFormDialog({
                   ...order,
                   items: items.filter((i) => i.description.trim()),
                   notes: form.notes || '',
+                  production_notes: form.production_notes || '',
                   operation_type: form.operation_type,
                   conserto_invoice_number: form.conserto_invoice_number,
                   conserto_invoice_date: form.conserto_invoice_date,
@@ -608,7 +639,33 @@ export function PiFormDialog({
               }}
             >
               <FileDown className="w-4 h-4 mr-2" />
-              Gerar PDF para Impressão
+              Gerar PDF Financeiro
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              disabled={saving}
+              onClick={() => {
+                const updatedOrder = {
+                  ...order,
+                  items: items.filter((i) => i.description.trim()),
+                  production_notes: form.production_notes || '',
+                  operation_type: form.operation_type,
+                  conserto_invoice_number: form.conserto_invoice_number,
+                  conserto_invoice_date: form.conserto_invoice_date,
+                  pi_number: form.pi_number || '',
+                  cliente_nome: leadForm.name || '',
+                }
+                if (form.operation_type === 'conserto') {
+                  exportProductionPdfConserto(updatedOrder, selectedLead || undefined)
+                } else {
+                  exportProductionPdfNovo(updatedOrder, selectedLead || undefined)
+                }
+              }}
+            >
+              <FileDown className="w-4 h-4 mr-2" />
+              Gerar PDF Produção
             </Button>
           )}
           <Button type="submit" className="w-full" disabled={saving}>

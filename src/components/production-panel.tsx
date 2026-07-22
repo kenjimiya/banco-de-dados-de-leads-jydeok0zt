@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import {
   getInternalOrders,
   updateInternalOrder,
-  sendPiToProduction,
   type InternalOrder,
   type InternalOrderItem,
 } from '@/services/api'
@@ -25,7 +24,7 @@ import { exportProductionPdfNovo } from '@/lib/pi-pdf-production-novo'
 import { exportProductionPdfConserto } from '@/lib/pi-pdf-production-conserto'
 import { useToast } from '@/hooks/use-toast'
 import { format } from 'date-fns'
-import { Factory, FileDown, Save, Loader2, ClipboardList, Truck, Package } from 'lucide-react'
+import { FileDown, Save, Loader2, ClipboardList, Truck, Package } from 'lucide-react'
 
 export function ProductionPanel() {
   const { toast } = useToast()
@@ -37,7 +36,6 @@ export function ProductionPanel() {
   const [consertoDate, setConsertoDate] = useState('')
   const [logistics, setLogistics] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
-  const [sendingPi, setSendingPi] = useState(false)
 
   const loadData = async () => setOrders(await getInternalOrders())
   useEffect(() => {
@@ -51,25 +49,22 @@ export function ProductionPanel() {
     if (!selectedId) return
     const order = orders.find((o) => o.id === selectedId)
     if (!order) return
-    const isConserto = order.operation_type === 'conserto'
     setItems(
       order.items?.length
         ? order.items
-        : isConserto
-          ? [
-              {
-                description: '',
-                quantity: 1,
-                unit_price: 0,
-                ncm: '',
-                subtotal: 0,
-                substitution: '',
-                serial_number: '',
-                equipment_date: '',
-                delivery_date: '',
-              },
-            ]
-          : [{ description: '', quantity: 1, unit_price: 0, ncm: '', subtotal: 0 }],
+        : [
+            {
+              description: '',
+              quantity: 1,
+              unit_price: 0,
+              ncm: '',
+              subtotal: 0,
+              substitution: '',
+              serial_number: '',
+              equipment_date: '',
+              delivery_date: '',
+            },
+          ],
     )
     setProductionNotes(order.production_notes || '')
     setConsertoNf(order.conserto_invoice_number || '')
@@ -109,18 +104,6 @@ export function ProductionPanel() {
       toast({ title: 'Erro ao salvar', variant: 'destructive' })
     }
     setSaving(false)
-  }
-
-  const handleSendProduction = async () => {
-    if (!selected) return
-    setSendingPi(true)
-    try {
-      await sendPiToProduction(selected.id)
-      toast({ title: 'PI enviado para Produção (Ivanildo e Rosmar) e Financeiro!' })
-    } catch {
-      toast({ title: 'Erro ao enviar PI', variant: 'destructive' })
-    }
-    setSendingPi(false)
   }
 
   const handlePdf = () => {
@@ -214,11 +197,7 @@ export function ProductionPanel() {
           <Card className="border-none shadow-subtle">
             <CardContent className="p-4 space-y-3">
               <h3 className="font-semibold text-sm">Itens da Produção</h3>
-              <ProductionItemsTable
-                items={items}
-                onChange={setItems}
-                operationType={selected.operation_type}
-              />
+              <ProductionItemsTable items={items} onChange={setItems} />
             </CardContent>
           </Card>
 
@@ -306,14 +285,6 @@ export function ProductionPanel() {
             </Button>
             <Button variant="outline" onClick={handlePdf}>
               <FileDown className="w-4 h-4 mr-2" /> Gerar PDF Produção
-            </Button>
-            <Button variant="secondary" onClick={handleSendProduction} disabled={sendingPi}>
-              {sendingPi ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Factory className="w-4 h-4 mr-2" />
-              )}
-              {sendingPi ? 'Enviando...' : 'Enviar para Produção'}
             </Button>
           </div>
         </div>

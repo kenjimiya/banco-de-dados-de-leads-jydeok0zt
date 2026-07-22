@@ -41,7 +41,7 @@ table.info-table td{border:1px solid #ccc;padding:4px 6px}
 </style></head><body>
 <div style="text-align:center;border-bottom:2px solid #ea580c;padding-bottom:10px;margin-bottom:12px">
   <img src="${logoUrl}" style="max-width:140px;margin:0 auto 4px" alt="Sigma Transformadores" />
-  ${order.pi_number ? `<div style="font-size:22px;font-weight:bold;color:#ea580c;margin-top:4px">Nº ${order.pi_number}</div>` : ''}
+  ${order.pi_number ? `<div style="font-size:28px;font-weight:bold;color:#ea580c;margin-top:4px">Nº ${order.pi_number}</div>` : ''}
   <div style="font-size:12px;font-weight:bold;color:#9a3412;margin-top:4px;text-transform:uppercase">Tipo de Operação: Retorno de Conserto</div>
   <div style="font-size:10px;color:#9a3412;margin-top:2px">Data: ${d.dateStr}</div>
 </div>
@@ -56,12 +56,9 @@ table.info-table td{border:1px solid #ccc;padding:4px 6px}
     </tr>
   </table>
 </div>
-<div class="section-title">Dados do Cliente</div>
+<div class="section-title">Cliente</div>
 <table class="info-table">
-  <tr><td class="label">RAZÃO SOCIAL:</td><td colspan="3">${d.leadName}</td></tr>
-  <tr><td class="label">CNPJ:</td><td>${d.leadCnpj}</td><td class="label" style="width:100px;">INSCR. EST.:</td><td>${d.leadIe}</td></tr>
-  <tr><td class="label">ENDEREÇO:</td><td colspan="3">${d.leadAddress}</td></tr>
-  <tr><td class="label">CIDADE/UF:</td><td>${d.leadCity} / ${d.leadUF}</td><td class="label">CEP:</td><td>${d.leadCep}</td></tr>
+  <tr><td class="label">NOME:</td><td>${d.leadName}</td></tr>
 </table>
 <div class="section-title">Retorno de Conserto — Itens da Produção</div>
 <table class="tech-table">

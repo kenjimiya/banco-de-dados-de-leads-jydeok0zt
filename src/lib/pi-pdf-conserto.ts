@@ -23,7 +23,7 @@ export function exportPiConsertoPDF(order: InternalOrder, lead?: Lead) {
 body{font-family:Arial,sans-serif;font-size:10px;color:#000;padding:15px}
 .pi-header{text-align:center;border-bottom:2px solid #ea580c;padding-bottom:8px;margin-bottom:8px}
 .pi-header img{max-width:140px;margin:0 auto 4px}
-.pi-number{font-size:22px;font-weight:bold;color:#ea580c;margin-top:4px}
+.pi-number{font-size:28px;font-weight:bold;color:#ea580c;margin-top:4px}
 .pi-op-type{font-size:12px;font-weight:bold;color:#9a3412;margin-top:4px;text-transform:uppercase}
 .pi-date{font-size:10px;color:#9a3412;margin-top:2px}
 .section-title{font-size:10px;font-weight:bold;color:#fff;background:#ea580c;padding:3px 8px;margin-bottom:4px;text-transform:uppercase;border-radius:2px}
@@ -37,7 +37,8 @@ table.info-table td{border:1px solid #ccc;padding:3px 6px}
 .totals-row{font-weight:bold;background:#fff7ed}
 .remessa-box{border:2px solid #ea580c;background:#fff7ed;padding:8px;margin-bottom:6px;border-radius:4px}
 .remessa-box-title{font-size:11px;font-weight:bold;color:#ea580c;text-transform:uppercase;margin-bottom:4px}
-@media print{body{padding:10px}}
+@page{size:A4;margin:8mm}
+@media print{body{padding:5px;font-size:9px}.pi-header img{max-width:100px}table{margin-bottom:4px}.section-title{padding:2px 6px;margin-bottom:2px}.info-table td{padding:2px 4px}.tech-table td,.tech-table th{padding:3px 4px}}
 </style></head><body>
 <div class="pi-header">
   <img src="${logoUrl}" alt="Sigma Transformadores" />
@@ -58,7 +59,10 @@ table.info-table td{border:1px solid #ccc;padding:3px 6px}
 </div>
 <div class="section-title">Cliente</div>
 <table class="info-table">
-  <tr><td class="label">NOME:</td><td>${d.leadName}</td></tr>
+  <tr><td class="label">NOME:</td><td colspan="3">${d.leadName}</td></tr>
+  <tr><td class="label">CNPJ:</td><td>${d.leadCnpj}</td><td class="label" style="width:60px;">I.E.:</td><td>${d.leadIe}</td></tr>
+  <tr><td class="label">ENDEREÇO:</td><td colspan="3">${d.leadAddress}</td></tr>
+  <tr><td class="label">CEP:</td><td colspan="3">${d.leadCep}</td></tr>
 </table>
 <div class="section-title">Itens do Pedido</div>
 <table class="tech-table">
