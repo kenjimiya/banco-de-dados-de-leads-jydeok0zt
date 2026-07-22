@@ -39,14 +39,10 @@ table.info-table td{border:1px solid #ccc;padding:4px 6px}
 .remessa-box-title{font-size:13px;font-weight:bold;color:#ea580c;text-transform:uppercase;margin-bottom:8px}
 @media print{body{padding:0}}
 </style></head><body>
-<div class="header">
-  <div><img src="${logoUrl}" class="logo-img" alt="Sigma Transformadores" /></div>
-  <div style="text-align:right">
-    <div class="title">Pedido Interno Sigma</div>
-    <div class="subtitle">Produção — Retorno de Conserto</div>
-    ${order.pi_number ? `<div class="pat-cell" style="font-size:14px;color:#ea580c">Nº ${order.pi_number}</div>` : ''}
-    <div class="pat-cell">Data: ${d.dateStr}</div>
-  </div>
+<div style="text-align:center;border-bottom:2px solid #ea580c;padding-bottom:10px;margin-bottom:12px">
+  <img src="${logoUrl}" style="max-width:140px;margin:0 auto 4px" alt="Sigma Transformadores" />
+  ${order.pi_number ? `<div style="font-size:22px;font-weight:bold;color:#ea580c;margin-top:4px">Nº ${order.pi_number}</div>` : ''}
+  <div style="font-size:10px;color:#9a3412;margin-top:2px">Data: ${d.dateStr}</div>
 </div>
 <div class="remessa-box">
   <div class="remessa-box-title">Dados da Remessa (Conserto)</div>

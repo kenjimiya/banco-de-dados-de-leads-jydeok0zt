@@ -54,14 +54,14 @@ export function ProductionItemsTable({
     return (
       <div className="space-y-3">
         <div className="overflow-x-auto">
-          <div className="min-w-[820px] space-y-2">
+          <div className="min-w-[920px] space-y-2">
             <div className="grid grid-cols-12 gap-2 text-xs font-semibold text-muted-foreground px-1 pb-1">
               <div className="col-span-1">Qtd</div>
-              <div className="col-span-3">Equipamento</div>
-              <div className="col-span-3">Subst.</div>
+              <div className="col-span-2">Equipamento</div>
+              <div className="col-span-2">Subst.</div>
               <div className="col-span-2">Nº Série</div>
-              <div className="col-span-1">Data EQ</div>
-              <div className="col-span-1">Entrega</div>
+              <div className="col-span-2">Data EQ</div>
+              <div className="col-span-2">Entrega</div>
               <div className="col-span-1" />
             </div>
             {items.map((item, i) => (
@@ -80,13 +80,13 @@ export function ProductionItemsTable({
                 <Input
                   value={item.description}
                   onChange={(e) => updateItem(i, 'description', e.target.value)}
-                  className="col-span-3"
+                  className="col-span-2"
                   placeholder="Equipamento"
                 />
                 <Input
                   value={item.substitution || ''}
                   onChange={(e) => updateItem(i, 'substitution', e.target.value)}
-                  className="col-span-3"
+                  className="col-span-2"
                   placeholder="Substituição"
                 />
                 <Input
@@ -99,13 +99,13 @@ export function ProductionItemsTable({
                   type="date"
                   value={item.equipment_date || ''}
                   onChange={(e) => updateItem(i, 'equipment_date', e.target.value)}
-                  className="col-span-1"
+                  className="col-span-2"
                 />
                 <Input
                   type="date"
                   value={item.delivery_date || ''}
                   onChange={(e) => updateItem(i, 'delivery_date', e.target.value)}
-                  className="col-span-1"
+                  className="col-span-2"
                 />
                 <Button
                   type="button"

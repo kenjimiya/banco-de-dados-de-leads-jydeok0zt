@@ -34,14 +34,10 @@ table.info-table td{border:1px solid #ccc;padding:4px 6px}
 .tech-table th{background:#f3f4f6;font-weight:bold;color:#4b5563;text-align:left}
 @media print{body{padding:0}}
 </style></head><body>
-<div class="header">
-  <div><img src="${logoUrl}" class="logo-img" alt="Sigma Transformadores" /></div>
-  <div style="text-align:right">
-    <div class="title">Pedido Interno Sigma</div>
-    <div class="subtitle">Produção</div>
-    ${order.pi_number ? `<div class="pat-cell" style="font-size:14px;color:#2563eb">Nº ${order.pi_number}</div>` : ''}
-    <div class="pat-cell">Data: ${d.dateStr}</div>
-  </div>
+<div style="text-align:center;border-bottom:2px solid #2563eb;padding-bottom:10px;margin-bottom:12px">
+  <img src="${logoUrl}" style="max-width:140px;margin:0 auto 4px" alt="Sigma Transformadores" />
+  ${order.pi_number ? `<div style="font-size:22px;font-weight:bold;color:#2563eb;margin-top:4px">Nº ${order.pi_number}</div>` : ''}
+  <div style="font-size:10px;color:#6b7280;margin-top:2px">Data: ${d.dateStr}</div>
 </div>
 <div class="section-title">Dados do Cliente</div>
 <table class="info-table">
