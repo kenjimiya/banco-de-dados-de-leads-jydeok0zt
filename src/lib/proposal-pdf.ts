@@ -39,8 +39,8 @@ export function exportProposalPDF(proposal: Proposal, lead?: Lead) {
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;font-size:15px;color:#333;padding:20px}
-.header{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #2563eb;padding-bottom:15px;margin-bottom:20px}
-.logo-img{max-width:180px;}
+.header{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-bottom:2px solid #2563eb;padding-bottom:15px;margin-bottom:20px}
+.logo-img{max-width:300px;margin-bottom:10px}
 .company-name{font-size:20px;font-weight:bold;color:#2563eb;margin-bottom:4px}
 .company-info{font-size:14px;color:#4b5563;margin-top:2px}
 .section{margin-bottom:15px}
@@ -60,17 +60,13 @@ ul{list-style:none}
 @media print{body{padding:0}}
 </style></head><body>
 <div class="header">
-  <div>
-    <img src="${logoUrl}" class="logo-img" alt="Sigma Transformadores" />
-  </div>
-  <div style="text-align:right">
-    <div style="font-size:18px;font-weight:bold;color:#2563eb">PROPOSTA COMERCIAL</div>
-    <div class="company-info" style="font-size:15px;margin-top:5px">Nº ${proposal.title || '—'}</div>
-    <div class="company-info">Revisão: ${proposal.revision || '00'}</div>
-    <div class="company-info">Data: ${new Date().toLocaleDateString('pt-BR')}</div>
-    <div class="company-info" style="margin-top:10px;font-weight:bold">Eng. Mauro - Gerente Comercial</div>
-    <div class="company-info">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
-  </div>
+  <img src="${logoUrl}" class="logo-img" alt="Sigma Transformadores" />
+  <div style="font-size:18px;font-weight:bold;color:#2563eb">PROPOSTA COMERCIAL</div>
+  <div class="company-info" style="font-size:15px;margin-top:5px">Nº ${proposal.title || '—'} ${leadName !== 'Cliente' ? leadName : ''}</div>
+  <div class="company-info">Revisão: ${proposal.revision || '00'}</div>
+  <div class="company-info">Data: ${new Date().toLocaleDateString('pt-BR')}</div>
+  <div class="company-info" style="margin-top:10px;font-weight:bold">Eng. Mauro - Gerente Comercial</div>
+  <div class="company-info">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>
 </div>
 <div class="section"><div class="section-title">Dados do Cliente</div>
 <table>
