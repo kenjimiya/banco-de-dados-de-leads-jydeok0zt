@@ -16,6 +16,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,12 +54,27 @@ export default function PatPropostas() {
   const [editOpen, setEditOpen] = useState(false)
   const [delTarget, setDelTarget] = useState<TechnicalProposal | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false)
 
   const loadData = async () => setProposals(await getTechnicalProposals())
   useEffect(() => {
     loadData()
   }, [])
   useRealtime('technical_proposals', loadData)
+
+  const toggleSelect = (id: string) =>
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === proposals.length) setSelectedIds(new Set())
+    else setSelectedIds(new Set(proposals.map((p) => p.id)))
+  }
 
   const handleDelete = async () => {
     if (!delTarget) return
@@ -73,6 +89,19 @@ export default function PatPropostas() {
     setDeleting(false)
   }
 
+  const handleBulkDelete = async () => {
+    setDeleting(true)
+    try {
+      await Promise.all([...selectedIds].map((id) => deleteTechnicalProposal(id)))
+      toast({ title: `${selectedIds.size} PAT(s) excluída(s) com sucesso!` })
+      setSelectedIds(new Set())
+      setBulkDeleteOpen(false)
+    } catch {
+      toast({ title: 'Erro ao excluir PATs', variant: 'destructive' })
+    }
+    setDeleting(false)
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
@@ -82,7 +111,19 @@ export default function PatPropostas() {
           </div>
           <h2 className="text-2xl font-bold">Assistência Técnica (PAT)</h2>
         </div>
-        <PatFormDialog onSaved={loadData} />
+        <div className="flex items-center gap-2">
+          {selectedIds.size > 0 && (
+            <Button
+              variant="destructive"
+              className="rounded-xl"
+              onClick={() => setBulkDeleteOpen(true)}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Excluir ({selectedIds.size})
+            </Button>
+          )}
+          <PatFormDialog onSaved={loadData} />
+        </div>
       </div>
 
       <Card className="border-none shadow-subtle overflow-hidden">
@@ -91,6 +132,12 @@ export default function PatPropostas() {
             <Table>
               <TableHeader className="bg-secondary/50">
                 <TableRow className="border-none hover:bg-transparent">
+                  <TableHead className="w-[40px]">
+                    <Checkbox
+                      checked={proposals.length > 0 && selectedIds.size === proposals.length}
+                      onCheckedChange={toggleSelectAll}
+                    />
+                  </TableHead>
                   <TableHead>Nº Proposta</TableHead>
                   <TableHead>Cliente</TableHead>
                   <TableHead>NF</TableHead>
@@ -103,6 +150,12 @@ export default function PatPropostas() {
               <TableBody>
                 {proposals.map((p) => (
                   <TableRow key={p.id} className="border-b border-border/50 hover:bg-secondary/30">
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedIds.has(p.id)}
+                        onCheckedChange={() => toggleSelect(p.id)}
+                      />
+                    </TableCell>
                     <TableCell className="font-medium">{p.proposal_number || '-'}</TableCell>
                     <TableCell className="font-medium">
                       {p.expand?.lead_id?.name || 'Cliente excluído'}
@@ -175,7 +228,7 @@ export default function PatPropostas() {
                 ))}
                 {proposals.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
                       <Wrench className="w-12 h-12 mx-auto mb-3 opacity-30" />
                       <p className="font-medium">Nenhuma PAT encontrada.</p>
                       <p className="text-sm">Crie uma nova proposta de assistência técnica.</p>
@@ -212,6 +265,28 @@ export default function PatPropostas() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {deleting ? 'Excluindo...' : 'Excluir'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir PATs Selecionadas</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir {selectedIds.size} proposta(s) selecionada(s)? Esta
+              ação é permanente e não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? 'Excluindo...' : `Excluir ${selectedIds.size}`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
