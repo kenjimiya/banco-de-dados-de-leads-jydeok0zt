@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react'
-import { getInternalOrders, deleteInternalOrder, type InternalOrder } from '@/services/api'
+import {
+  getInternalOrders,
+  deleteInternalOrder,
+  sendPiToProduction,
+  type InternalOrder,
+} from '@/services/api'
 import { useRealtime } from '@/hooks/use-realtime'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -29,7 +34,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { format } from 'date-fns'
-import { ClipboardList, MoreVertical, Pencil, Trash2, FileDown } from 'lucide-react'
+import { ClipboardList, MoreVertical, Pencil, Trash2, FileDown, Factory } from 'lucide-react'
 import { PiFormDialog } from '@/components/pi-form-dialog'
 import { exportPiPDF } from '@/lib/pi-pdf'
 import { useToast } from '@/hooks/use-toast'
@@ -42,6 +47,7 @@ export default function InternalOrders() {
   const [editOpen, setEditOpen] = useState(false)
   const [delTarget, setDelTarget] = useState<InternalOrder | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [sendingPi, setSendingPi] = useState<string | null>(null)
 
   const loadData = async () => setOrders(await getInternalOrders())
   useEffect(() => {
@@ -60,6 +66,17 @@ export default function InternalOrders() {
       toast({ title: 'Erro ao excluir PI', variant: 'destructive' })
     }
     setDeleting(false)
+  }
+
+  const handleSendToProduction = async (order: InternalOrder) => {
+    setSendingPi(order.id)
+    try {
+      await sendPiToProduction(order.id)
+      toast({ title: 'PI enviado para Produção (Ivanildo e Rosmar) e Financeiro!' })
+    } catch {
+      toast({ title: 'Erro ao enviar PI', variant: 'destructive' })
+    }
+    setSendingPi(null)
   }
 
   return (
@@ -134,6 +151,13 @@ export default function InternalOrders() {
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => exportPiPDF(o, o.expand?.lead_id)}>
                             <FileDown className="w-4 h-4 mr-2" /> Exportar PDF
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleSendToProduction(o)}
+                            disabled={sendingPi === o.id}
+                          >
+                            <Factory className="w-4 h-4 mr-2" />
+                            {sendingPi === o.id ? 'Enviando...' : 'Enviar para Produção'}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => setDelTarget(o)}

@@ -272,3 +272,10 @@ export const updateInternalOrder = (id: string, data: Partial<InternalOrder>) =>
   pb.collection<InternalOrder>('internal_orders').update(id, data)
 
 export const deleteInternalOrder = (id: string) => pb.collection('internal_orders').delete(id)
+
+export const sendPiToProduction = (piId: string) =>
+  pb.send('/backend/v1/send-pi-to-production', {
+    method: 'POST',
+    body: JSON.stringify({ pi_id: piId }),
+    headers: { 'Content-Type': 'application/json' },
+  })
