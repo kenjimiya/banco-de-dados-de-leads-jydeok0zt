@@ -51,8 +51,14 @@ export function PiItemsTable({
             <Input
               type="number"
               min="1"
+              step="1"
               value={item.quantity || ''}
-              onChange={(e) => updateItem(i, 'quantity', e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value
+                if (val === '' || /^\d+$/.test(val)) {
+                  updateItem(i, 'quantity', val)
+                }
+              }}
               className="col-span-3 min-w-[160px]"
               placeholder="Qtd"
             />

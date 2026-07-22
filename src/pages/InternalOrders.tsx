@@ -36,7 +36,8 @@ import {
 import { format } from 'date-fns'
 import { ClipboardList, MoreVertical, Pencil, Trash2, FileDown, Factory } from 'lucide-react'
 import { PiFormDialog } from '@/components/pi-form-dialog'
-import { exportPiPDF } from '@/lib/pi-pdf'
+import { exportPiNovoPDF } from '@/lib/pi-pdf-novo'
+import { exportPiConsertoPDF } from '@/lib/pi-pdf-conserto'
 import { useToast } from '@/hooks/use-toast'
 import { fmtCurrency } from '@/lib/utils'
 
@@ -149,7 +150,13 @@ export default function InternalOrders() {
                           >
                             <Pencil className="w-4 h-4 mr-2" /> Editar
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => exportPiPDF(o, o.expand?.lead_id)}>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              o.operation_type === 'conserto'
+                                ? exportPiConsertoPDF(o, o.expand?.lead_id)
+                                : exportPiNovoPDF(o, o.expand?.lead_id)
+                            }
+                          >
                             <FileDown className="w-4 h-4 mr-2" /> Exportar PDF
                           </DropdownMenuItem>
                           <DropdownMenuItem

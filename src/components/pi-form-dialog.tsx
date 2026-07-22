@@ -28,12 +28,14 @@ import {
   type InternalOrderItem,
 } from '@/services/api'
 import { useToast } from '@/hooks/use-toast'
-import { Plus, Loader2, Hash } from 'lucide-react'
+import { Plus, Loader2, Hash, FileDown } from 'lucide-react'
 import { format } from 'date-fns'
 import { LeadSelect } from './lead-select'
 import { PiItemsTable } from './pi-items-table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
+import { exportPiNovoPDF } from '@/lib/pi-pdf-novo'
+import { exportPiConsertoPDF } from '@/lib/pi-pdf-conserto'
 
 interface PiFormDialogProps {
   order?: InternalOrder | null
@@ -164,6 +166,25 @@ export function PiFormDialog({
     e.preventDefault()
     if (!selectedLead) {
       toast({ title: 'Selecione um cliente', variant: 'destructive' })
+      return
+    }
+    if (!leadForm.name?.trim()) {
+      toast({ title: 'O nome do cliente é obrigatório', variant: 'destructive' })
+      return
+    }
+    const validItems = items.filter((i) => i.description?.trim())
+    if (validItems.length === 0) {
+      toast({ title: 'Adicione pelo menos um item ao pedido', variant: 'destructive' })
+      return
+    }
+    const hasInvalidNumbers = validItems.some(
+      (i) => i.quantity <= 0 || i.unit_price < 0 || isNaN(i.quantity) || isNaN(i.unit_price),
+    )
+    if (hasInvalidNumbers) {
+      toast({
+        title: 'Verifique os valores numéricos dos itens (quantidade deve ser maior que zero)',
+        variant: 'destructive',
+      })
       return
     }
     setSaving(true)
@@ -339,7 +360,11 @@ export function PiFormDialog({
 
               <div className="space-y-1.5">
                 <Label>Tipo de Operação</Label>
-                <Select value={form.operation_type} onValueChange={(v) => set('operation_type', v)}>
+                <Select
+                  value={form.operation_type}
+                  onValueChange={(v) => set('operation_type', v)}
+                  disabled={isEdit}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -348,6 +373,11 @@ export function PiFormDialog({
                     <SelectItem value="conserto">Retorno de Conserto</SelectItem>
                   </SelectContent>
                 </Select>
+                {isEdit && (
+                  <p className="text-xs text-muted-foreground">
+                    O tipo de operação não pode ser alterado na edição.
+                  </p>
+                )}
               </div>
 
               {form.operation_type === 'conserto' && (
@@ -534,6 +564,53 @@ export function PiFormDialog({
             />
           </div>
 
+          {isEdit && order && (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              disabled={saving}
+              onClick={() => {
+                const updatedOrder = {
+                  ...order,
+                  items: items.filter((i) => i.description.trim()),
+                  notes: form.notes || '',
+                  operation_type: form.operation_type,
+                  conserto_invoice_number: form.conserto_invoice_number,
+                  conserto_invoice_date: form.conserto_invoice_date,
+                  discount_amount: Number(form.discount_amount) || 0,
+                  shipping_cost: Number(form.shipping_cost) || 0,
+                  shipping_type: form.shipping_type || '',
+                  total_value: grandTotal,
+                  payment_condition: form.payment_condition || '',
+                  delivery_date: form.delivery_date,
+                  carrier_name: form.carrier_name || '',
+                  volumes_quantity: Number(form.volumes_quantity) || 0,
+                  net_weight: Number(form.net_weight) || 0,
+                  gross_weight: Number(form.gross_weight) || 0,
+                  packaging_type: form.packaging_type,
+                  pi_number: form.pi_number || '',
+                  billing_date: form.billing_date,
+                  cliente_nome: leadForm.name || '',
+                  cliente_endereco: leadForm.address || '',
+                  cliente_cep: leadForm.cep || '',
+                  cliente_cnpj: leadForm.cnpj || '',
+                  cliente_ie: leadForm.ie || '',
+                  cliente_email: leadForm.email || '',
+                  cliente_telefone: leadForm.phone || '',
+                  cliente_contato: leadForm.contact_name || '',
+                }
+                if (form.operation_type === 'conserto') {
+                  exportPiConsertoPDF(updatedOrder, selectedLead || undefined)
+                } else {
+                  exportPiNovoPDF(updatedOrder, selectedLead || undefined)
+                }
+              }}
+            >
+              <FileDown className="w-4 h-4 mr-2" />
+              Gerar PDF para Impressão
+            </Button>
+          )}
           <Button type="submit" className="w-full" disabled={saving}>
             {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             {isEdit ? 'Salvar Alterações' : 'Criar Pedido Interno'}
