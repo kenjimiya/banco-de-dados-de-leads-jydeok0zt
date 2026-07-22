@@ -178,7 +178,8 @@ export function ProposalFormDialog({
             <Textarea
               value={form.description || ''}
               onChange={(e) => set('description', e.target.value)}
-              rows={4}
+              rows={12}
+              className="min-h-[280px] resize-y"
               placeholder="Descreva o produto ou serviço proposto..."
             />
           </div>
