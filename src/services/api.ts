@@ -249,6 +249,7 @@ export interface InternalOrder extends RecordModel {
   cliente_telefone: string
   cliente_contato: string
   pcs_id: string
+  production_notes: string
   expand?: {
     lead_id: Lead
     pcs_id: Proposal

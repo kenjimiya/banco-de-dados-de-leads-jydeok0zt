@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-22T13:18:03.234Z",
+  "generatedAt": "2026-07-22T13:37:51.427Z",
   "collections": [
     {
       "name": "users",
@@ -716,6 +716,12 @@
           "required": false,
           "system": false,
           "collectionRef": "proposals"
+        },
+        {
+          "name": "production_notes",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_internal_orders_lead_id ON internal_orders (lead_id)"]
