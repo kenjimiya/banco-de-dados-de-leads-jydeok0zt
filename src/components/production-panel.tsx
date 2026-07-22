@@ -99,9 +99,11 @@ export function ProductionPanel() {
 
   const handlePdf = () => {
     if (!selected) return
-    selected.operation_type === 'conserto'
-      ? exportPiConsertoPDF(selected, selected.expand?.lead_id)
-      : exportPiNovoPDF(selected, selected.expand?.lead_id)
+    if (selected.operation_type === 'conserto') {
+      exportPiConsertoPDF(selected, selected.expand?.lead_id)
+    } else {
+      exportPiNovoPDF(selected, selected.expand?.lead_id)
+    }
   }
 
   return (
