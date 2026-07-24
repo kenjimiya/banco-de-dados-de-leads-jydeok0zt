@@ -20,7 +20,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Sparkles, Plus, Send, MapPin, Briefcase, Pencil } from 'lucide-react'
+import {
+  ArrowLeft,
+  Sparkles,
+  Plus,
+  Send,
+  MapPin,
+  Briefcase,
+  Pencil,
+  Trash2,
+  Loader2,
+} from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -34,7 +44,19 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { LeadEditDialog } from '@/components/lead-edit-dialog'
+import { useToast } from '@/hooks/use-toast'
+import { deleteLead } from '@/services/api'
 import { fmtCurrency } from '@/lib/utils'
 
 export default function LeadDetail() {
@@ -51,6 +73,9 @@ export default function LeadDetail() {
   const [convId, setConvId] = useState<string | null>(null)
   const [isChatting, setIsChatting] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const { toast } = useToast()
 
   const loadData = async () => {
     if (!id) return
@@ -150,15 +175,41 @@ export default function LeadDetail() {
 
   if (!lead) return <div className="p-8 text-center">Carregando...</div>
 
+  const totalAssociated =
+    purchases.length + proposals.length + patProposals.length + internalOrders.length
+
+  const handleDelete = async () => {
+    setDeleting(true)
+    try {
+      await deleteLead(lead.id)
+      toast({ title: 'Cliente excluído com sucesso.' })
+      navigate('/leads')
+    } catch {
+      toast({ title: 'Erro ao excluir cliente. Tente novamente.', variant: 'destructive' })
+      setDeleting(false)
+      setDeleteOpen(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <Button
-        variant="ghost"
-        onClick={() => navigate('/leads')}
-        className="mb-4 pl-0 hover:bg-transparent text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
-      </Button>
+      <div className="flex items-center justify-between">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/leads')}
+          className="pl-0 hover:bg-transparent text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
+        </Button>
+        <Button
+          variant="destructive"
+          size="sm"
+          className="rounded-xl"
+          onClick={() => setDeleteOpen(true)}
+        >
+          <Trash2 className="w-4 h-4 mr-2" /> Excluir
+        </Button>
+      </div>
 
       <div className="flex flex-col md:flex-row gap-6">
         <Card className="w-full md:w-1/3 border-none shadow-subtle h-fit">
@@ -382,6 +433,60 @@ export default function LeadDetail() {
         </Card>
       </div>
       <LeadEditDialog lead={lead} open={editOpen} onOpenChange={setEditOpen} onSaved={loadData} />
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Cliente</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita.</p>
+                {totalAssociated > 0 && (
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm">
+                    <p className="font-semibold text-destructive mb-1">
+                      Registros associados ({totalAssociated}):
+                    </p>
+                    <ul className="list-disc list-inside space-y-0.5 text-muted-foreground">
+                      {purchases.length > 0 && <li>{purchases.length} venda(s)</li>}
+                      {proposals.length > 0 && (
+                        <li>{proposals.length} proposta(s) comercial(is)</li>
+                      )}
+                      {patProposals.length > 0 && (
+                        <li>{patProposals.length} assistência(s) técnica(s)</li>
+                      )}
+                      {internalOrders.length > 0 && (
+                        <li>{internalOrders.length} pedido(s) interno(s)</li>
+                      )}
+                    </ul>
+                    <p className="mt-2 text-destructive">
+                      Todos os registros associados também serão excluídos.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault()
+                handleDelete()
+              }}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Excluindo...
+                </>
+              ) : (
+                'Confirmar Exclusão'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

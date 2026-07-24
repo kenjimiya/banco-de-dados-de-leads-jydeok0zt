@@ -129,6 +129,20 @@ export const deletePurchase = async (id: string, leadId: string) => {
 }
 
 export const deleteLead = async (id: string) => {
+  const [purchases, proposals, techProposals, internalOrders] = await Promise.all([
+    pb.collection<Purchase>('purchases').getFullList({ filter: `lead_id = "${id}"` }),
+    pb.collection<Proposal>('proposals').getFullList({ filter: `lead_id = "${id}"` }),
+    pb
+      .collection<TechnicalProposal>('technical_proposals')
+      .getFullList({ filter: `lead_id = "${id}"` }),
+    pb.collection<InternalOrder>('internal_orders').getFullList({ filter: `lead_id = "${id}"` }),
+  ])
+  await Promise.all([
+    ...purchases.map((p) => pb.collection('purchases').delete(p.id)),
+    ...proposals.map((p) => pb.collection('proposals').delete(p.id)),
+    ...techProposals.map((p) => pb.collection('technical_proposals').delete(p.id)),
+    ...internalOrders.map((p) => pb.collection('internal_orders').delete(p.id)),
+  ])
   await pb.collection('leads').delete(id)
 }
 
