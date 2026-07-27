@@ -22,6 +22,8 @@ import {
   updateLead,
   getLead,
   getLeadProposals,
+  getProposal,
+  getTechnicalProposal,
   type Lead,
   type Proposal,
   type InternalOrder,
@@ -39,6 +41,7 @@ import { exportPiConsertoPDF } from '@/lib/pi-pdf-conserto'
 import { exportProductionPdfNovo } from '@/lib/pi-pdf-production-novo'
 import { exportProductionPdfConserto } from '@/lib/pi-pdf-production-conserto'
 import { ProductionItemsTable } from './production-items-table'
+import { ImportProposalsDialog } from './import-proposals-dialog'
 
 interface PiFormDialogProps {
   order?: InternalOrder | null
@@ -65,6 +68,12 @@ export function PiFormDialog({
   const [leadForm, setLeadForm] = useState<Record<string, string>>({})
   const [proposals, setProposals] = useState<Proposal[]>([])
   const [selectedProposalId, setSelectedProposalId] = useState('')
+  const [linkedPcsId, setLinkedPcsId] = useState('')
+  const [linkedTpIds, setLinkedTpIds] = useState<string[]>([])
+  const [linkedPcsProposal, setLinkedPcsProposal] = useState<Proposal | null>(null)
+  const [linkedTpProposals, setLinkedTpProposals] = useState<any[]>([])
+  const [importMode, setImportMode] = useState<'pcs' | 'pat'>('pcs')
+  const [importOpen, setImportOpen] = useState(false)
 
   useEffect(() => {
     if (!open) return
@@ -108,6 +117,10 @@ export function PiFormDialog({
       notes: order?.notes || '',
       production_notes: order?.production_notes || '',
     })
+    setLinkedPcsId(order?.pcs_id || '')
+    setLinkedTpIds(order?.technical_proposal_ids || [])
+    setLinkedPcsProposal((order?.expand as any)?.pcs_id || null)
+    setLinkedTpProposals((order?.expand as any)?.technical_proposal_ids || [])
   }, [open, order])
 
   useEffect(() => {
@@ -148,6 +161,37 @@ export function PiFormDialog({
   const set = (k: string, v: any) => setForm((p) => ({ ...p, [k]: v }))
   const setL = (k: string, v: string) => setLeadForm((p) => ({ ...p, [k]: v }))
 
+  const handleImportPcs = async (ids: string[]) => {
+    const newId = ids[0] || ''
+    setLinkedPcsId(newId)
+    if (newId) {
+      try {
+        const prop = await getProposal(newId)
+        setLinkedPcsProposal(prop)
+      } catch {
+        setLinkedPcsProposal(null)
+      }
+    } else {
+      setLinkedPcsProposal(null)
+    }
+    toast({ title: 'Proposta PCS vinculada com sucesso!' })
+  }
+
+  const handleImportPat = async (ids: string[]) => {
+    setLinkedTpIds(ids)
+    if (ids.length) {
+      try {
+        const tps = await Promise.all(ids.map((id) => getTechnicalProposal(id)))
+        setLinkedTpProposals(tps)
+      } catch {
+        setLinkedTpProposals([])
+      }
+    } else {
+      setLinkedTpProposals([])
+    }
+    toast({ title: `${ids.length} proposta(s) técnica(s) vinculada(s)!` })
+  }
+
   const importProposalItems = (proposalId: string) => {
     setSelectedProposalId(proposalId)
     const proposal = proposals.find((p) => p.id === proposalId)
@@ -167,12 +211,18 @@ export function PiFormDialog({
       'source_reference',
       `PCS: ${proposal.title}${proposal.revision ? ` Rev. ${proposal.revision}` : ''}`,
     )
+    setLinkedPcsId(proposalId)
+    setLinkedPcsProposal(proposal)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedLead) {
       toast({ title: 'Selecione um cliente', variant: 'destructive' })
+      return
+    }
+    if (!form.pi_number?.trim()) {
+      toast({ title: 'O número do PI é obrigatório', variant: 'destructive' })
       return
     }
     if (!leadForm.name?.trim()) {
@@ -223,6 +273,8 @@ export function PiFormDialog({
         source_reference: form.source_reference || '',
         notes: form.notes || '',
         production_notes: form.production_notes || '',
+        pcs_id: linkedPcsId || null,
+        technical_proposal_ids: linkedTpIds.length ? linkedTpIds : [],
         cliente_nome: leadForm.name || '',
         cliente_endereco: leadForm.address || '',
         cliente_cep: leadForm.cep || '',
@@ -277,6 +329,7 @@ export function PiFormDialog({
               <TabsTrigger value="items">Operação & Itens</TabsTrigger>
               <TabsTrigger value="finance">Financeiro & Logística</TabsTrigger>
               <TabsTrigger value="production">Produção</TabsTrigger>
+              <TabsTrigger value="proposals">Propostas</TabsTrigger>
             </TabsList>
 
             <TabsContent value="client" className="space-y-4">
@@ -356,11 +409,12 @@ export function PiFormDialog({
             <TabsContent value="items" className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-1.5">
-                  <Label>Nº do PI</Label>
+                  <Label>Nº do PI *</Label>
                   <Input
                     value={form.pi_number || ''}
                     onChange={(e) => set('pi_number', e.target.value)}
-                    placeholder="Gerado automaticamente"
+                    placeholder="Digite o número do PI"
+                    required
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -624,6 +678,102 @@ export function PiFormDialog({
                 </div>
               </div>
             </TabsContent>
+
+            <TabsContent value="proposals" className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">Propostas Comerciais (PCS)</h3>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setImportMode('pcs')
+                      setImportOpen(true)
+                    }}
+                  >
+                    Importar PCS
+                  </Button>
+                </div>
+                {linkedPcsProposal ? (
+                  <div className="flex items-center justify-between p-3 rounded-lg border bg-secondary/10">
+                    <div>
+                      <p className="font-medium">{linkedPcsProposal.title}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Rev. {linkedPcsProposal.revision || '00'} — {linkedPcsProposal.status}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive"
+                      onClick={() => {
+                        setLinkedPcsId('')
+                        setLinkedPcsProposal(null)
+                      }}
+                    >
+                      Remover
+                    </Button>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground py-4 text-center border rounded-lg border-dashed">
+                    Nenhuma proposta PCS vinculada.
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-3 pt-4 border-t">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">Propostas Técnicas (PAT)</h3>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setImportMode('pat')
+                      setImportOpen(true)
+                    }}
+                  >
+                    Importar PAT
+                  </Button>
+                </div>
+                {linkedTpProposals.length > 0 ? (
+                  <div className="space-y-2">
+                    {linkedTpProposals.map((tp: any) => (
+                      <div
+                        key={tp.id}
+                        className="flex items-center justify-between p-3 rounded-lg border bg-secondary/10"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium">{tp.proposal_number || 'Sem nº'}</p>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {tp.defect || 'Sem defeito'} — {tp.status}
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive shrink-0"
+                          onClick={() => {
+                            const newIds = linkedTpIds.filter((id) => id !== tp.id)
+                            setLinkedTpIds(newIds)
+                            setLinkedTpProposals((prev) => prev.filter((p: any) => p.id !== tp.id))
+                          }}
+                        >
+                          Remover
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground py-4 text-center border rounded-lg border-dashed">
+                    Nenhuma proposta PAT vinculada.
+                  </p>
+                )}
+              </div>
+            </TabsContent>
           </Tabs>
 
           <div className="space-y-1.5">
@@ -650,6 +800,8 @@ export function PiFormDialog({
                     items: items.filter((i) => i.description.trim()),
                     notes: form.notes || '',
                     production_notes: form.production_notes || '',
+                    pcs_id: linkedPcsId,
+                    technical_proposal_ids: linkedTpIds,
                     operation_type: form.operation_type,
                     conserto_invoice_number: form.conserto_invoice_number,
                     conserto_invoice_date: form.conserto_invoice_date,
@@ -701,6 +853,8 @@ export function PiFormDialog({
                     ...order,
                     items: items.filter((i) => i.description.trim()),
                     production_notes: form.production_notes || '',
+                    pcs_id: linkedPcsId,
+                    technical_proposal_ids: linkedTpIds,
                     operation_type: form.operation_type,
                     conserto_invoice_number: form.conserto_invoice_number,
                     conserto_invoice_date: form.conserto_invoice_date,
@@ -737,6 +891,13 @@ export function PiFormDialog({
             {isEdit ? 'Salvar Alterações' : 'Criar Pedido Interno'}
           </Button>
         </form>
+        <ImportProposalsDialog
+          open={importOpen}
+          onOpenChange={setImportOpen}
+          mode={importMode}
+          existingIds={importMode === 'pcs' ? (linkedPcsId ? [linkedPcsId] : []) : linkedTpIds}
+          onConfirm={importMode === 'pcs' ? handleImportPcs : handleImportPat}
+        />
       </DialogContent>
     </Dialog>
   )

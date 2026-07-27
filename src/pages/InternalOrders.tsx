@@ -93,6 +93,7 @@ export default function InternalOrders() {
                       <TableHead>Nº PI</TableHead>
                       <TableHead>Cliente</TableHead>
                       <TableHead>Referência</TableHead>
+                      <TableHead>Propostas</TableHead>
                       <TableHead>Operação</TableHead>
                       <TableHead>Entrega</TableHead>
                       <TableHead className="text-right">Valor Total</TableHead>
@@ -116,6 +117,25 @@ export default function InternalOrders() {
                         </TableCell>
                         <TableCell className="text-muted-foreground">
                           {o.expand?.pcs_id?.title || o.source_reference || '-'}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            {o.expand?.pcs_id && (
+                              <Badge variant="secondary" className="text-xs">
+                                PCS
+                              </Badge>
+                            )}
+                            {o.technical_proposal_ids?.length > 0 && (
+                              <Badge variant="outline" className="text-xs">
+                                PAT ({o.technical_proposal_ids.length})
+                              </Badge>
+                            )}
+                            {!o.expand?.pcs_id &&
+                              (!o.technical_proposal_ids ||
+                                o.technical_proposal_ids.length === 0) && (
+                                <span className="text-muted-foreground text-xs">-</span>
+                              )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Badge variant={o.operation_type === 'novo' ? 'default' : 'secondary'}>
@@ -166,7 +186,7 @@ export default function InternalOrders() {
                     ))}
                     {orders.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
+                        <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
                           <ClipboardList className="w-12 h-12 mx-auto mb-3 opacity-30" />
                           <p className="font-medium">Nenhum Pedido Interno gerado ainda.</p>
                           <p className="text-sm">

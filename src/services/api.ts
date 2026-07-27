@@ -173,6 +173,7 @@ export const updateProposal = (id: string, data: Partial<Proposal>) =>
   pb.collection<Proposal>('proposals').update(id, data)
 
 export const deleteProposal = (id: string) => pb.collection('proposals').delete(id)
+export const getProposal = (id: string) => pb.collection<Proposal>('proposals').getOne(id)
 
 export interface ReplacementPart {
   defect?: string
@@ -224,6 +225,8 @@ export const updateTechnicalProposal = (id: string, data: Partial<TechnicalPropo
 
 export const deleteTechnicalProposal = (id: string) =>
   pb.collection('technical_proposals').delete(id)
+export const getTechnicalProposal = (id: string) =>
+  pb.collection<TechnicalProposal>('technical_proposals').getOne(id)
 
 export interface InternalOrderItem {
   description: string
@@ -270,22 +273,26 @@ export interface InternalOrder extends RecordModel {
   cliente_uf: string
   cliente_bairro: string
   pcs_id: string
+  technical_proposal_ids: string[]
   production_notes: string
   expand?: {
     lead_id: Lead
     pcs_id: Proposal
+    technical_proposal_ids: TechnicalProposal[]
   }
 }
 
 export const getInternalOrders = () =>
   pb
     .collection<InternalOrder>('internal_orders')
-    .getFullList({ sort: '-created', expand: 'lead_id,pcs_id' })
+    .getFullList({ sort: '-created', expand: 'lead_id,pcs_id,technical_proposal_ids' })
 
 export const getLeadInternalOrders = (leadId: string) =>
-  pb
-    .collection<InternalOrder>('internal_orders')
-    .getFullList({ filter: `lead_id = "${leadId}"`, sort: '-created' })
+  pb.collection<InternalOrder>('internal_orders').getFullList({
+    filter: `lead_id = "${leadId}"`,
+    sort: '-created',
+    expand: 'pcs_id,technical_proposal_ids',
+  })
 
 export const createInternalOrder = (data: Partial<InternalOrder>) =>
   pb.collection<InternalOrder>('internal_orders').create(data)
