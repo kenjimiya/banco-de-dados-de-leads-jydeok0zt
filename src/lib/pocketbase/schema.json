@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-27T18:43:50.854Z",
+  "generatedAt": "2026-07-27T18:56:36.857Z",
   "collections": [
     {
       "name": "users",
@@ -29,14 +29,19 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
       "indexes": [
@@ -78,7 +83,12 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": ["novo", "morno", "quente", "cliente"]
+          "selectValues": [
+            "novo",
+            "morno",
+            "quente",
+            "cliente"
+          ]
         },
         {
           "name": "notes",
@@ -111,14 +121,19 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         },
         {
           "name": "uf",
@@ -235,14 +250,19 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         },
         {
           "name": "sale_type",
@@ -333,7 +353,12 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": ["rascunho", "enviado", "aceito", "recusado"]
+          "selectValues": [
+            "rascunho",
+            "enviado",
+            "aceito",
+            "recusado"
+          ]
         },
         {
           "name": "total_value",
@@ -352,14 +377,19 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         },
         {
           "name": "items",
@@ -404,7 +434,9 @@
           "system": false
         }
       ],
-      "indexes": ["CREATE INDEX idx_proposals_lead_id ON proposals (lead_id)"]
+      "indexes": [
+        "CREATE INDEX idx_proposals_lead_id ON proposals (lead_id)"
+      ]
     },
     {
       "name": "technical_proposals",
@@ -465,21 +497,31 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": ["rascunho", "enviado", "aceito", "recusado"]
+          "selectValues": [
+            "rascunho",
+            "enviado",
+            "aceito",
+            "recusado"
+          ]
         },
         {
           "name": "created",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         },
         {
           "name": "revision",
@@ -518,7 +560,9 @@
           "system": false
         }
       ],
-      "indexes": ["CREATE INDEX idx_technical_proposals_lead_id ON technical_proposals (lead_id)"]
+      "indexes": [
+        "CREATE INDEX idx_technical_proposals_lead_id ON technical_proposals (lead_id)"
+      ]
     },
     {
       "name": "internal_orders",
@@ -543,7 +587,10 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": ["novo", "conserto"]
+          "selectValues": [
+            "novo",
+            "conserto"
+          ]
         },
         {
           "name": "conserto_invoice_number",
@@ -628,21 +675,29 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": ["papelao", "madeira"]
+          "selectValues": [
+            "papelao",
+            "madeira"
+          ]
         },
         {
           "name": "created",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         },
         {
           "name": "pi_number",
