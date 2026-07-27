@@ -79,6 +79,9 @@ export function ProposalFormDialog({
       expiry_date: proposal?.expiry_date
         ? format(new Date(proposal.expiry_date), 'yyyy-MM-dd')
         : '',
+      document_date: proposal?.document_date
+        ? format(new Date(proposal.document_date), 'yyyy-MM-dd')
+        : '',
       payment_condition: proposal?.payment_condition || '28DDL',
       delivery_time: proposal?.delivery_time || 'A Combinar',
       composition: proposal?.composition || '',
@@ -110,6 +113,7 @@ export function ProposalFormDialog({
         status: form.status || 'rascunho',
         total_value: grandTotal,
         expiry_date: form.expiry_date ? new Date(form.expiry_date).toISOString() : '',
+        document_date: form.document_date ? new Date(form.document_date).toISOString() : '',
         items: items.filter((i) => i.description.trim()),
         payment_condition: form.payment_condition || '',
         delivery_time: form.delivery_time || '',
@@ -177,7 +181,7 @@ export function ProposalFormDialog({
             <Label>Itens da Proposta</Label>
             <ProposalItemsTable items={items} onChange={setItems} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1.5">
               <Label>Status</Label>
               <Select value={form.status} onValueChange={(v) => set('status', v)}>
@@ -198,6 +202,14 @@ export function ProposalFormDialog({
                 type="date"
                 value={form.expiry_date || ''}
                 onChange={(e) => set('expiry_date', e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Data do Documento</Label>
+              <Input
+                type="date"
+                value={form.document_date || ''}
+                onChange={(e) => set('document_date', e.target.value)}
               />
             </div>
           </div>

@@ -18,7 +18,9 @@ function buildTemplate(
 ): string {
   const accent = isConserto ? '#ea580c' : '#2563eb'
   const accentBg = isConserto ? '#fff7ed' : '#eff6ff'
-  const dateStr = new Date(order.created).toLocaleDateString('pt-BR')
+  const dateStr = (
+    order.document_date ? new Date(order.document_date) : new Date(order.created)
+  ).toLocaleDateString('pt-BR')
   const items = order.items || []
 
   const consertoSection = isConserto

@@ -121,7 +121,7 @@ ul{list-style:none}
     <div class="header-right">
       <div class="proposal-id">Nº ${proposalId}</div>
       <div class="proposal-meta">Revisão: ${proposal.revision || '00'}</div>
-      <div class="proposal-meta">Data: ${new Date().toLocaleDateString('pt-BR')}</div>
+      <div class="proposal-meta">Data: ${(proposal.document_date ? new Date(proposal.document_date) : new Date(proposal.created)).toLocaleDateString('pt-BR')}</div>
       <div style="height:12px"></div>
       <div class="contact-info"><strong>Eng. Mauro - Gerente Comercial</strong></div>
       <div class="contact-info">Tel: (41) 3385-8840 | sigma.producao@gmail.com</div>

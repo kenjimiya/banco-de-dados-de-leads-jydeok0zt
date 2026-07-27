@@ -102,6 +102,9 @@ export function PiFormDialog({
       pi_number: order?.pi_number || '',
       billing_date: order?.billing_date ? format(new Date(order.billing_date), 'yyyy-MM-dd') : '',
       source_reference: order?.source_reference || '',
+      document_date: order?.document_date
+        ? format(new Date(order.document_date), 'yyyy-MM-dd')
+        : '',
       notes: order?.notes || '',
       production_notes: order?.production_notes || '',
     })
@@ -216,6 +219,7 @@ export function PiFormDialog({
         packaging_type: form.packaging_type,
         pi_number: form.pi_number || '',
         billing_date: form.billing_date ? new Date(form.billing_date).toISOString() : '',
+        document_date: form.document_date ? new Date(form.document_date).toISOString() : '',
         source_reference: form.source_reference || '',
         notes: form.notes || '',
         production_notes: form.production_notes || '',
@@ -350,7 +354,7 @@ export function PiFormDialog({
             </TabsContent>
 
             <TabsContent value="items" className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-1.5">
                   <Label>Nº do PI</Label>
                   <Input
@@ -365,6 +369,14 @@ export function PiFormDialog({
                     type="date"
                     value={form.billing_date || ''}
                     onChange={(e) => set('billing_date', e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Data do Documento</Label>
+                  <Input
+                    type="date"
+                    value={form.document_date || ''}
+                    onChange={(e) => set('document_date', e.target.value)}
                   />
                 </div>
               </div>
@@ -654,6 +666,9 @@ export function PiFormDialog({
                     packaging_type: form.packaging_type,
                     pi_number: form.pi_number || '',
                     billing_date: form.billing_date,
+                    document_date: form.document_date
+                      ? new Date(form.document_date).toISOString()
+                      : '',
                     cliente_nome: leadForm.name || '',
                     cliente_endereco: leadForm.address || '',
                     cliente_cep: leadForm.cep || '',
@@ -690,6 +705,9 @@ export function PiFormDialog({
                     conserto_invoice_number: form.conserto_invoice_number,
                     conserto_invoice_date: form.conserto_invoice_date,
                     pi_number: form.pi_number || '',
+                    document_date: form.document_date
+                      ? new Date(form.document_date).toISOString()
+                      : '',
                     cliente_nome: leadForm.name || '',
                     cliente_endereco: leadForm.address || '',
                     cliente_cep: leadForm.cep || '',

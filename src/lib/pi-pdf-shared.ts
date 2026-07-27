@@ -37,7 +37,10 @@ export function extractPiData(order: InternalOrder, lead?: Lead): PiPdfData {
     leadPhone: order.cliente_telefone || ld?.phone || '---',
     leadEmail: order.cliente_email || ld?.email || '---',
     leadContact: order.cliente_contato || ld?.contact_name || '---',
-    dateStr: new Date(order.created).toLocaleDateString('pt-BR'),
+    dateStr: (order.document_date
+      ? new Date(order.document_date)
+      : new Date(order.created)
+    ).toLocaleDateString('pt-BR'),
     items: order.items || [],
     subtotal: (order.items || []).reduce((acc, i) => acc + (i.subtotal || 0), 0),
   }

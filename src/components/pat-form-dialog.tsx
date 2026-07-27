@@ -109,9 +109,7 @@ export function PatFormDialog({
       proposal_number: proposal?.proposal_number || '',
       revision: proposal?.revision || '00',
       invoice_number: proposal?.invoice_number || '',
-      date: proposal?.date
-        ? format(new Date(proposal.date), 'yyyy-MM-dd')
-        : format(new Date(), 'yyyy-MM-dd'),
+      date: proposal?.date ? format(new Date(proposal.date), 'yyyy-MM-dd') : '',
       status: proposal?.status || 'rascunho',
       payment_condition: proposal?.payment_condition || DEFAULT_TERMS.payment_condition,
       delivery_time: proposal?.delivery_time || DEFAULT_TERMS.delivery_time,
@@ -185,7 +183,7 @@ export function PatFormDialog({
             <LeadSelect value={selectedLead} onChange={setSelectedLead} />
           </div>
           {selectedLead && <LeadInfoCard lead={selectedLead} />}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="space-y-1.5">
               <Label>Nº Proposta</Label>
               <Input
@@ -203,6 +201,14 @@ export function PatFormDialog({
               />
             </div>
             <div className="space-y-1.5">
+              <Label>Data do Documento</Label>
+              <Input
+                type="date"
+                value={form.date || ''}
+                onChange={(e) => set('date', e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
               <Label>Status</Label>
               <Select value={form.status} onValueChange={(v) => set('status', v)}>
                 <SelectTrigger>
@@ -217,23 +223,13 @@ export function PatFormDialog({
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label>Nº Nota Fiscal (Remessa)</Label>
-              <Input
-                value={form.invoice_number || ''}
-                onChange={(e) => set('invoice_number', e.target.value)}
-                placeholder="Ex: 375928"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Data da Nota Fiscal</Label>
-              <Input
-                type="date"
-                value={form.date || ''}
-                onChange={(e) => set('date', e.target.value)}
-              />
-            </div>
+          <div className="space-y-1.5">
+            <Label>Nº Nota Fiscal (Remessa)</Label>
+            <Input
+              value={form.invoice_number || ''}
+              onChange={(e) => set('invoice_number', e.target.value)}
+              placeholder="Ex: 375928"
+            />
           </div>
 
           <div className="pt-2">
