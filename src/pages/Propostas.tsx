@@ -29,7 +29,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { format } from 'date-fns'
-import { FileText, MoreVertical, Pencil, Trash2, FileDown } from 'lucide-react'
+import { FileText, MoreVertical, Pencil, Trash2, FileDown, Upload } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -38,6 +38,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ProposalFormDialog } from '@/components/proposal-form-dialog'
+import { ImportDocumentDialog } from '@/components/import-document-dialog'
 import { exportProposalPDF } from '@/lib/proposal-pdf'
 import { useToast } from '@/hooks/use-toast'
 
@@ -56,6 +57,7 @@ export default function Propostas() {
   const [editOpen, setEditOpen] = useState(false)
   const [delTarget, setDelTarget] = useState<Proposal | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
 
   const loadData = async () => setProposals(await getProposals())
   useEffect(() => {
@@ -85,7 +87,12 @@ export default function Propostas() {
           </div>
           <h2 className="text-2xl font-bold">Propostas Comerciais (PCS)</h2>
         </div>
-        <ProposalFormDialog onSaved={loadData} />
+        <div className="flex items-center gap-2">
+          <Button variant="outline" className="rounded-xl" onClick={() => setImportOpen(true)}>
+            <Upload className="w-4 h-4 mr-2" /> Importar Documento
+          </Button>
+          <ProposalFormDialog onSaved={loadData} />
+        </div>
       </div>
 
       <Card className="border-none shadow-subtle overflow-hidden">
@@ -192,6 +199,13 @@ export default function Propostas() {
         open={editOpen}
         onOpenChange={setEditOpen}
         onSaved={loadData}
+      />
+
+      <ImportDocumentDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        mode="pcs"
+        onImported={loadData}
       />
 
       <AlertDialog open={!!delTarget} onOpenChange={(o) => !o && setDelTarget(null)}>

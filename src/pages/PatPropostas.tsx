@@ -34,7 +34,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { format } from 'date-fns'
-import { Wrench, MoreVertical, Pencil, Trash2, FileDown } from 'lucide-react'
+import { Wrench, MoreVertical, Pencil, Trash2, FileDown, Upload } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -43,6 +43,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { PatFormDialog } from '@/components/pat-form-dialog'
+import { ImportDocumentDialog } from '@/components/import-document-dialog'
 import { exportPatPDF } from '@/lib/pat-pdf'
 import { useToast } from '@/hooks/use-toast'
 import { fmtCurrency } from '@/lib/utils'
@@ -56,6 +57,7 @@ export default function PatPropostas() {
   const [deleting, setDeleting] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
 
   const loadData = async () => setProposals(await getTechnicalProposals())
   useEffect(() => {
@@ -122,7 +124,12 @@ export default function PatPropostas() {
               Excluir ({selectedIds.size})
             </Button>
           )}
-          <PatFormDialog onSaved={loadData} />
+          <div className="flex items-center gap-2">
+            <Button variant="outline" className="rounded-xl" onClick={() => setImportOpen(true)}>
+              <Upload className="w-4 h-4 mr-2" /> Importar Documento
+            </Button>
+            <PatFormDialog onSaved={loadData} />
+          </div>
         </div>
       </div>
 
@@ -246,6 +253,13 @@ export default function PatPropostas() {
         open={editOpen}
         onOpenChange={setEditOpen}
         onSaved={loadData}
+      />
+
+      <ImportDocumentDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        mode="pat"
+        onImported={loadData}
       />
 
       <AlertDialog open={!!delTarget} onOpenChange={(o) => !o && setDelTarget(null)}>
