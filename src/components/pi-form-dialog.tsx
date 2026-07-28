@@ -24,16 +24,16 @@ import {
   getLeadProposals,
   getProposal,
   getTechnicalProposal,
+  migrateItems,
   type Lead,
   type Proposal,
   type InternalOrder,
-  type InternalOrderItem,
+  type ProductionEquipment,
 } from '@/services/api'
 import { useToast } from '@/hooks/use-toast'
 import { Plus, Loader2, Hash, FileDown } from 'lucide-react'
 import { format } from 'date-fns'
 import { LeadSelect } from './lead-select'
-import { PiItemsTable } from './pi-items-table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { exportPiNovoPDF } from '@/lib/pi-pdf-novo'
@@ -63,7 +63,7 @@ export function PiFormDialog({
   const setOpen = onOpenChange ?? setInternalOpen
   const [saving, setSaving] = useState(false)
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
-  const [items, setItems] = useState<InternalOrderItem[]>([])
+  const [items, setItems] = useState<ProductionEquipment[]>([])
   const [form, setForm] = useState<Record<string, any>>({})
   const [leadForm, setLeadForm] = useState<Record<string, string>>({})
   const [proposals, setProposals] = useState<Proposal[]>([])
@@ -85,9 +85,18 @@ export function PiFormDialog({
     else setSelectedLead(null)
 
     setItems(
-      order?.items
-        ? order.items
-        : [{ description: '', quantity: 1, unit_price: 0, ncm: '', subtotal: 0 }],
+      order?.items && order.items.length > 0
+        ? migrateItems(order.items)
+        : [
+            {
+              serialNumber: '',
+              equipmentDate: '',
+              deliveryDate: '',
+              fileUrl: '',
+              fileName: '',
+              replacementItems: [{ description: '', quantity: 1, unitPrice: 0, total: 0 }],
+            },
+          ],
     )
 
     setForm({
@@ -154,7 +163,14 @@ export function PiFormDialog({
     setSelectedProposalId('')
   }, [selectedLead])
 
-  const itemsTotal = useMemo(() => items.reduce((s, i) => s + (i.subtotal || 0), 0), [items])
+  const itemsTotal = useMemo(
+    () =>
+      items.reduce(
+        (s, eq) => s + (eq.replacementItems?.reduce((rs, ri) => rs + (ri.total || 0), 0) || 0),
+        0,
+      ),
+    [items],
+  )
   const grandTotal =
     itemsTotal - (Number(form.discount_amount) || 0) + (Number(form.shipping_cost) || 0)
 
@@ -193,21 +209,26 @@ export function PiFormDialog({
   }
 
   const importProposalItems = (proposalId: string) => {
-    setSelectedProposalId(proposalId)
-    const proposal = proposals.find((p) => p.id === proposalId)
-    if (!proposal?.items?.length) return
-    setItems(
-      proposal.items
+  setSelectedProposalId(proposalId)
+  const proposal = proposals.find((p) => p.id === proposalId)
+  if (!proposal?.items?.length) return
+  setItems([
+    {
+      serialNumber: '',
+      equipmentDate: '',
+      deliveryDate: '',
+      fileUrl: '',
+      fileName: '',
+      replacementItems: proposal.items
         .filter((i) => i.description?.trim())
         .map((item) => ({
           description: item.description || '',
           quantity: item.quantity || 1,
-          unit_price: item.unit_price || 0,
-          ncm: '',
-          subtotal: (item.quantity || 1) * (item.unit_price || 0),
+          unitPrice: item.unit_price || 0,
+          total: (item.quantity || 1) * (item.unit_price || 0),
         })),
-    )
-    set(
+    },
+  ])    set(
       'source_reference',
       `PCS: ${proposal.title}${proposal.revision ? ` Rev. ${proposal.revision}` : ''}`,
     )
@@ -229,13 +250,36 @@ export function PiFormDialog({
       toast({ title: 'O nome do cliente é obrigatório', variant: 'destructive' })
       return
     }
-    const validItems = items.filter((i) => i.description?.trim())
-    if (validItems.length === 0) {
-      toast({ title: 'Adicione pelo menos um item ao pedido', variant: 'destructive' })
+    const validEquipments = items.filter((eq) => eq.serialNumber?.trim())
+    if (validEquipments.length === 0) {
+      toast({
+        title: 'Adicione pelo menos um equipamento com número de série',
+        variant: 'destructive',
+      })
       return
     }
-    const hasInvalidNumbers = validItems.some(
-      (i) => i.quantity <= 0 || i.unit_price < 0 || isNaN(i.quantity) || isNaN(i.unit_price),
+    const missingSerial = items.some((eq) => !eq.serialNumber?.trim())
+    if (missingSerial) {
+      toast({
+        title: 'Número de série é obrigatório para cada equipamento',
+        variant: 'destructive',
+      })
+      return
+    }
+    const emptyEquipment = items.some(
+      (eq) => !eq.replacementItems?.some((ri) => ri.description?.trim()),
+    )
+    if (emptyEquipment) {
+      toast({
+        title: 'Cada equipamento deve ter pelo menos um item de reposição',
+        variant: 'destructive',
+      })
+      return
+    }
+    const hasInvalidNumbers = items.some((eq) =>
+      eq.replacementItems?.some(
+        (ri) => ri.quantity <= 0 || ri.unitPrice < 0 || isNaN(ri.quantity) || isNaN(ri.unitPrice),
+      ),
     )
     if (hasInvalidNumbers) {
       toast({
@@ -255,7 +299,12 @@ export function PiFormDialog({
         conserto_invoice_date: form.conserto_invoice_date
           ? new Date(form.conserto_invoice_date).toISOString()
           : '',
-        items: items.filter((i) => i.description.trim()),
+        items: items
+          .filter((eq) => eq.serialNumber?.trim())
+          .map((eq) => ({
+            ...eq,
+            replacementItems: eq.replacementItems.filter((ri) => ri.description.trim()),
+          })),
         discount_amount: Number(form.discount_amount) || 0,
         shipping_cost: Number(form.shipping_cost) || 0,
         shipping_type: form.shipping_type || '',
@@ -324,7 +373,7 @@ export function PiFormDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <Tabs defaultValue="client" className="w-full">
-            <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 mb-4">
+            <TabsList className="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mb-4">
               <TabsTrigger value="client">Cliente</TabsTrigger>
               <TabsTrigger value="items">Operação & Itens</TabsTrigger>
               <TabsTrigger value="finance">Financeiro & Logística</TabsTrigger>
@@ -498,8 +547,10 @@ export function PiFormDialog({
               )}
 
               <div className="space-y-1.5 mt-4">
-                <Label className="font-semibold">Itens do Pedido</Label>
-                <PiItemsTable items={items} onChange={setItems} />
+                <Label className="font-semibold">
+                  Itens do Pedido (Equipamentos e Reposições)
+                </Label>
+                <ProductionItemsTable items={items} onChange={setItems} />
               </div>
             </TabsContent>
 
@@ -679,6 +730,19 @@ export function PiFormDialog({
               </div>
             </TabsContent>
 
+            <TabsContent value="production" className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="production_notes">Observações de Produção</Label>
+                <Textarea
+                  id="production_notes"
+                  value={form.production_notes || ''}
+                  onChange={(e) => set('production_notes', e.target.value)}
+                  placeholder="Observações específicas para a produção..."
+                  rows={5}
+                />
+              </div>
+            </TabsContent>
+
             <TabsContent value="proposals" className="space-y-4">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -797,7 +861,14 @@ export function PiFormDialog({
                 onClick={() => {
                   const updatedOrder = {
                     ...order,
-                    items: items.filter((i) => i.description.trim()),
+                    items: items
+                      .filter((eq) => eq.serialNumber?.trim())
+                      .map((eq) => ({
+                        ...eq,
+                        replacementItems: eq.replacementItems.filter((ri) =>
+                          ri.description.trim(),
+                        ),
+                      })),
                     notes: form.notes || '',
                     production_notes: form.production_notes || '',
                     pcs_id: linkedPcsId,
@@ -851,7 +922,14 @@ export function PiFormDialog({
                 onClick={() => {
                   const updatedOrder = {
                     ...order,
-                    items: items.filter((i) => i.description.trim()),
+                    items: items
+                      .filter((eq) => eq.serialNumber?.trim())
+                      .map((eq) => ({
+                        ...eq,
+                        replacementItems: eq.replacementItems.filter((ri) =>
+                          ri.description.trim(),
+                        ),
+                      })),
                     production_notes: form.production_notes || '',
                     pcs_id: linkedPcsId,
                     technical_proposal_ids: linkedTpIds,

@@ -228,6 +228,22 @@ export const deleteTechnicalProposal = (id: string) =>
 export const getTechnicalProposal = (id: string) =>
   pb.collection<TechnicalProposal>('technical_proposals').getOne(id)
 
+export interface ReplacementItem {
+  description: string
+  quantity: number
+  unitPrice: number
+  total: number
+}
+
+export interface ProductionEquipment {
+  serialNumber: string
+  equipmentDate: string
+  deliveryDate: string
+  fileUrl?: string
+  fileName?: string
+  replacementItems: ReplacementItem[]
+}
+
 export interface InternalOrderItem {
   description: string
   quantity: number
@@ -240,12 +256,32 @@ export interface InternalOrderItem {
   delivery_date?: string
 }
 
+export function migrateItems(items: any[]): ProductionEquipment[] {
+  if (!items || !Array.isArray(items) || items.length === 0) return []
+  if (items[0]?.replacementItems !== undefined) return items as ProductionEquipment[]
+  return [
+    {
+      serialNumber: '',
+      equipmentDate: '',
+      deliveryDate: '',
+      fileUrl: '',
+      fileName: '',
+      replacementItems: items.map((i) => ({
+        description: i.description || '',
+        quantity: i.quantity || 1,
+        unitPrice: i.unit_price || 0,
+        total: i.subtotal || 0,
+      })),
+    },
+  ]
+}
+
 export interface InternalOrder extends RecordModel {
   lead_id: string
   operation_type: 'novo' | 'conserto'
   conserto_invoice_number: string
   conserto_invoice_date: string
-  items: InternalOrderItem[]
+  items: ProductionEquipment[]
   discount_amount: number
   shipping_cost: number
   shipping_type: string

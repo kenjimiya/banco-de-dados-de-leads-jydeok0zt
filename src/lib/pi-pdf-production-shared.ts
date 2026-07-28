@@ -1,4 +1,4 @@
-import type { InternalOrder, Lead } from '@/services/api'
+import type { InternalOrder, Lead, ProductionEquipment } from '@/services/api'
 import logoSrc from '@/assets/logosigma-04ba5.jpg'
 
 export const getLogoUrl = () => new URL(logoSrc, window.location.href).href
@@ -12,7 +12,7 @@ export interface ProductionPdfData {
   leadUF: string
   leadCep: string
   dateStr: string
-  items: InternalOrder['items']
+  items: ProductionEquipment[]
 }
 
 export function extractProductionData(order: InternalOrder, lead?: Lead): ProductionPdfData {
@@ -41,19 +41,29 @@ export function openPrintWindow(html: string) {
   setTimeout(() => win.print(), 500)
 }
 
-export function buildProductionItemsHtml(items: InternalOrder['items']): string {
+export function buildProductionItemsHtml(items: ProductionEquipment[]): string {
   if (!items || items.length === 0) {
     return '<tr><td colspan="3" style="text-align:center;padding:10px">Nenhum item</td></tr>'
   }
-  return items
-    .map(
-      (item, index) => `<tr>
-      <td style="text-align:center">${index + 1}</td>
-      <td style="text-align:center">${item.quantity}</td>
-      <td>${item.description}</td>
-    </tr>`,
-    )
-    .join('')
+  let html = ''
+  let itemNum = 1
+  for (const eq of items) {
+    html += `<tr>
+      <td colspan="3" style="background:#eff6ff;font-weight:bold;padding:4px 6px;color:#1e40af">
+        Equipamento Série: ${eq.serialNumber || '---'}
+      </td>
+    </tr>`
+    if (eq.replacementItems && eq.replacementItems.length > 0) {
+      for (const ri of eq.replacementItems) {
+        html += `<tr>
+          <td style="text-align:center">${itemNum++}</td>
+          <td style="text-align:center">${ri.quantity}</td>
+          <td>${ri.description}</td>
+        </tr>`
+      }
+    }
+  }
+  return html
 }
 
 export function buildLogisticsHtml(order: InternalOrder, accent: string, accentBg: string): string {
@@ -65,23 +75,45 @@ export function buildLogisticsHtml(order: InternalOrder, accent: string, accentB
 </table>`
 }
 
-export function buildConsertoItemsHtml(items: InternalOrder['items']): string {
+export function buildConsertoItemsHtml(items: ProductionEquipment[]): string {
   if (!items || items.length === 0) {
     return '<tr><td colspan="7" style="text-align:center;padding:10px">Nenhum item</td></tr>'
   }
-  return items
-    .map(
-      (item, index) => `<tr>
-      <td style="text-align:center">${index + 1}</td>
-      <td style="text-align:center">${item.quantity}</td>
-      <td>${item.description || '-'}</td>
-      <td>${item.substitution || '-'}</td>
-      <td>${item.serial_number || '-'}</td>
-      <td style="text-align:center">${item.equipment_date ? new Date(item.equipment_date).toLocaleDateString('pt-BR') : '-'}</td>
-      <td style="text-align:center">${item.delivery_date ? new Date(item.delivery_date).toLocaleDateString('pt-BR') : '-'}</td>
-    </tr>`,
-    )
-    .join('')
+  let html = ''
+  let itemNum = 1
+  for (const eq of items) {
+    const eqDate = eq.equipmentDate ? new Date(eq.equipmentDate).toLocaleDateString('pt-BR') : '-'
+    const delDate = eq.deliveryDate ? new Date(eq.deliveryDate).toLocaleDateString('pt-BR') : '-'
+    html += `<tr>
+      <td colspan="7" style="background:#fff7ed;font-weight:bold;color:#9a3412;padding:4px 6px">
+        Equipamento Série: ${eq.serialNumber || '---'} | Data Eq.: ${eqDate} | Entrega: ${delDate}
+      </td>
+    </tr>`
+    if (eq.replacementItems && eq.replacementItems.length > 0) {
+      for (const ri of eq.replacementItems) {
+        html += `<tr>
+          <td style="text-align:center">${itemNum++}</td>
+          <td style="text-align:center">${ri.quantity}</td>
+          <td>${ri.description || '-'}</td>
+          <td>-</td>
+          <td>${eq.serialNumber || '-'}</td>
+          <td style="text-align:center">${eqDate}</td>
+          <td style="text-align:center">${delDate}</td>
+        </tr>`
+      }
+    } else {
+      html += `<tr>
+        <td style="text-align:center">${itemNum++}</td>
+        <td style="text-align:center">-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>${eq.serialNumber || '-'}</td>
+        <td style="text-align:center">${eqDate}</td>
+        <td style="text-align:center">${delDate}</td>
+      </tr>`
+    }
+  }
+  return html
 }
 
 export function buildSignaturesHtml(): string {
