@@ -16,27 +16,28 @@ export function exportPiNovoPDF(order: InternalOrder, lead?: Lead) {
 <title>PI - ${order.pi_number || order.id}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;font-size:12px;color:#000;padding:15px}
+body{font-family:Arial,sans-serif;font-size:14px;color:#000;padding:15px}
 .pi-header{text-align:center;border-bottom:2px solid #2563eb;padding-bottom:8px;margin-bottom:8px}
 .pi-header img{max-width:140px;margin:0 auto 4px}
 .pi-number{font-size:28px;font-weight:bold;color:#2563eb;margin-top:4px}
-.pi-op-type{font-size:13px;font-weight:bold;color:#1e40af;margin-top:4px;text-transform:uppercase}
-.pi-date{font-size:11px;color:#6b7280;margin-top:2px}
-.section-title{font-size:12px;font-weight:bold;color:#fff;background:#2563eb;padding:3px 8px;margin-bottom:4px;text-transform:uppercase;border-radius:2px}
-table{width:100%;border-collapse:collapse;margin-bottom:6px;font-size:12px}
+.pi-op-type{font-size:15px;font-weight:bold;color:#1e40af;margin-top:4px;text-transform:uppercase}
+.pi-date{font-size:13px;color:#6b7280;margin-top:2px}
+.section-title{font-size:15px;font-weight:bold;color:#fff;background:#2563eb;padding:3px 8px;margin-bottom:4px;text-transform:uppercase;border-radius:2px}
+table{width:100%;border-collapse:collapse;margin-bottom:6px;font-size:14px}
 table.info-table td{border:1px solid #ccc;padding:3px 6px}
 .label{font-weight:bold;color:#4b5563;width:80px;background:#f3f4f6}
 .tech-table td,.tech-table th{border:1px solid #ccc;padding:4px 6px}
 .tech-table th{background:#f3f4f6;font-weight:bold;color:#4b5563;text-align:left}
 .totals-row{font-weight:bold;background:#eff6ff}
 @page{size:A4;margin:8mm}
-@media print{body{padding:5px;font-size:11px}.pi-header img{max-width:100px}table{margin-bottom:4px}.section-title{padding:2px 6px;margin-bottom:2px}.info-table td{padding:2px 4px}.tech-table td,.tech-table th{padding:3px 4px}}
+@media print{body{padding:5px;font-size:13px}.pi-header img{max-width:100px}table{margin-bottom:4px}.section-title{padding:2px 6px;margin-bottom:2px}.info-table td{padding:2px 4px}.tech-table td,.tech-table th{padding:3px 4px}}
 </style></head><body>
 <div class="pi-header">
   <img src="${logoUrl}" alt="Sigma Transformadores" />
   ${order.pi_number ? `<div class="pi-number">Nº ${order.pi_number}</div>` : ''}
   <div class="pi-op-type">Tipo de Operação: Equipamento Novo</div>
   <div class="pi-date">Data: ${d.dateStr}</div>
+  ${d.billingDate ? `<div class="pi-date">Faturamento: ${d.billingDate}</div>` : ''}
 </div>
 <div class="section-title">Cliente</div>
 <table class="info-table">

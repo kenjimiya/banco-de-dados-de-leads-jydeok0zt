@@ -71,8 +71,8 @@ export function buildClientSection(info: LeadInfo, accent: string, accentBg: str
     )
     .join('')
 
-  return `<div style="font-size:10px;font-weight:bold;color:#fff;background:${accent};padding:3px 8px;margin-bottom:4px;text-transform:uppercase;border-radius:2px">Cliente</div>
-<table style="width:100%;border-collapse:collapse;margin-bottom:6px;font-size:10px">${rowsHtml}</table>`
+  return `<div style="font-size:13px;font-weight:bold;color:#fff;background:${accent};padding:3px 8px;margin-bottom:4px;text-transform:uppercase;border-radius:2px">Cliente</div>
+<table style="width:100%;border-collapse:collapse;margin-bottom:6px;font-size:12px">${rowsHtml}</table>`
 }
 
 export function buildTotalsSection(
@@ -81,10 +81,10 @@ export function buildTotalsSection(
   accent: string,
 ): string {
   const subtotal = items.reduce((acc, i) => acc + (i.subtotal || 0), 0)
-  return `<tr><td colspan="5" style="text-align:right;font-weight:bold;font-size:10px">SOMA DOS ITENS:</td><td style="text-align:right;font-weight:bold;font-size:10px">${fmtCurrency(subtotal)}</td></tr>
-<tr><td colspan="5" style="text-align:right;font-weight:bold;color:#ef4444;font-size:10px">DESCONTO:</td><td style="text-align:right;font-weight:bold;color:#ef4444;font-size:10px">- ${fmtCurrency(order.discount_amount || 0)}</td></tr>
-<tr><td colspan="5" style="text-align:right;font-weight:bold;color:#16a34a;font-size:10px">FRETE (${order.shipping_type || 'N/A'}):</td><td style="text-align:right;font-weight:bold;color:#16a34a;font-size:10px">+ ${fmtCurrency(order.shipping_cost || 0)}</td></tr>
-<tr style="font-weight:bold"><td colspan="5" style="text-align:right;font-size:12px">VALOR TOTAL:</td><td style="text-align:right;font-size:12px;color:${accent}">${fmtCurrency(order.total_value || 0)}</td></tr>`
+  return `<tr><td colspan="5" style="text-align:right;font-weight:bold;font-size:12px">SOMA DOS ITENS:</td><td style="text-align:right;font-weight:bold;font-size:12px">${fmtCurrency(subtotal)}</td></tr>
+<tr><td colspan="5" style="text-align:right;font-weight:bold;color:#ef4444;font-size:12px">DESCONTO:</td><td style="text-align:right;font-weight:bold;color:#ef4444;font-size:12px">- ${fmtCurrency(order.discount_amount || 0)}</td></tr>
+<tr><td colspan="5" style="text-align:right;font-weight:bold;color:#16a34a;font-size:12px">FRETE (${order.shipping_type || 'N/A'}):</td><td style="text-align:right;font-weight:bold;color:#16a34a;font-size:12px">+ ${fmtCurrency(order.shipping_cost || 0)}</td></tr>
+<tr style="font-weight:bold"><td colspan="5" style="text-align:right;font-size:14px">VALOR TOTAL:</td><td style="text-align:right;font-size:14px;color:${accent}">${fmtCurrency(order.total_value || 0)}</td></tr>`
 }
 
 export function buildLogisticsSection(
@@ -93,8 +93,8 @@ export function buildLogisticsSection(
   accentBg: string,
 ): string {
   const fmtDate = (d: string) => (d ? new Date(d).toLocaleDateString('pt-BR') : '-')
-  return `<div style="font-size:10px;font-weight:bold;color:#fff;background:${accent};padding:3px 8px;margin-bottom:4px;text-transform:uppercase;border-radius:2px">Logística e Financeiro</div>
-<table style="width:100%;border-collapse:collapse;margin-bottom:6px;font-size:10px">
+  return `<div style="font-size:13px;font-weight:bold;color:#fff;background:${accent};padding:3px 8px;margin-bottom:4px;text-transform:uppercase;border-radius:2px">Logística e Financeiro</div>
+<table style="width:100%;border-collapse:collapse;margin-bottom:6px;font-size:12px">
   <tr><td style="border:1px solid #ccc;padding:3px 6px;font-weight:bold;width:100px;background:${accentBg}">COND. PAG.:</td><td style="border:1px solid #ccc;padding:3px 6px">${order.payment_condition || '-'}</td><td style="border:1px solid #ccc;padding:3px 6px;font-weight:bold;width:80px;background:${accentBg}">ENTREGA:</td><td style="border:1px solid #ccc;padding:3px 6px">${fmtDate(order.delivery_date)}</td></tr>
   <tr><td style="border:1px solid #ccc;padding:3px 6px;font-weight:bold;background:${accentBg}">TRANSPORTADORA:</td><td colspan="3" style="border:1px solid #ccc;padding:3px 6px">${order.carrier_name || '-'}</td></tr>
   <tr><td style="border:1px solid #ccc;padding:3px 6px;font-weight:bold;background:${accentBg}">VOLUMES:</td><td style="border:1px solid #ccc;padding:3px 6px">${order.volumes_quantity || 1}</td><td style="border:1px solid #ccc;padding:3px 6px;font-weight:bold;background:${accentBg}">EMBALAGEM:</td><td style="border:1px solid #ccc;padding:3px 6px">${order.packaging_type === 'madeira' ? 'Madeira' : 'Papelão'}</td></tr>
@@ -104,6 +104,6 @@ export function buildLogisticsSection(
 
 export function buildNotesSection(notes: string, accent: string): string {
   if (!notes) return ''
-  return `<div style="font-size:10px;font-weight:bold;color:#fff;background:${accent};padding:3px 8px;margin-bottom:4px;text-transform:uppercase;border-radius:2px">Observações</div>
-<div style="border:1px solid #ccc;padding:4px 6px;margin-bottom:6px;min-height:30px;white-space:pre-wrap;font-size:10px">${notes}</div>`
+  return `<div style="font-size:13px;font-weight:bold;color:#fff;background:${accent};padding:3px 8px;margin-bottom:4px;text-transform:uppercase;border-radius:2px">Observações</div>
+<div style="border:1px solid #ccc;padding:4px 6px;margin-bottom:6px;min-height:30px;white-space:pre-wrap;font-size:12px">${notes}</div>`
 }
