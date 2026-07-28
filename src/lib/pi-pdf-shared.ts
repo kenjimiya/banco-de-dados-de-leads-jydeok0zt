@@ -19,6 +19,7 @@ export interface PiPdfData {
   leadEmail: string
   leadContact: string
   dateStr: string
+  billingDate: string
   items: InternalOrder['items']
   subtotal: number
 }
@@ -41,6 +42,7 @@ export function extractPiData(order: InternalOrder, lead?: Lead): PiPdfData {
       ? new Date(order.document_date)
       : new Date(order.created)
     ).toLocaleDateString('pt-BR'),
+    billingDate: order.billing_date ? new Date(order.billing_date).toLocaleDateString('pt-BR') : '',
     items: order.items || [],
     subtotal: (order.items || []).reduce((acc, i) => acc + (i.subtotal || 0), 0),
   }
