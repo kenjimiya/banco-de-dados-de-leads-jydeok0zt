@@ -209,26 +209,27 @@ export function PiFormDialog({
   }
 
   const importProposalItems = (proposalId: string) => {
-  setSelectedProposalId(proposalId)
-  const proposal = proposals.find((p) => p.id === proposalId)
-  if (!proposal?.items?.length) return
-  setItems([
-    {
-      serialNumber: '',
-      equipmentDate: '',
-      deliveryDate: '',
-      fileUrl: '',
-      fileName: '',
-      replacementItems: proposal.items
-        .filter((i) => i.description?.trim())
-        .map((item) => ({
-          description: item.description || '',
-          quantity: item.quantity || 1,
-          unitPrice: item.unit_price || 0,
-          total: (item.quantity || 1) * (item.unit_price || 0),
-        })),
-    },
-  ])    set(
+    setSelectedProposalId(proposalId)
+    const proposal = proposals.find((p) => p.id === proposalId)
+    if (!proposal?.items?.length) return
+    setItems([
+      {
+        serialNumber: '',
+        equipmentDate: '',
+        deliveryDate: '',
+        fileUrl: '',
+        fileName: '',
+        replacementItems: proposal.items
+          .filter((i) => i.description?.trim())
+          .map((item) => ({
+            description: item.description || '',
+            quantity: item.quantity || 1,
+            unitPrice: item.unit_price || 0,
+            total: (item.quantity || 1) * (item.unit_price || 0),
+          })),
+      },
+    ])
+    set(
       'source_reference',
       `PCS: ${proposal.title}${proposal.revision ? ` Rev. ${proposal.revision}` : ''}`,
     )
@@ -547,9 +548,7 @@ export function PiFormDialog({
               )}
 
               <div className="space-y-1.5 mt-4">
-                <Label className="font-semibold">
-                  Itens do Pedido (Equipamentos e Reposições)
-                </Label>
+                <Label className="font-semibold">Itens do Pedido (Equipamentos e Reposições)</Label>
                 <ProductionItemsTable items={items} onChange={setItems} />
               </div>
             </TabsContent>
@@ -865,9 +864,7 @@ export function PiFormDialog({
                       .filter((eq) => eq.serialNumber?.trim())
                       .map((eq) => ({
                         ...eq,
-                        replacementItems: eq.replacementItems.filter((ri) =>
-                          ri.description.trim(),
-                        ),
+                        replacementItems: eq.replacementItems.filter((ri) => ri.description.trim()),
                       })),
                     notes: form.notes || '',
                     production_notes: form.production_notes || '',
@@ -926,9 +923,7 @@ export function PiFormDialog({
                       .filter((eq) => eq.serialNumber?.trim())
                       .map((eq) => ({
                         ...eq,
-                        replacementItems: eq.replacementItems.filter((ri) =>
-                          ri.description.trim(),
-                        ),
+                        replacementItems: eq.replacementItems.filter((ri) => ri.description.trim()),
                       })),
                     production_notes: form.production_notes || '',
                     pcs_id: linkedPcsId,
